@@ -1,0 +1,208 @@
+---
+// HardwareDiagram.astro — Diagrama interactivo de la GPU
+// Muestra los componentes físicos, distancias y tiempos
+---
+
+<div class="gpu-diagram mb-8" id="gpu-diagram">
+  <h3 class="text-lg font-semibold text-neutral-900 mb-4 text-center">Arquitectura física de una GPU (RTX 4090)</h3>
+  
+  <div class="relative max-w-2xl mx-auto">
+    <!-- SVG Diagram -->
+    <svg viewBox="0 0 700 500" class="w-full h-auto">
+      
+      <!-- === PCB / Substrate (fondo) === -->
+      <rect x="20" y="20" width="660" height="460" rx="12" fill="#f5f5f4" stroke="#d6d3d1" stroke-width="2"/>
+      <text x="350" y="50" text-anchor="middle" font-size="11" fill="#78716c" font-family="system-ui">Placa de circuito (PCB) — ~20 cm × 20 cm</text>
+
+      <!-- === Chip GPU === -->
+      <rect x="200" y="140" width="300" height="220" rx="8" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+      <text x="350" y="170" text-anchor="middle" font-size="13" fill="#e2e8f0" font-weight="bold" font-family="system-ui">Chip GPU AD102</text>
+      <text x="350" y="190" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="system-ui">~3 cm × 3 cm</text>
+
+      <!-- L2 Cache -->
+      <rect x="215" y="210" width="270" height="30" rx="4" fill="#3b82f6" opacity="0.8"/>
+      <text x="350" y="229" text-anchor="middle" font-size="10" fill="white" font-family="system-ui">L2 Cache — 72 MB (SRAM en el chip)</text>
+
+      <!-- SM blocks -->
+      <rect x="215" y="255" width="40" height="85" rx="3" fill="#10b981" opacity="0.8"/>
+      <rect x="262" y="255" width="40" height="85" rx="3" fill="#10b981" opacity="0.8"/>
+      <rect x="309" y="255" width="40" height="85" rx="3" fill="#10b981" opacity="0.8"/>
+      <rect x="356" y="255" width="40" height="85" rx="3" fill="#10b981" opacity="0.8"/>
+      <rect x="403" y="255" width="40" height="85" rx="3" fill="#10b981" opacity="0.8"/>
+      <rect x="450" y="255" width="35" height="85" rx="3" fill="#10b981" opacity="0.8"/>
+
+      <text x="350" y="280" text-anchor="middle" font-size="7" fill="white" font-family="system-ui">128 SM ×</text>
+      <text x="350" y="294" text-anchor="middle" font-size="7" fill="white" font-family="system-ui">128 CUDA</text>
+      <text x="350" y="308" text-anchor="middle" font-size="7" fill="white" font-family="system-ui">+ 4 Tensor</text>
+      <text x="350" y="322" text-anchor="middle" font-size="7" fill="white" font-family="system-ui">c/SM</text>
+      <text x="350" y="338" text-anchor="middle" font-size="7" fill="white" font-family="system-ui">L1: 16 MB</text>
+
+      <!-- === VRAM Chips === -->
+      <!-- Top row -->
+      <rect x="200" y="70" width="52" height="40" rx="4" fill="#7c3aed" opacity="0.7"/>
+      <text x="226" y="88" text-anchor="middle" font-size="7" fill="white" font-family="monospace">GDDR6X</text>
+      <text x="226" y="100" text-anchor="middle" font-size="6" fill="#ddd6fe" font-family="monospace">2 GB</text>
+      
+      <rect x="270" y="70" width="52" height="40" rx="4" fill="#7c3aed" opacity="0.7"/>
+      <text x="296" y="88" text-anchor="middle" font-size="7" fill="white" font-family="monospace">GDDR6X</text>
+      <text x="296" y="100" text-anchor="middle" font-size="6" fill="#ddd6fe" font-family="monospace">2 GB</text>
+
+      <rect x="340" y="70" width="52" height="40" rx="4" fill="#7c3aed" opacity="0.7"/>
+      <text x="366" y="88" text-anchor="middle" font-size="7" fill="white" font-family="monospace">GDDR6X</text>
+      <text x="366" y="100" text-anchor="middle" font-size="6" fill="#ddd6fe" font-family="monospace">2 GB</text>
+
+      <rect x="410" y="70" width="52" height="40" rx="4" fill="#7c3aed" opacity="0.7"/>
+      <text x="436" y="88" text-anchor="middle" font-size="7" fill="white" font-family="monospace">GDDR6X</text>
+      <text x="436" y="100" text-anchor="middle" font-size="6" fill="#ddd6fe" font-family="monospace">2 GB</text>
+
+      <!-- Bottom row -->
+      <rect x="200" y="390" width="52" height="40" rx="4" fill="#7c3aed" opacity="0.7"/>
+      <text x="226" y="408" text-anchor="middle" font-size="7" fill="white" font-family="monospace">GDDR6X</text>
+      <text x="226" y="420" text-anchor="middle" font-size="6" fill="#ddd6fe" font-family="monospace">2 GB</text>
+      
+      <rect x="270" y="390" width="52" height="40" rx="4" fill="#7c3aed" opacity="0.7"/>
+      <rect x="340" y="390" width="52" height="40" rx="4" fill="#7c3aed" opacity="0.7"/>
+      <rect x="410" y="390" width="52" height="40" rx="4" fill="#7c3aed" opacity="0.7"/>
+
+      <text x="350" y="418" text-anchor="middle" font-size="7" fill="#ddd6fe" font-family="monospace">12 chips × 2 GB = 24 GB VRAM</text>
+
+      <!-- === Bus connections (líneas entre chip y VRAM) === -->
+      <line x1="226" y1="110" x2="226" y2="140" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="296" y1="110" x2="296" y2="140" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="366" y1="110" x2="366" y2="140" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="436" y1="110" x2="436" y2="140" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+      
+      <line x1="226" y1="390" x2="226" y2="360" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="296" y1="390" x2="296" y2="360" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="366" y1="390" x2="366" y2="360" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="436" y1="390" x2="436" y2="360" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+      <!-- Bus label -->
+      <text x="475" y="260" font-size="9" fill="#d97706" font-family="system-ui">
+        <tspan x="475" dy="0" font-weight="bold">Bus: 384 bits</tspan>
+        <tspan x="475" dy="14">Cada línea = 32 bits</tspan>
+        <tspan x="475" dy="14">12 chips × 32 = 384</tspan>
+      </text>
+
+      <!-- === Annotations with distances === -->
+      <g class="annotation-group">
+        <!-- Distance arrow chip↔VRAM -->
+        <line x1="350" y1="125" x2="350" y2="70" stroke="#ef4444" stroke-width="1" marker-end="url(#arrowhead)"/>
+        <rect x="310" y="80" width="80" height="18" rx="3" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
+        <text x="350" y="93" text-anchor="middle" font-size="8" fill="#dc2626" font-family="system-ui">~2 cm físicos</text>
+        
+        <line x1="400" y1="125" x2="400" y2="70" stroke="#ef4444" stroke-width="1"/>
+        <rect x="410" y="72" width="95" height="28" rx="3" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
+        <text x="457" y="84" text-anchor="middle" font-size="7" fill="#dc2626" font-family="system-ui">Señal: ~70% velocidad luz</text>
+        <text x="457" y="95" text-anchor="middle" font-size="7" fill="#dc2626" font-family="system-ui">= ~0.1 ns por cm</text>
+      </g>
+
+      <!-- Arrowhead marker -->
+      <defs>
+        <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
+          <polygon points="0,0 6,2 0,4" fill="#ef4444"/>
+        </marker>
+      </defs>
+    </svg>
+
+    <!-- === Interactive info cards === -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+      <div class="info-card chip-card p-3 rounded-xl border cursor-pointer transition-all hover:shadow-md" data-target="chip">
+        <div class="flex items-center gap-2 mb-1">
+          <div class="w-3 h-3 rounded-sm bg-slate-800"></div>
+          <span class="text-sm font-semibold text-neutral-900">🔲 Chip GPU</span>
+        </div>
+        <p class="text-xs text-neutral-600">Aquí se hacen las cuentas. Contiene 128 SM con CUDA Cores y Tensor Cores.</p>
+        <div class="chip-details hidden mt-2 text-xs text-neutral-500 space-y-1">
+          <p>• Tamaño: ~3 cm × 3 cm</p>
+          <p>• Reloj: 2.23 GHz → 1 ciclo = 0.45 ns</p>
+          <p>• Luz en 1 ciclo: 13.5 cm</p>
+          <p>• Señal en 1 ciclo: ~9 cm</p>
+          <p>• Caché L1+L2: ~88 MB (SRAM, en el chip)</p>
+        </div>
+      </div>
+
+      <div class="info-card vram-card p-3 rounded-xl border cursor-pointer transition-all hover:shadow-md" data-target="vram">
+        <div class="flex items-center gap-2 mb-1">
+          <div class="w-3 h-3 rounded-sm bg-purple-700"></div>
+          <span class="text-sm font-semibold text-neutral-900">💾 VRAM (HBM/GDDR)</span>
+        </div>
+        <p class="text-xs text-neutral-600">Aquí viven los pesos del modelo. 12 chips alrededor del chip GPU.</p>
+        <div class="vram-details hidden mt-2 text-xs text-neutral-500 space-y-1">
+          <p>• 12 chips × 2 GB = 24 GB total</p>
+          <p>• Cada chip conectado por 32 cables (bits)</p>
+          <p>• Bus total: 12 × 32 = 384 bits</p>
+          <p>• Distancia al chip: ~2 cm</p>
+          <p>• Tiempo de ida y vuelta: ~200 ciclos</p>
+        </div>
+      </div>
+
+      <div class="info-card bus-card p-3 rounded-xl border cursor-pointer transition-all hover:shadow-md" data-target="bus">
+        <div class="flex items-center gap-2 mb-1">
+          <div class="w-3 h-3 rounded-sm bg-amber-500"></div>
+          <span class="text-sm font-semibold text-neutral-900">🔌 Bus de memoria</span>
+        </div>
+        <p class="text-xs text-neutral-600">Los cables que conectan VRAM con chip. Por aquí viajan los pesos.</p>
+        <div class="bus-details hidden mt-2 text-xs text-neutral-500 space-y-1">
+          <p>• 384 cables paralelos (bits de ancho)</p>
+          <p>• Cada cable: 21 Gbps (GDDR6X)</p>
+          <p>• Ancho de banda: 1008 GB/s</p>
+          <p>• Por el bus viajan los PESOS (no activaciones)</p>
+          <p>• ~13 GB viajan por token generado</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- === Timeline visualization === -->
+    <div class="mt-6 p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+      <h4 class="text-sm font-semibold text-neutral-900 mb-3">⏱️ Línea de tiempo: cargar 4 bytes desde VRAM</h4>
+      <div class="relative">
+        <!-- Timeline bar -->
+        <div class="h-8 bg-neutral-200 rounded-full overflow-hidden flex">
+          <div class="timeline-segment relative" style="width: 5%" title="Dirección viaja por bus">
+            <div class="h-full bg-blue-400"></div>
+            <span class="absolute -top-4 text-[9px] text-blue-600 whitespace-nowrap">Dir: 10 ciclos</span>
+          </div>
+          <div class="timeline-segment relative" style="width: 40%" title="VRAM busca datos (CAS latency)">
+            <div class="h-full bg-purple-400"></div>
+            <span class="absolute -top-4 text-[9px] text-purple-600 whitespace-nowrap">VRAM busca: 80 ciclos</span>
+          </div>
+          <div class="timeline-segment relative" style="width: 30%" title="Datos viajan por bus">
+            <div class="h-full bg-amber-400"></div>
+            <span class="absolute -top-4 text-[9px] text-amber-600 whitespace-nowrap">Datos viajan: 50 ciclos</span>
+          </div>
+          <div class="timeline-segment relative" style="width: 20%" title="Pasan por L2 → L1 → Registros">
+            <div class="h-full bg-green-400"></div>
+            <span class="absolute -top-4 text-[9px] text-green-600 whitespace-nowrap">Cachés: 60 ciclos</span>
+          </div>
+          <div class="timeline-segment relative" style="width: 5%" title="Multiplicación">
+            <div class="h-full bg-red-400"></div>
+            <span class="absolute -top-4 text-[9px] text-red-600 whitespace-nowrap">Mul: 2 ciclos</span>
+          </div>
+        </div>
+        <p class="text-xs text-neutral-500 mt-6">Total: ~202 ciclos ≈ 91 ns. Solo 2 ciclos (~1%) se usan realmente para multiplicar.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // Toggle details on card click
+    document.querySelectorAll('.info-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var details = card.querySelector('[class*="-details"]');
+        if (details) {
+          var isHidden = details.classList.contains('hidden');
+          // Hide all others
+          document.querySelectorAll('[class*="-details"]').forEach(function(d) {
+            d.classList.add('hidden');
+          });
+          if (isHidden) {
+            details.classList.remove('hidden');
+          }
+        }
+      });
+    });
+  })();
+</script>

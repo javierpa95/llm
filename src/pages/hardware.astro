@@ -1,457 +1,466 @@
 ---
 import DocLayout from '../layouts/DocLayout.astro'
 import LevelTabs from '../components/content/LevelTabs.astro'
+import HardwareDiagram from '../components/content/HardwareDiagram.astro'
 import InfoBox from '../components/content/InfoBox.vue'
 ---
 
 <DocLayout
   title="Hardware"
-  description="Dónde viven los pesos, cómo se mueven por los cables, por qué hay que transportarlos a cada multiplicación y cómo el bus limita la velocidad."
+  description="Desde el ciclo de reloj hasta el bus de memoria: cómo funciona físicamente una GPU al ejecutar un LLM."
   currentPath="/hardware"
   :sections={[
-    { id: 'modelo-fisico', label: 'Qué se mueve y por qué', level: 'beginner' },
-    { id: 'bus-memoria', label: 'La autopista de datos', level: 'deep' },
-    { id: 'jerarquia', label: 'Jerarquía de memoria', level: 'advanced' },
-    { id: 'memory-wall', label: 'Memory Wall', level: 'deep' },
+    { id: 'reloj-distancias', label: 'Ciclo de reloj y distancias', level: 'beginner' },
+    { id: 'componentes-gpu', label: 'Componentes de la GPU', level: 'beginner' },
+    { id: 'flujo-datos', label: 'El viaje de los pesos', level: 'deep' },
+    { id: 'memory-bound', label: 'El cuello de botella', level: 'advanced' },
   ]}
 >
   <h1 class="text-3xl font-bold text-neutral-900 mb-2">🔌 Hardware: la realidad física</h1>
   <p class="text-lg text-neutral-600 mb-8">
-    Los pesos de un LLM son solo números en una memoria. Pero para que sirvan de algo, esos números tienen que viajar físicamente a través de cables de silicio a los sitios donde se hacen las cuentas. Y eso tiene un coste en tiempo.
+    Todo lo que hace un LLM —cada multiplicación, cada token— se traduce al final en señales eléctricas viajando por cables de silicio a velocidades finitas. Esta página explica <strong>qué hay físicamente</strong> dentro de la GPU y <strong>por qué los datos tardan lo que tardan</strong>.
   </p>
 
-  <!-- ====== MODELO FÍSICO: QUÉ SE MUEVE Y POR QUÉ ====== -->
-  <section id="modelo-fisico" class="content-section">
-    <h2 class="text-2xl font-bold text-neutral-900 mb-4">¿Qué se mueve y por qué?</h2>
+  <!-- ====== CICLO DE RELOJ Y DISTANCIAS ====== -->
+  <section id="reloj-distancias" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">⏱️ El ciclo de reloj: el latido de la GPU</h2>
     <LevelTabs>
       <Fragment slot="beginner">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">El problema: los pesos no se multiplican solos</h3>
-        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-6">
-          <p class="text-sm text-amber-800">
-            ❓ <strong>Tu pregunta:</strong> "Si el modelo son pesos que se multiplican, ¿por qué hay que mover todo el modelo?"
-            <br><br>
-            ✅ <strong>Respuesta:</strong> Porque los pesos están guardados en la VRAM, pero las multiplicaciones se hacen en los núcleos de la GPU. La VRAM y los núcleos <strong>no están en el mismo sitio físico</strong>. Los pesos tienen que viajar de un lado a otro cada vez que se usan.
-          </p>
-        </div>
-
-        <div class="grid gap-4 md:grid-cols-2 mb-6">
-          <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
-            <p class="text-sm font-semibold text-neutral-800 mb-2">🔴 VRAM (HBM, GDDR)</p>
-            <p class="text-xs text-neutral-600">Aquí viven los pesos. Es un almacén grande y lejano (~200 ciclos de distancia).</p>
-            <p class="text-xs text-neutral-500 mt-1">Capacidad: 8-80 GB<br>Velocidad: 1-3 TB/s</p>
-          </div>
-          <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
-            <p class="text-sm font-semibold text-green-800 mb-2">🟢 Chip GPU (núcleos)</p>
-            <p class="text-xs text-green-700">Aquí se hacen las multiplicaciones. Es una fábrica rápida pero con poca memoria.</p>
-            <p class="text-xs text-green-600 mt-1">Caché total: ~50-80 MB<br>Velocidad: ~30-50 TB/s</p>
-          </div>
-        </div>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">1. ¿Qué es un ciclo de reloj?</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Imagina un metrónomo dando 2.23 mil millones de pulsos por segundo. Eso es el <strong>reloj de la GPU</strong>. Cada pulso es un <strong>ciclo</strong>. En cada ciclo pueden ocurrir cosas:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-neutral-700 mb-4">
+          <li>Una señal eléctrica avanza por un cable</li>
+          <li>Un núcleo empieza una multiplicación</li>
+          <li>Un dato se lee de la caché</li>
+        </ul>
 
         <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-6">
           <p class="text-sm text-blue-800">
-            💡 <strong>Analogía: una cocina y una despensa</strong>
+            💡 <strong>RTX 4090: 2.23 GHz</strong> → 1 ciclo = <strong>0.45 nanosegundos</strong> (ns).
             <br><br>
-            La VRAM es tu despensa. Los núcleos son la cocina. Los pesos son los ingredientes.
+            En 0.45 ns, la luz recorre <strong>13.5 centímetros</strong>. La señal eléctrica en un cable de cobre es más lenta (~70% de la velocidad de la luz), así que recorre <strong>~9 centímetros por ciclo</strong>.
             <br><br>
-            No puedes cocinar (multiplicar) dentro de la despensa. Tienes que <strong>llevar los ingredientes a la cocina</strong> cada vez que cocinas. Y la cocina es pequeña — no caben todos los ingredientes del mes. Tienes que ir y volver muchas veces.
+            El chip de la GPU mide ~3 cm. La señal lo cruza en ~0.3 ciclos.
             <br><br>
-            El <strong>bus de memoria</strong> es el pasillo entre la despensa y la cocina. Cuanto más ancho sea, más ingredientes caben por viaje.
+            Pero la VRAM está a ~2 cm del chip. Ida + vuelta = 4 cm ≈ medio ciclo si fuera en línea recta... pero no lo es.
           </p>
         </div>
 
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">El flujo real para 1 token</h3>
-        <div class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-sm font-mono mb-4">
-          <p class="text-neutral-300 text-xs mb-2">/* Una capa Transformer. Esto se repite 32 veces para LLaMA 7B */</p>
-          <p><span class="text-blue-300">1. Leer W_Q</span> <span class="text-neutral-500">/* 4096×4096 = 33 MB desde VRAM → Registros */</span></p>
-          <p><span class="text-green-300">2. Multiplicar: Q = x × W_Q</span> <span class="text-neutral-500">/* en los núcleos */</span></p>
-          <p><span class="text-blue-300">3. Leer W_K</span> <span class="text-neutral-500">/* otros 33 MB desde VRAM */</span></p>
-          <p><span class="text-green-300">4. Multiplicar: K = x × W_K</span></p>
-          <p><span class="text-blue-300">5. Leer W_V</span> <span class="text-neutral-500">/* otros 33 MB */</span></p>
-          <p><span class="text-green-300">6. Multiplicar: V = x × W_V</span></p>
-          <p><span class="text-blue-300">7. Leer W_O</span> <span class="text-neutral-500">/* 33 MB más */</span></p>
-          <p>...</p>
-          <p><span class="text-blue-300">8. Leer W_gate, W_up, W_down</span> <span class="text-neutral-500">/* 3 × 33 MB = 99 MB */</span></p>
-          <p class="text-neutral-400 text-xs mt-3">/* Total por capa: ~265 MB leídos desde VRAM */</p>
-          <p class="text-neutral-400 text-xs">/* 32 capas: ~8.5 GB por cada token generado */</p>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">2. El mapa físico de la GPU</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Una GPU tiene una jerarquía física muy clara. Visualmente:
+        </p>
+
+        <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-mono text-xs mb-6">
+          <p class="mb-2">🔲 <span class="text-blue-600 font-semibold">Chip GPU (3×3 cm)</span> — aquí están los núcleos que multiplican</p>
+          <p class="ml-4 mb-1">├─ 128 SM (Streaming Multiprocessors)</p>
+          <p class="ml-6 mb-1">├─ 16,384 CUDA Cores (matemáticas generales)</p>
+          <p class="ml-6 mb-1">├─ 512 Tensor Cores (matemáticas matriciales → las que usa el LLM)</p>
+          <p class="ml-4 mb-1">├─ L1 Cache: 16 MB (SRAM, dentro del chip)</p>
+          <p class="ml-4 mb-2">├─ L2 Cache: 72 MB (SRAM, también en el chip)</p>
+          <p class="mb-2">🔌 <span class="text-amber-600 font-semibold">Bus de memoria (384 bits)</span> — cables que conectan chip con VRAM</p>
+          <p class="ml-4 mb-1">├─ 12 pares de cables de 32 bits cada uno</p>
+          <p class="ml-4 mb-2">├─ ~2 cm de longitud por cable</p>
+          <p class="mb-2">💾 <span class="text-purple-600 font-semibold">VRAM (24 GB)</span> — 12 chips GDDR6X alrededor del chip</p>
+          <p class="ml-4 mb-1">├─ Cada chip: 2 GB, ~5×5 mm</p>
+          <p class="ml-4 mb-1">├─ Colocados en anillo alrededor del chip GPU</p>
+          <p class="ml-4">├─ Comunicación a través del bus de 384 bits</p>
         </div>
 
-        <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
-          <p class="text-sm text-green-800">
-            🟢 <strong>Resumen:</strong> Por cada token que genera el modelo, la GPU tiene que leer ~8.5 GB de pesos desde la VRAM. Esos 8.5 GB viajan por el bus de memoria. El bus tiene una velocidad máxima (ancho de banda). Por eso, aunque la GPU pueda hacer billones de operaciones por segundo, <strong>el límite real es la velocidad a la que los pesos llegan a los núcleos</strong>.
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">3. ¿Por qué 200 ciclos para leer de VRAM?</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Cuando un núcleo necesita un peso que está en VRAM, pasa esto:
+        </p>
+        <ol class="list-decimal list-inside space-y-3 text-neutral-700 mb-4">
+          <li><strong>~10 ciclos:</strong> la dirección de memoria viaja desde el núcleo hasta la VRAM por el bus de direcciones (~2 cm de ida, señal a 9 cm/ciclo)</li>
+          <li><strong>~80 ciclos:</strong> la VRAM busca el dato en su interior (CAS latency — es el tiempo que tarda en encontrar la fila y columna correcta dentro del chip de memoria, como buscar un libro en una estantería)</li>
+          <li><strong>~50 ciclos:</strong> el dato (4 bytes) viaja de vuelta por el bus de datos (~2 cm de vuelta, más el tiempo de sincronización entre relojes distintos)</li>
+          <li><strong>~60 ciclos:</strong> el dato pasa por L2 Cache, L1 Cache, y llega a los registros del núcleo (atravesando el chip)</li>
+        </ol>
+
+        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+          <p class="text-sm text-yellow-800">
+            ⚠️ <strong>¿Por qué 200 ciclos para 2 cm?</strong> Porque no es solo la distancia. La VRAM es un chip separado con su propio reloj, más lento que el de la GPU (la GDDR6X corre a ~2.6 GHz, la GPU a 2.23 GHz — pero no están sincronizados). Además, la VRAM está optimizada para <strong>capacidad</strong> (24 GB) y <strong>ancho de banda</strong>, no para velocidad de acceso individual. Cada petición tiene que negociar el bus, esperar su turno, y luego buscar físicamente los datos dentro del chip de memoria.
+            <br><br>
+            Es como pedir un libro en una biblioteca enorme: aunque estés a 2 metros de la estantería, el bibliotecario tiene que mirar el catálogo, ir a la estantería, encontrar la sección, buscar el libro, y traerlo.
           </p>
         </div>
       </Fragment>
 
       <Fragment slot="deep">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Capa por capa: el flujo de datos en inferencia</h3>
-        <p class="text-neutral-700 leading-relaxed mb-4">
-          Cuando el modelo genera un token, los pesos no se mueven todos a la vez. Se mueven <strong>capa por capa</strong>, en oleadas. La caché del chip (L1+L2) solo tiene ~50 MB, y los pesos de una sola capa ya ocupan cientos de MB. Así que cada capa requiere una carga completa desde VRAM.
-        </p>
-
-        <h4 class="text-md font-semibold text-neutral-900 mb-2">Cálculo exacto: pesos leídos por token</h4>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Tiempos de acceso en detalle</h3>
         <div class="overflow-x-auto mb-4">
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-neutral-100">
-                <th class="px-3 py-2 text-left font-medium text-neutral-700">Modelo</th>
-                <th class="px-3 py-2 text-right font-medium text-neutral-700">Pesos totales</th>
-                <th class="px-3 py-2 text-left font-medium text-neutral-700">Precisión</th>
-                <th class="px-3 py-2 text-right font-medium text-neutral-700">Leídos/token</th>
-                <th class="px-3 py-2 text-left font-medium text-neutral-700">¿Por qué?</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Operación</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">Ciclos</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">Tiempo real</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Distancia equivalente</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-neutral-200">
-              <tr><td class="px-3 py-2">7B</td><td class="px-3 py-2 text-right">6.7B</td><td class="px-3 py-2">FP16</td><td class="px-3 py-2 text-right">~13.4 GB</td><td class="px-3 py-2 text-xs">Cada capa se lee completa en cada forward</td></tr>
-              <tr><td class="px-3 py-2">7B Q4</td><td class="px-3 py-2 text-right">6.7B</td><td class="px-3 py-2">INT4</td><td class="px-3 py-2 text-right">~3.8 GB</td><td class="px-3 py-2 text-xs">Cuantizado → 4× menos datos que FP16</td></tr>
-              <tr><td class="px-3 py-2">70B</td><td class="px-3 py-2 text-right">~70B</td><td class="px-3 py-2">FP16</td><td class="px-3 py-2 text-right">~140 GB</td><td class="px-3 py-2 text-xs">10× más parámetros → 10× más datos por token</td></tr>
-              <tr><td class="px-3 py-2">70B Q4</td><td class="px-3 py-2 text-right">~70B</td><td class="px-3 py-2">INT4</td><td class="px-3 py-2 text-right">~38 GB</td><td class="px-3 py-2 text-xs">Cuantizado, pero sigue siendo enorme</td></tr>
+              <tr><td class="px-3 py-2">1 ciclo de reloj</td><td class="px-3 py-2 text-right">1</td><td class="px-3 py-2 text-right">0.45 ns</td><td class="px-3 py-2">13.5 cm (luz) / 9 cm (señal)</td></tr>
+              <tr><td class="px-3 py-2">Suma de enteros</td><td class="px-3 py-2 text-right">1</td><td class="px-3 py-2 text-right">0.45 ns</td><td class="px-3 py-2">—</td></tr>
+              <tr><td class="px-3 py-2">Multiplicación FP32</td><td class="px-3 py-2 text-right">~4</td><td class="px-3 py-2 text-right">1.8 ns</td><td class="px-3 py-2">—</td></tr>
+              <tr><td class="px-3 py-2">Tensor Core matmul 4×4</td><td class="px-3 py-2 text-right">1</td><td class="px-3 py-2 text-right">0.45 ns</td><td class="px-3 py-2">—</td></tr>
+              <tr><td class="px-3 py-2">Leer de L1 Cache</td><td class="px-3 py-2 text-right">~10</td><td class="px-3 py-2 text-right">4.5 ns</td><td class="px-3 py-2">0.4 mm (señal dentro del chip)</td></tr>
+              <tr><td class="px-3 py-2">Leer de L2 Cache</td><td class="px-3 py-2 text-right">~50</td><td class="px-3 py-2 text-right">22.5 ns</td><td class="px-3 py-2">2 mm (a través del chip)</td></tr>
+              <tr class="font-semibold"><td class="px-3 py-2">Leer de VRAM (GDDR6X)</td><td class="px-3 py-2 text-right">~200</td><td class="px-3 py-2 text-right">90 ns</td><td class="px-3 py-2">~2 cm (ida+vuelta + latencia chip)</td></tr>
+              <tr><td class="px-3 py-2">Leer de RAM CPU (DDR5)</td><td class="px-3 py-2 text-right">~500</td><td class="px-3 py-2 text-right">225 ns</td><td class="px-3 py-2">ida+vuelta PCIe + RAM latencia</td></tr>
+              <tr><td class="px-3 py-2">Leer de SSD NVMe</td><td class="px-3 py-2 text-right">~1,000,000</td><td class="px-3 py-2 text-right">0.45 ms</td><td class="px-3 py-2">controlador + bus PCIe + flash</td></tr>
             </tbody>
           </table>
         </div>
-
-        <h4 class="text-md font-semibold text-neutral-900 mb-2">Los pesos no se quedan en el chip</h4>
-        <p class="text-neutral-700 leading-relaxed mb-4">
-          ¿Por qué no mantener los pesos cargados en la caché de la GPU para no tener que leerlos otra vez? Porque <strong>no caben</strong>:
-        </p>
-        <div class="overflow-x-auto mb-4">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Componente</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Tamaño en RTX 4090</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Caben pesos 7B FP16 (14 GB)?</th></tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-200">
-              <tr><td class="px-3 py-2">Registros</td><td class="px-3 py-2 text-right">32 MB (256 KB × 128 SM)</td><td class="px-3 py-2 text-right text-red-600">❌ 0.2%</td></tr>
-              <tr><td class="px-3 py-2">L1 Cache</td><td class="px-3 py-2 text-right">16 MB (128 KB × 128 SM)</td><td class="px-3 py-2 text-right text-red-600">❌ 0.1%</td></tr>
-              <tr><td class="px-3 py-2">L2 Cache</td><td class="px-3 py-2 text-right">72 MB</td><td class="px-3 py-2 text-right text-red-600">❌ 0.5%</td></tr>
-              <tr><td class="px-3 py-2 font-semibold">VRAM (HBM)</td><td class="px-3 py-2 text-right font-semibold">24 GB</td><td class="px-3 py-2 text-right text-green-600">✅ Sí cabe</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4">
-          <p class="text-sm text-blue-800">
-            💡 <strong>Los pesos solo caben en la VRAM.</strong> La VRAM es enorme (24 GB) pero lenta (~200 ciclos de latencia). La caché es rapidísima (~10 ciclos) pero diminuta (~50 MB). <strong>Cada multiplicación requiere ir a buscar los pesos a VRAM, traerlos a la caché, usarlos y, como la caché se llena enseguida, descartarlos para la siguiente tanda.</strong>
-          </p>
-        </div>
-
-        <h4 class="text-md font-semibold text-neutral-900 mb-2">¿Y las activaciones?</h4>
-        <p class="text-neutral-700 leading-relaxed mb-4">
-          Además de los pesos, también se mueven las <strong>activaciones</strong> (resultados intermedios). Pero las activaciones son pequeñas comparadas con los pesos:
-        </p>
-        <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-mono text-sm mb-4">
-          <p><strong>Pesos</strong> de 1 capa en 7B FP16: 4 matrices × 4096×4096 × 2 bytes = <strong>~134 MB</strong></p>
-          <p><strong>Activaciones</strong> para un token: 1 vector de 4096 × 2 bytes = <strong>~8 KB</strong></p>
-          <p class="mt-2 text-blue-600">➜ Los pesos pesan 16,000× más que las activaciones</p>
-          <p class="text-blue-600">➜ El 99.9% del tráfico del bus son pesos, no activaciones</p>
-        </div>
-        <p class="text-neutral-700 text-sm">
-          Por eso se dice que la inferencia es <strong>memory-bound</strong>: el cuello de botella no es calcular (las cuentas son simples), sino <strong>mover los pesos desde VRAM a los núcleos</strong>.
+        <p class="text-xs text-neutral-500">
+          Leer de VRAM cuesta ~200× más que una multiplicación. Por eso mover datos es el cuello de botella.
         </p>
       </Fragment>
 
       <Fragment slot="advanced">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Modelo computacional: Roofline</h3>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Física de la señal en el chip</h3>
         <p class="text-neutral-700 leading-relaxed mb-4">
-          El modelo <strong>Roofline</strong> clasifica cualquier operación en una GPU según su <strong>intensidad aritmética</strong> (FLOPs / bytes movidos):
+          Una señal eléctrica en un conductor de cobre viaja a aproximadamente el 70% de la velocidad de la luz en el vacío (la velocidad real depende de la permitividad del material dieléctrico alrededor del conductor):
         </p>
-        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Intensidad aritmética = FLOPs necesarios / Bytes desde VRAM
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Velocidad de la luz:          299,792,458 m/s ≈ 30 cm/ns
+Velocidad en PCB (cobre):     ~70% ≈ 21 cm/ns
+Velocidad en silicio (chip):  ~50% ≈ 15 cm/ns
 
-Para inferencia de 1 token en 7B FP16:
-  FLOPs capa:       4 × (2×4096²) + 3 × (2×4096×11008) ≈ 0.4 GFLOP
-  Bytes leídos:     265 MB (pesos de la capa)
+Reloj GPU (2.23 GHz):
+  1 ciclo = 0.45 ns
+  Distancia recorrida en 1 ciclo:
+    - En PCB:      21 cm/ns × 0.45 ns ≈ 9.5 cm
+    - En silicio:  15 cm/ns × 0.45 ns ≈ 6.8 cm
 
-  Intensidad = 0.4 GFLOP / 265 MB = 1.5 FLOP/byte
+Esto significa:
+  - Señal cruzando el chip (3 cm) ≈ 0.2 ns ≈ 0.4 ciclos
+  - Señal chip→VRAM (2 cm) ≈ 0.1 ns ≈ 0.2 ciclos
+  - Pero la VRAM tarda ~90 ns por su latencia interna (no por distancia)</code></pre>
 
-En una RTX 4090 (82 TFLOPS, 1008 GB/s):
-  Límite de cómputo: 82 TFLOP/s
-  Límite de memoria: 1008 GB/s × 1.5 FLOP/byte = 1.5 TFLOP/s
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <p class="text-sm text-blue-800">
+            💡 <strong>Mito: "la velocidad de la luz es el límite"</strong> — Es cierto, pero en una GPU el límite no es la distancia física (2 cm) sino la <strong>latencia de los chips de memoria</strong>. Cada chip GDDR6X tiene su propia lógica interna: decodificar direcciones, activar filas en la matriz de celdas, leer los condensadores, amplificar la señal, y enviarla de vuelta. Eso lleva ~80 ciclos. Es como un camión que tarda 10 minutos en cargarse aunque el viaje sean 2 minutos.
+          </p>
+        </div>
+      </Fragment>
+    </LevelTabs>
+  </section>
 
-  ➜ Estamos en la región memory-bound
-  ➜ La GPU solo usa el 1.8% de su capacidad de cómputo</code></pre>
+  <!-- ====== COMPONENTES DE LA GPU ====== -->
+  <section id="componentes-gpu" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">🔧 Componentes de la GPU (diagrama interactivo)</h2>
+    <p class="text-neutral-700 leading-relaxed mb-6">
+      Aquí tienes todos los componentes físicos explicados: el chip, los núcleos, la VRAM, el bus. <strong>Haz clic en cada tarjeta</strong> para ver los detalles.
+    </p>
 
-        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl mb-4">
-          <p class="text-sm text-yellow-800">
-            ⚠️ <strong>Conclusión contraintuitiva:</strong> Una RTX 4090 puede hacer 82 billones de operaciones por segundo, pero al ejecutar un LLM solo hace ~1.5 billones. El 98% del tiempo la GPU está <strong>esperando a que lleguen los datos</strong> (stalled on memory). Es como tener un chef superrápido pero que pasa el 98% del tiempo esperando a que le traigan ingredientes de la despensa.
+    <HardwareDiagram />
+
+    <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+      <p class="text-sm text-green-800">
+        🟢 <strong>Resumen visual de la jerarquía:</strong>
+        <br><br>
+        <strong>Registros (32 MB)</strong> → están DENTRO de cada SM, son la memoria más rápida (~1 ciclo). Aquí se ponen los números justo antes de multiplicarse.
+        <br><br>
+        <strong>L1 Cache (16 MB)</strong> → está DENTRO del chip, compartida entre unos pocos SM. Si los datos están aquí, se leen en ~10 ciclos.
+        <br><br>
+        <strong>L2 Cache (72 MB)</strong> → está DENTRO del chip, compartida globalmente. Trampolín antes de ir a VRAM. ~50 ciclos.
+        <br><br>
+        <strong>VRAM (24 GB)</strong> → está FUERA del chip, conectada por el bus. Aquí viven los pesos. ~200 ciclos.
+        <br><br>
+        <strong>Los pesos del modelo NO CABEN ni en registros, ni en L1, ni en L2.</strong> Solo caben en VRAM. Por eso cada multiplicación requiere leer de VRAM, y eso cuesta ~200 ciclos.
+      </p>
+    </div>
+  </section>
+
+  <!-- ====== EL VIAJE DE LOS PESOS ====== -->
+  <section id="flujo-datos" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">🚛 El viaje: de VRAM a los núcleos</h2>
+    <LevelTabs>
+      <Fragment slot="beginner">
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">¿Qué es lo que viaja exactamente?</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Lo que viaja desde VRAM a los núcleos son <strong>los pesos (parámetros)</strong>. Los pesos son números que se multiplican. El modelo tiene miles de millones de ellos.
+        </p>
+
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-6">
+          <p class="text-sm text-amber-800">
+            ❓ <strong>Pregunta clave:</strong> "¿Por qué los pesos tienen que viajar si solo se van a multiplicar?"
+            <br><br>
+            ✅ <strong>Respuesta:</strong> Porque la multiplicación no ocurre donde están guardados los pesos. El Tensor Core que hace la multiplicación está dentro del chip GPU. El peso está en VRAM, fuera del chip. 
+            <br><br>
+            Es como tener los números en una libreta y la calculadora en la mesa. No puedes multiplicar dentro de la libreta. Tienes que leer el número de la libreta, teclearlo en la calculadora, y entonces obtienes el resultado.
+            <br><br>
+            <strong>La "libreta" es la VRAM. La "calculadora" es el Tensor Core. El "movimiento de tus ojos y manos" es el bus de memoria.</strong>
           </p>
         </div>
 
-        <h4 class="text-md font-semibold text-neutral-900 mt-6 mb-3">Arithmetic Intensity por operación</h4>
-        <div class="overflow-x-auto">
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">El flujo, paso a paso</h3>
+        
+        <div class="space-y-4 mb-6">
+          <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+            <div class="flex items-start gap-3">
+              <span class="text-lg shrink-0">1️⃣</span>
+              <div>
+                <p class="text-sm font-semibold text-neutral-900">El prompt se tokeniza y se carga en VRAM</p>
+                <p class="text-xs text-neutral-600">"La capital de Francia es" → [123, 456, 789, 101] → 4 vectores de 4096 números</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+            <div class="flex items-start gap-3">
+              <span class="text-lg shrink-0">2️⃣</span>
+              <div>
+                <p class="text-sm font-semibold text-neutral-900">Se lee W_Q desde VRAM → a los núcleos</p>
+                <p class="text-xs text-neutral-600">33 MB de pesos viajan por el bus. Tarda ~0.03 ms.</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+            <div class="flex items-start gap-3">
+              <span class="text-lg shrink-0">3️⃣</span>
+              <div>
+                <p class="text-sm font-semibold text-neutral-900">Se multiplica: activaciones × W_Q = Q</p>
+                <p class="text-xs text-neutral-600">Esto ocurre en los Tensor Cores. Tarda ~0.001 ms. Los pesos se descartan de la caché.</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+            <div class="flex items-start gap-3">
+              <span class="text-lg shrink-0">4️⃣</span>
+              <div>
+                <p class="text-sm font-semibold text-neutral-900">Se lee W_K desde VRAM</p>
+                <p class="text-xs text-neutral-600">Hay que volver a VRAM a por la siguiente matriz. No se guardó porque no cabía en caché.</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+            <div class="flex items-start gap-3">
+              <span class="text-lg shrink-0">🔄</span>
+              <div>
+                <p class="text-sm font-semibold text-amber-800">Esto se repite para W_K, W_V, W_O, W_gate, W_up, W_down</p>
+                <p class="text-xs text-amber-700">Cada una requiere leer ~33-100 MB de pesos desde VRAM. 7 matrices por capa. 32 capas. Luego otra vez para el siguiente token.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <p class="text-sm text-blue-800">
+            💡 <strong>¿Cuántos datos viajan en total por el bus?</strong>
+            <br><br>
+            Para generar 1 token con un modelo 7B en FP16:
+            <br>
+            • 32 capas × 7 matrices × ~33 MB = <strong>~7.4 GB leídos desde VRAM</strong>
+            <br>
+            • A 1008 GB/s: ~7.4 ms de ida y vuelta constante de datos
+            <br><br>
+            Para 100 tokens de respuesta: <strong>~740 GB de datos viajando por el bus</strong>
+            <br>
+            Pero la VRAM sigue teniendo los mismos 14 GB de pesos. No se gastan. Solo se leen.
+          </p>
+        </div>
+      </Fragment>
+
+      <Fragment slot="deep">
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Cálculo detallado: datos por capa</h3>
+        <div class="overflow-x-auto mb-4">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Operación</th><th class="px-3 py-2 text-right font-medium text-neutral-700">FLOP / byte</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Régimen</th></tr>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Operación</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Matriz</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">Params</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">Bytes (FP16)</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">Lecturas</th>
+              </tr>
             </thead>
             <tbody class="divide-y divide-neutral-200">
-              <tr><td class="px-3 py-2">MatMul capa FFN (7B)</td><td class="px-3 py-2 text-right">~1.5</td><td class="px-3 py-2 text-red-600">🔴 Memory-bound</td></tr>
-              <tr><td class="px-3 py-2">MatMul Attention (7B)</td><td class="px-3 py-2 text-right">~2.0</td><td class="px-3 py-2 text-red-600">🔴 Memory-bound</td></tr>
-              <tr><td class="px-3 py-2">Batch=512 Attention</td><td class="px-3 py-2 text-right">~512</td><td class="px-3 py-2 text-green-600">🟢 Compute-bound</td></tr>
-              <tr><td class="px-3 py-2">Convolución (imagen grande)</td><td class="px-3 py-2 text-right">~100-1000</td><td class="px-3 py-2 text-green-600">🟢 Compute-bound</td></tr>
+              <tr><td>Attention Q</td><td>d_model × d_model</td><td class="px-3 py-2 text-right">16.7M</td><td class="px-3 py-2 text-right">33.5 MB</td><td class="px-3 py-2 text-right">1×</td></tr>
+              <tr><td>Attention K</td><td>d_model × d_model</td><td class="px-3 py-2 text-right">16.7M</td><td class="px-3 py-2 text-right">33.5 MB</td><td class="px-3 py-2 text-right">1×</td></tr>
+              <tr><td>Attention V</td><td>d_model × d_model</td><td class="px-3 py-2 text-right">16.7M</td><td class="px-3 py-2 text-right">33.5 MB</td><td class="px-3 py-2 text-right">1×</td></tr>
+              <tr><td>Attention O</td><td>d_model × d_model</td><td class="px-3 py-2 text-right">16.7M</td><td class="px-3 py-2 text-right">33.5 MB</td><td class="px-3 py-2 text-right">1×</td></tr>
+              <tr><td>FFN gate</td><td>d_model × d_ff</td><td class="px-3 py-2 text-right">45.1M</td><td class="px-3 py-2 text-right">90.2 MB</td><td class="px-3 py-2 text-right">1×</td></tr>
+              <tr><td>FFN up</td><td>d_model × d_ff</td><td class="px-3 py-2 text-right">45.1M</td><td class="px-3 py-2 text-right">90.2 MB</td><td class="px-3 py-2 text-right">1×</td></tr>
+              <tr><td>FFN down</td><td>d_ff × d_model</td><td class="px-3 py-2 text-right">45.1M</td><td class="px-3 py-2 text-right">90.2 MB</td><td class="px-3 py-2 text-right">1×</td></tr>
+              <tr class="font-semibold"><td colspan="2">Total por capa</td><td class="px-3 py-2 text-right">202M</td><td class="px-3 py-2 text-right">404 MB</td><td class="px-3 py-2 text-right">7 lecturas</td></tr>
+              <tr class="font-semibold text-blue-600"><td colspan="2">Total 32 capas</td><td class="px-3 py-2 text-right">6.5B</td><td class="px-3 py-2 text-right">12.9 GB</td><td class="px-3 py-2 text-right">224 lecturas</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="text-xs text-neutral-500 mt-2">
-          La inferencia de LLMs tiene baja intensidad aritmética porque por cada byte de peso que cargamos, hacemos muy pocas operaciones. En cambio, procesar imágenes en batch permite reutilizar los mismos pesos para muchas entradas, subiendo la intensidad.
+
+        <h4 class="text-md font-semibold text-neutral-900 mb-2">Pero espera — hay 6.5B parámetros, no 14 GB</h4>
+        <p class="text-neutral-700 leading-relaxed text-sm mb-4">
+          En el modelo de 7B hay ~6.7B parámetros (no 7B exactos). En FP16, 6.7B × 2 bytes = 13.4 GB. 
+          La tabla de arriba suma ~12.9 GB, que son los pesos de las capas. El resto (~0.5 GB) es embedding y LM head, que solo se leen una vez al principio y al final.
+        </p>
+
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <p class="text-sm text-blue-800">
+            💡 <strong>Por cada token generado, el bus mueve ~13 GB de pesos.</strong>
+            <br><br>
+            Pero no todos a la vez. Son 224 viajes individuales (7 matrices × 32 capas), cada uno moviendo 33-90 MB. El bus es una autopista por la que viajan constantemente estos datos, como una cinta transportadora de números.
+            <br><br>
+            Es como tener que leer 224 capítulos de un libro, y cada capítulo requiere ir a la estantería a buscar el libro (VRAM), abrirlo por la página correcta, leerla, y dejarlo.
+          </p>
+        </div>
+      </Fragment>
+
+      <Fragment slot="advanced">
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Ancho de banda efectivo vs. teórico</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          El ancho de banda teórico de 1008 GB/s es el límite máximo, pero en la práctica no se alcanza porque:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-neutral-700 text-sm mb-4">
+          <li><strong>Overhead de dirección:</strong> cada lectura de VRAM requiere enviar una dirección de memoria antes de recibir los datos</li>
+          <li><strong>Row activation:</strong> la VRAM organiza los datos en filas y columnas. Cambiar de fila cuesta tiempo extra</li>
+          <li><strong>Bank conflicts:</strong> múltiples peticiones a la misma partición de VRAM se serializan</li>
+          <li><strong>Protocol overhead:</strong> la señal tiene que ser codificada/decodificada (GDDR6X usa PAM4, que codifica 2 bits por símbolo)</li>
+        </ul>
+        <p class="text-neutral-700 text-sm">
+          En benchmarks reales (como llama.cpp), una RTX 4090 suele alcanzar ~80-85% del ancho de banda teórico, es decir, ~800-850 GB/s efectivos.
         </p>
       </Fragment>
     </LevelTabs>
   </section>
 
-  <!-- ====== EL BUS DE MEMORIA ====== -->
-  <section id="bus-memoria" class="content-section">
-    <h2 class="text-2xl font-bold text-neutral-900 mb-4">La autopista de datos</h2>
+  <!-- ====== EL CUELLO DE BOTELLA ====== -->
+  <section id="memory-bound" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">🐢 El cuello de botella: memory-bound</h2>
     <LevelTabs>
       <Fragment slot="beginner">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">El bus: lo que conecta la VRAM con los núcleos</h3>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">La inferencia es mover datos, no calcular</h3>
         <p class="text-neutral-700 leading-relaxed mb-4">
-          El <strong>bus de memoria</strong> es el cable físico que conecta la VRAM (dónde están los pesos) con el chip de la GPU (dónde se multiplican). Por este cable viajan los números de los pesos.
+          Ahora que sabemos qué viaja (pesos), dónde (bus), y por qué tarda (~200 ciclos por viaje), podemos entender por qué la inferencia está limitada por la <strong>memoria</strong>, no por la <strong>potencia de cálculo</strong>.
         </p>
 
-        <div class="p-4 bg-purple-50 border border-purple-200 rounded-xl mb-6">
-          <p class="text-sm text-purple-800">
-            🛣️ <strong>Imagina una autopista de peaje.</strong>
-            <br><br>
-            El <strong>ancho del bus</strong> son los carriles de la autopista. Un bus de 384 bits = 384 carriles. Cada carril lleva 1 bit de información por ciclo de reloj.
-            <br><br>
-            La <strong>frecuencia</strong> es la velocidad límite. En GDDR6X, los datos viajan a 21 Gbps = 21 mil millones de bits por segundo por cada carril.
-            <br><br>
-            El <strong>ancho de banda</strong> es el resultado: 384 carriles × 21 Gbps = 8,064 Gbps = 1,008 GB/s. Es decir, <strong>cada segundo pueden viajar ~1 terabyte de datos</strong> desde la VRAM a los núcleos.
-          </p>
+        <div class="grid md:grid-cols-2 gap-4 mb-6">
+          <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
+            <p class="text-sm font-semibold text-neutral-800 mb-2">🧮 Capacidad de cálculo (TFLOPS)</p>
+            <p class="text-xs text-neutral-600">82 TFLOPS = 82 billones de multiplicaciones por segundo</p>
+            <p class="text-xs text-neutral-500 mt-1">Pero cada multiplicación necesita sus operandos. Si los operandos tardan 200 ciclos en llegar, el núcleo se para y espera.</p>
+          </div>
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <p class="text-sm font-semibold text-blue-800 mb-2">🚛 Capacidad de transporte (BW)</p>
+            <p class="text-xs text-blue-700">1008 GB/s = 1 terabyte de datos por segundo pueden viajar por el bus</p>
+            <p class="text-xs text-blue-600 mt-1">El modelo 7B pesa 14 GB. Cada token requiere leer ~13 GB. 1008 / 13 ≈ 77 tokens/s. Ese es el límite.</p>
+          </div>
         </div>
 
-        <div class="overflow-x-auto mb-6">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">GPU</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Carriles (bits)</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Velocidad</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Ancho de banda</th><th class="px-3 py-2 text-left font-medium text-neutral-700">¿Cuántos modelos 7B Q4 por segundo?</th></tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-200">
-              <tr><td class="px-3 py-2">RTX 4060</td><td class="px-3 py-2 text-right">128</td><td class="px-3 py-2 text-right">17 Gbps</td><td class="px-3 py-2 text-right">272 GB/s</td><td class="px-3 py-2">68 veces</td></tr>
-              <tr><td class="px-3 py-2">RTX 4090</td><td class="px-3 py-2 text-right">384</td><td class="px-3 py-2 text-right">21 Gbps</td><td class="px-3 py-2 text-right">1008 GB/s</td><td class="px-3 py-2">252 veces</td></tr>
-              <tr><td class="px-3 py-2 font-semibold">H100</td><td class="px-3 py-2 text-right">5120*</td><td class="px-3 py-2 text-right">3.2 Gbps</td><td class="px-3 py-2 text-right">3352 GB/s</td><td class="px-3 py-2">838 veces</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="text-xs text-neutral-400 mb-4">*HBM usa múltiples stacks apilados verticalmente con un interposer de silicio, creando un bus extraordinariamente ancho (5120 bits). Aunque cada carril individual es más lento, hay tantos que el ancho de banda total es enorme.</p>
-
-        <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
-          <p class="text-sm text-green-800">
-            🟢 <strong>La idea clave:</strong> imagina que el modelo pesa 4 GB en Q4. Para generar 1 token, la GPU tiene que leer ~3.8 GB de pesos desde VRAM. Con 1008 GB/s de ancho de banda, cargar esos pesos lleva 3.8/1008 = <strong>3.8 milisegundos</strong>. Y luego hay que hacer la cuenta (mucho más rápido). Ese tiempo de carga es el que limita cuántos tokens por segundo puedes generar.
+        <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+          <p class="text-sm text-red-800">
+            🔴 <strong>El dato que lo explica todo:</strong>
+            <br><br>
+            De cada 200 ciclos que tarda en leerse un peso de VRAM, solo ~2 ciclos se usan para multiplicar. <strong>El 99% del tiempo la GPU está esperando a que lleguen datos desde la VRAM.</strong>
+            <br><br>
+            Es como un chef superrápido (puede cortar una cebolla en 0.1 segundos) pero que tiene que ir a la despensa a buscar cada ingrediente, y la despensa está al otro lado de la cocina. Pasa el 99% del tiempo caminando y el 1% cortando.
           </p>
         </div>
       </Fragment>
 
       <Fragment slot="deep">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Anchos de bus en GPUs reales</h3>
-        <div class="overflow-x-auto mb-4">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">GPU</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Bus (bits)</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Memoria</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Frec. efectiva</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Ancho de banda</th></tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-200">
-              <tr><td class="px-3 py-2">RTX 4060</td><td class="px-3 py-2 text-right">128-bit</td><td class="px-3 py-2">GDDR6</td><td class="px-3 py-2 text-right">17 Gbps</td><td class="px-3 py-2 text-right">272 GB/s</td></tr>
-              <tr><td class="px-3 py-2">RTX 4070</td><td class="px-3 py-2 text-right">192-bit</td><td class="px-3 py-2">GDDR6X</td><td class="px-3 py-2 text-right">21 Gbps</td><td class="px-3 py-2 text-right">504 GB/s</td></tr>
-              <tr><td class="px-3 py-2">RTX 4080</td><td class="px-3 py-2 text-right">256-bit</td><td class="px-3 py-2">GDDR6X</td><td class="px-3 py-2 text-right">22.4 Gbps</td><td class="px-3 py-2 text-right">716 GB/s</td></tr>
-              <tr><td class="px-3 py-2 font-semibold">RTX 4090</td><td class="px-3 py-2 text-right font-semibold">384-bit</td><td class="px-3 py-2">GDDR6X</td><td class="px-3 py-2 text-right">21 Gbps</td><td class="px-3 py-2 text-right font-semibold">1008 GB/s</td></tr>
-              <tr><td class="px-3 py-2">RTX 5090</td><td class="px-3 py-2 text-right">512-bit</td><td class="px-3 py-2">GDDR7</td><td class="px-3 py-2 text-right">28-30 Gbps</td><td class="px-3 py-2 text-right">~1792 GB/s</td></tr>
-              <tr><td class="px-3 py-2">A100</td><td class="px-3 py-2 text-right">5120-bit*</td><td class="px-3 py-2">HBM2e</td><td class="px-3 py-2 text-right">2.4 Gbps</td><td class="px-3 py-2 text-right">2039 GB/s</td></tr>
-              <tr><td class="px-3 py-2">H100</td><td class="px-3 py-2 text-right">5120-bit*</td><td class="px-3 py-2">HBM3</td><td class="px-3 py-2 text-right">3.2 Gbps</td><td class="px-3 py-2 text-right">3352 GB/s</td></tr>
-            </tbody>
-          </table>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Cálculo exacto: tiempo de inferencia</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Modelo 7B FP16 en RTX 4090 (1008 GB/s, 82 TFLOPS)
+
+PESOS A LEER POR TOKEN:
+  Attention (Q,K,V,O):   4 × 33.5 MB = 134 MB
+  FFN (gate,up,down):    3 × 90.2 MB = 270 MB
+  Total por capa:                   404 MB
+  32 capas:                         12.9 GB
+  + Embedding + LM Head:            ~0.5 GB
+  ------------------------------------------
+  Total leído por token:            13.4 GB
+
+TIEMPO DE CARGA (1008 GB/s):
+  13.4 GB / 1008 GB/s = 13.3 ms
+  
+TIEMPO DE CÓMPUTO (82 TFLOPS):
+  FLOPs por token (7B): ~14 GFLOP
+  14 GFLOP / 82 TFLOP/s = 0.17 ms
+
+TIEMPO TOTAL ESTIMADO:
+  13.3 + 0.17 ≈ 13.5 ms/token
+  → ~74 tokens/s
+
+En realidad con overheads y KV cache: ~60-70 tokens/s</code></pre>
+
+        <h4 class="text-md font-semibold text-neutral-900 mb-3">¿Y si cuantizamos?</h4>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Modelo 7B Q4_K_M en RTX 4090 (1008 GB/s)
+
+Pesos a leer: 6.7B × 0.5 bytes = 3.4 GB
+Tiempo de carga: 3.4 / 1008 = 3.4 ms
+Tiempo de cómputo: ~0.05 ms (matmuls más pequeñas)
+
+Total: ~3.5 ms/token → ~290 tokens/s
+
+En la práctica: ~200-250 t/s (algo de overhead de de-cuantización)</code></pre>
+
+        <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
+          <p class="text-sm text-green-800">
+            🟢 <strong>Moraleja:</strong> La cuantización acelera 4× porque reduces los datos que viajan por el bus en 4×. No porque las multiplicaciones sean más rápidas (de hecho, multiplicar INT4 puede ser más lento que FP16 en Tensor Cores). El cuello de botella siempre es el bus.
+          </p>
         </div>
-
-        <h4 class="text-md font-semibold text-neutral-900 mb-2">Calculando el límite de tokens/s</h4>
-        <div class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-sm font-mono mb-4">
-          <p><span class="text-blue-300">tokens/s</span> = <span class="text-green-300">Ancho_de_banda</span> / <span class="text-yellow-300">Pesos_a_leer_por_token</span></p>
-          <p class="mt-2">Ejemplo: <span class="text-green-300">1008 GB/s</span> / <span class="text-yellow-300">3.8 GB</span> = <span class="text-blue-300">265 tokens/s</span></p>
-          <p class="text-xs text-neutral-400 mt-2">/* Esto es el límite teórico. En la práctica hay overheads que lo reducen ~10-20% */</p>
-        </div>
-
-        <p class="text-neutral-700 text-sm leading-relaxed mb-4">
-          Esta fórmula explica por qué <strong>cuantizar acelera la inferencia</strong>: en INT4 lees 4× menos bytes por token que en FP16, así que generas ~4× más tokens por segundo (para el mismo ancho de banda).
-        </p>
-
-        <div class="overflow-x-auto mb-4">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">GPU</th><th class="px-3 py-2 text-right font-medium text-neutral-700">7B FP16 (14 GB leídos)</th><th class="px-3 py-2 text-right font-medium text-neutral-700">7B Q4 (3.8 GB leídos)</th></tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-200">
-              <tr><td class="px-3 py-2">RTX 4060 (272 GB/s)</td><td class="px-3 py-2 text-right">~19 t/s</td><td class="px-3 py-2 text-right">~72 t/s</td></tr>
-              <tr><td class="px-3 py-2">RTX 4090 (1008 GB/s)</td><td class="px-3 py-2 text-right">~72 t/s</td><td class="px-3 py-2 text-right">~265 t/s</td></tr>
-              <tr><td class="px-3 py-2">H100 (3352 GB/s)</td><td class="px-3 py-2 text-right">~240 t/s</td><td class="px-3 py-2 text-right">~882 t/s</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <InfoBox type="tip" client:only="vue">
-          <strong>¿Por qué la RTX 4090 da ~265 t/s con Q4 y no más?</strong> Porque el bus es la autopista: puede mover 1008 GB por segundo, pero necesita mover 3.8 GB por cada token. 1008 / 3.8 = 265. Es matemática de transporte, no de computación.
-        </InfoBox>
       </Fragment>
 
       <Fragment slot="advanced">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Cálculo detallado del ancho de banda</h3>
-        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>GDDR6X (RTX 4090):
-  BW = 384 bits × 21 Gbps ÷ 8 bits/byte
-  BW = 384 × 21 × 10⁹ ÷ 8
-  BW = 1.008 × 10¹² bytes/s
-  BW = 1008 GB/s ✓
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Roofline Model</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          El modelo Roofline clasifica cualquier operación según su intensidad aritmética (FLOPs por byte movido):
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Intensidad aritmética = FLOPs / Bytes desde VRAM
 
-GDDR7 (RTX 5090, estimado):
-  BW = 512 bits × 28 Gbps ÷ 8
-  BW = 1792 GB/s
+Para inferencia de 1 token en 7B FP16:
+  Intensidad = 14 GFLOP / 13.4 GB ≈ 1.0 FLOP/byte
 
-DDR5-4800 (CPU):
-  BW = 64 bits × 4800 MT/s ÷ 8
-  BW = 38.4 GB/s (un canal)
-  Típicamente 2 canales → ~76.8 GB/s</code></pre>
+Límites de la RTX 4090:
+  Techo de cómputo: 82 TFLOPS
+  Techo de memoria: 1008 GB/s
 
-        <h4 class="text-md font-semibold text-neutral-900 mt-6 mb-3">¿Por qué la inferencia es memory-bound?</h4>
-        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto"><code>Para 1 token con un modelo 7B FP16:
+Rendimiento real = min(82 TFLOP, 1008 GB/s × 1.0 FLOP/byte)
+                = min(82 TFLOP, 1.0 TFLOP)
+                = 1.0 TFLOP  ← memory bound!
 
-  Pesos leídos desde VRAM: ~13.4 GB
-  Operaciones aritméticas: ~14 GFLOP
+La GPU solo usa el 1.2% de su capacidad de cómputo.</code></pre>
 
-  Tiempo de carga (BW 1008 GB/s): 13.4 GB / 1008 GB/s ≈ 13.3 ms
-  Tiempo de cómputo (82 TFLOPS): 14G / 82T ≈ 0.17 ms
-
-  ➜ 98.7% del tiempo es mover datos
-  ➜ 1.3% del tiempo es calcular
-
-  ¡Es un problema de logística, no de matemáticas!</code></pre>
-
-        <InfoBox type="hot" client:only="vue">
-          <strong>Memory Wall:</strong> desde 2005, los CPUs/GPUs duplican su capacidad de cómputo cada ~2 años, pero el ancho de banda de memoria solo crece ~15% anual. Cada año estamos más limitados por memoria.
-        </InfoBox>
-
-        <h4 class="text-md font-semibold text-neutral-900 mt-6 mb-3">¿Cómo acelerar entonces?</h4>
-        <ol class="list-decimal list-inside space-y-2 text-neutral-700">
-          <li><strong>Cuantizar</strong> — reduces los bytes por peso (FP16 → INT4 = 4× menos tráfico)</li>
-          <li><strong>KV Cache optimizada</strong> — evitas recalcular para tokens previos</li>
-          <li><strong>Speculative Decoding</strong> — generas varios tokens con un modelo pequeño y verificas con el grande</li>
-          <li><strong>Prompt Caching / RadixAttention</strong> — reutiliza KV Cache de prompts repetidos</li>
-          <li><strong>Batching</strong> — procesas varios prompts a la vez, compartiendo la carga de pesos entre ellos</li>
+        <h4 class="text-md font-semibold text-neutral-900 mb-3">¿Cómo escapar del memory-bound?</h4>
+        <ol class="list-decimal list-inside space-y-2 text-neutral-700 text-sm mb-4">
+          <li><strong>Batching:</strong> procesas N prompts a la vez. Los pesos se leen 1 vez y se reutilizan para N prompts. La intensidad aritmética sube a N × 1.0 FLOP/byte. Con batch=512, pasas a 512 FLOP/byte → compute-bound.</li>
+          <li><strong>Cuantizar:</strong> reduces los bytes/peso. Mueves menos datos por el mismo bus.</li>
+          <li><strong>Speculative Decoding:</strong> generas K tokens baratos con un modelo pequeño, verificas con el grande en paralelo.</li>
+          <li><strong>Prompt Caching:</strong> reutilizas la KV Cache de prompts repetidos sin tener que reprocesarlos.</li>
         </ol>
       </Fragment>
     </LevelTabs>
   </section>
 
-  <!-- ====== JERARQUÍA DE MEMORIA ====== -->
-  <section id="jerarquia" class="content-section">
-    <h2 class="text-2xl font-bold text-neutral-900 mb-4">Jerarquía de memoria en GPU</h2>
-    <LevelTabs>
-      <Fragment slot="beginner">
-        <p class="text-neutral-700 leading-relaxed mb-4">
-          La GPU tiene varios niveles de memoria, desde la más rápida (y pequeñísima) hasta la más lenta (y enorme). Piensa en una oficina:
-        </p>
-        <ul class="list-disc list-inside space-y-3 text-neutral-700 mb-4">
-          <li><strong>Registros</strong> = el boli que tienes en la mano (1 nanosegundo, 32 MB total)</li>
-          <li><strong>L1 Cache</strong> = el boli en tu bolsillo (5 ns, 16 MB)</li>
-          <li><strong>L2 Cache</strong> = el boli en el cajón de tu mesa (20 ns, 72 MB)</li>
-          <li><strong>VRAM / HBM</strong> = el boli en el almacén de la planta baja (200 ns, 24 GB)</li>
-          <li><strong>Disco SSD</strong> = el boli en una tienda al otro lado de la ciudad (1,000,000 ns, TB)</li>
-        </ul>
-        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-          <p class="text-sm text-blue-800">
-            💡 <strong>El problema de los LLM:</strong> los pesos solo caben en la VRAM (el almacén). Cada vez que necesitas un peso, tienes que ir al almacén a buscarlo. Ir al almacén cuesta ~200 ns, mientras que hacer una multiplicación cuesta ~0.2 ns. <strong>Pasar el 99.9% del tiempo yendo al almacén</strong> es el cuello de botella.
-          </p>
+  <!-- ====== RESUMEN FINAL ====== -->
+  <section class="content-section mt-8">
+    <div class="p-6 bg-gradient-to-br from-neutral-50 to-neutral-100 border border-neutral-200 rounded-2xl">
+      <h2 class="text-xl font-bold text-neutral-900 mb-4">📋 Resumen: respuestas a tus preguntas</h2>
+      <div class="space-y-4 text-sm text-neutral-700">
+        <div class="p-3 bg-white rounded-xl border border-neutral-200">
+          <p class="font-semibold text-neutral-900 mb-1">❓ "¿Los pesos caben en los núcleos de cálculo?"</p>
+          <p class="text-neutral-600">No. Los núcleos tienen registros (32 MB en total). Los pesos de una capa son ~400 MB. Los pesos viven en VRAM (24 GB).</p>
         </div>
-      </Fragment>
-
-      <Fragment slot="deep">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Jerarquía completa (RTX 4090)</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Nivel</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Tamaño típico</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Latencia</th><th class="px-3 py-2 text-right font-medium text-neutral-700">BW</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Quién</th></tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-200">
-              <tr><td class="px-3 py-2">Registros (SRAM)</td><td class="px-3 py-2 text-right">32 MB total</td><td class="px-3 py-2 text-right">~1 ciclo</td><td class="px-3 py-2 text-right">~50 TB/s</td><td class="px-3 py-2">Cada thread</td></tr>
-              <tr><td class="px-3 py-2">L1 Cache (SRAM)</td><td class="px-3 py-2 text-right">16 MB total</td><td class="px-3 py-2 text-right">~10 ciclos</td><td class="px-3 py-2 text-right">~30 TB/s</td><td class="px-3 py-2">Bloque SM</td></tr>
-              <tr><td class="px-3 py-2">L2 Cache (SRAM)</td><td class="px-3 py-2 text-right">72 MB</td><td class="px-3 py-2 text-right">~50 ciclos</td><td class="px-3 py-2 text-right">~5 TB/s</td><td class="px-3 py-2">Global</td></tr>
-              <tr><td class="px-3 py-2 font-semibold">HBM / VRAM</td><td class="px-3 py-2 text-right font-semibold">24 GB</td><td class="px-3 py-2 text-right font-semibold">~200 ciclos</td><td class="px-3 py-2 text-right font-semibold">1 TB/s</td><td class="px-3 py-2">Global</td></tr>
-              <tr><td class="px-3 py-2">PCIe → RAM CPU</td><td class="px-3 py-2 text-right">Hasta CPU</td><td class="px-3 py-2 text-right">~1000 ciclos</td><td class="px-3 py-2 text-right">32 GB/s</td><td class="px-3 py-2">CPU host</td></tr>
-              <tr><td class="px-3 py-2">NVMe / SSD</td><td class="px-3 py-2 text-right">TB</td><td class="px-3 py-2 text-right">~10⁶ ciclos</td><td class="px-3 py-2 text-right">7 GB/s</td><td class="px-3 py-2">Almacén</td></tr>
-            </tbody>
-          </table>
+        <div class="p-3 bg-white rounded-xl border border-neutral-200">
+          <p class="font-semibold text-neutral-900 mb-1">❓ "¿Si el modelo pesa 24 GB, esos 24 GB se mueven por el bus?"</p>
+          <p class="text-neutral-600">No se mueven de golpe. Viajan por el bus en fragmentos, capa por capa, matriz por matriz. Por cada token se mueven ~13 GB (el modelo completo), pero en 224 viajes individuales a lo largo de ~13 ms.</p>
         </div>
-        <p class="text-xs text-neutral-500 mt-2">
-          La latencia de VRAM (~200 ciclos, ~90 ns) es el cuello de botella porque los pesos solo caben ahí. La caché L2 (72 MB) es unas 10× más rápida pero solo cabe ~2% de los pesos de una capa.
-        </p>
-      </Fragment>
-
-      <Fragment slot="advanced">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Tiempos reales: un ciclo de reloj</h3>
-        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>RTX 4090: reloj base ~2.23 GHz
-  1 ciclo = 1 / 2.23×10⁹ ≈ 0.45 nanosegundos
-  La luz recorre 13.5 cm en ese tiempo
-
-Para cargar 4 bytes desde VRAM a un núcleo:
-  1. Dirección viaja por bus de direcciones: ~10 ciclos
-  2. VRAM busca los datos: ~50-100 ciclos (CAS latency)
-  3. Datos viajan por bus de datos: ~20-50 ciclos
-  4. Pasan por L2, L1: ~10-20 ciclos
-  Total: ~200 ciclos = ~90 nanosegundos
-
-  → Cargar 4 bytes (1 float32) desde VRAM tarda ~90 ns
-  → Una multiplicación tarda 1-4 ciclos (~0.5-2 ns)
-
-  Ratio: mover datos cuesta ~50-200× más que computar</code></pre>
-
-        <h4 class="text-md font-semibold text-neutral-900 mb-3">¿Por qué no fabrican VRAM más rápida?</h4>
-        <p class="text-neutral-700 leading-relaxed mb-4">
-          La VRAM (HBM, GDDR) está optimizada para <strong>capacidad y ancho de banda</strong>, no para baja latencia. Está físicamente separada del chip de la GPU (en otro trozo de silicio, conectada mediante un interposer o directamente en la placa). La señal eléctrica tiene que viajar centímetros, y eso lleva tiempo.
-        </p>
-        <p class="text-neutral-700 leading-relaxed">
-          La SRAM (caché) está integrada en el mismo chip que los núcleos. La señal viaja micrómetros. Es 100× más rápida, pero 100× más cara y consume mucha más energía por bit. Por eso solo hay ~50 MB de SRAM y ~24 GB de VRAM.
-        </p>
-      </Fragment>
-    </LevelTabs>
-  </section>
-
-  <!-- ====== ORGANIZACIÓN GPU ====== -->
-  <section id="organizacion-gpu" class="content-section">
-    <h2 class="text-2xl font-bold text-neutral-900 mb-4">Organización de una GPU</h2>
-    <p class="text-neutral-700 leading-relaxed mb-4">
-      Una GPU no es una caja negra. Está organizada jerárquicamente en clústeres, procesadores y núcleos. Esto ayuda a entender por qué los datos tardan lo que tardan en moverse.
-    </p>
-
-    <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-sm overflow-x-auto mb-4"><code>GPU (ej: AD102 de RTX 4090)
-├── 11 GPC (Graphics Processing Clusters)
-│   └── 6 TPC (Texture Proc. Clusters) cada uno
-│       └── 2 SM (Streaming Multiprocessors) cada uno
-│           ├── 128 CUDA Cores  ← aquí se hacen las cuentas
-│           ├── 4 Tensor Cores  ← aquí se hacen las matmuls (lo que usa el LLM)
-│           ├── L1 / Shared Memory (128 KB)
-│           ├── 65536 Registros (256 KB)
-│           └── Warp Scheduler (lanza instrucciones)
-
-Total RTX 4090:
-  - 128 SM × 128 CUDA cores = 16384 CUDA cores
-  - 128 SM × 4 Tensor Cores = 512 Tensor Cores
-  - L2 Cache: 72 MB
-  - VRAM: 24 GB GDDR6X (en 12 chips de 2 GB, alrededor del chip)
-  - Bus: 384-bit (32 bits por cada chip de VRAM)</code></pre>
-
-    <div class="p-4 bg-purple-50 border border-purple-200 rounded-xl mb-4">
-      <p class="text-sm text-purple-800">
-        🔬 <strong>¿Dónde están físicamente la VRAM y el bus?</strong> En una RTX 4090, el chip GPU está en el centro de la placa. Alrededor hay 12 chips de memoria GDDR6X (2 GB cada uno). Cada chip está conectado al chip GPU por 32 cables (bits). 12 chips × 32 bits = 384 bits de bus total. Los datos viajan por estos cables cada vez que se hace una multiplicación.
-      </p>
-    </div>
-
-    <InfoBox type="tip" client:only="vue">
-      <strong>Tensor Cores vs CUDA Cores:</strong> Para multiplicar dos matrices 4×4 en FP16, un CUDA Core necesita 16 operaciones individuales (16 ciclos), mientras que un Tensor Core lo hace en 1 operación matricial (1 ciclo). <strong>16× más rápido.</strong> En inferencia de LLMs, el ~90% del tiempo se va en matmuls, por eso los Tensor Cores son claves.
-    </InfoBox>
-
-    <div class="p-4 bg-green-50 border border-green-200 rounded-xl mt-4">
-      <p class="text-sm text-green-800">
-        🟢 <strong>Resumen final — respuestas a tus preguntas:</strong>
-        <br><br>
-        <strong>1. ¿Por qué hay que mover los pesos si solo se multiplican?</strong> Porque la multiplicación ocurre en los núcleos (chip), pero los pesos viven en VRAM (memoria externa). Son dos sitios físicamente separados. Los pesos no se multiplican dentro de la VRAM — tienen que viajar a los núcleos.
-        <br><br>
-        <strong>2. ¿Qué se mueve por el bus?</strong> Los pesos (parámetros). Son números de 2 bytes (FP16) o 4 bytes (FP32) o 0.5 bytes (INT4) que viajan desde la VRAM a los registros de los núcleos. Por cada token generado, se mueven ~3.8 GB (Q4) o ~14 GB (FP16) de pesos.
-        <br><br>
-        <strong>3. ¿Por qué no se quedan en el chip?</strong> Porque el chip solo tiene ~50 MB de caché. Los pesos de una sola capa ocupan ~265 MB. No caben. Hay que traerlos de VRAM capa por capa.
-        <br><br>
-        <strong>4. Si cuantizo, ¿muevo menos datos?</strong> Sí. INT4 ocupa 4× menos que FP16. Lees 4× menos del bus → generas ~4× más tokens por segundo.
-      </p>
+        <div class="p-3 bg-white rounded-xl border border-neutral-200">
+          <p class="font-semibold text-neutral-900 mb-1">❓ "¿Por qué 200 ciclos si la distancia son 2 cm?"</p>
+          <p class="text-neutral-600">Porque la VRAM tiene su propia latencia interna (~80 ciclos para buscar el dato dentro del chip). La distancia física solo explica ~10-20 ciclos. El resto es burocracia del protocolo de memoria.</p>
+        </div>
+        <div class="p-3 bg-white rounded-xl border border-neutral-200">
+          <p class="font-semibold text-neutral-900 mb-1">❓ "¿Qué es lo que se mueve por la autopista?"</p>
+          <p class="text-neutral-600">Los pesos (parámetros del modelo). Son números que viajan desde VRAM a los Tensor Cores para ser multiplicados. ~13 GB por token en FP16, ~3.5 GB por token en Q4.</p>
+        </div>
+        <div class="p-3 bg-white rounded-xl border border-neutral-200">
+          <p class="font-semibold text-neutral-900 mb-1">🚀 Conclusión final</p>
+          <p class="text-neutral-600">La inferencia de LLMs no es un problema de <strong>potencia de cálculo</strong> (tenemos de sobra). Es un problema de <strong>transporte de datos</strong>. La GPU pasa el 99% del tiempo esperando a que los pesos lleguen desde la VRAM. <strong>Cuantizar = reducir la carga a transportar = 4× más rápido.</strong></p>
+        </div>
+      </div>
     </div>
   </section>
+
 </DocLayout>
