@@ -1,0 +1,361 @@
+---
+import DocLayout from '../layouts/DocLayout.astro'
+import LevelTabs from '../components/content/LevelTabs.vue'
+import InfoBox from '../components/content/InfoBox.vue'
+import AttentionHeatmap from '../components/interactive/AttentionHeatmap.vue'
+---
+
+<DocLayout
+  title="Arquitectura Transformer"
+  description="La arquitectura Transformer explicada: atención, feed-forward, el bloque completo y cómo se ensamblan 32 capas para formar un LLM."
+  currentPath="/arquitectura"
+  :sections={[
+    { id: 'vision-global', label: 'Visión global', level: 'beginner' },
+    { id: 'atencion', label: 'Atención', level: 'deep' },
+    { id: 'feed-forward', label: 'Feed-Forward', level: 'deep' },
+    { id: 'bloque-completo', label: 'Bloque Transformer', level: 'advanced' },
+  ]}
+>
+  <h1 class="text-3xl font-bold text-neutral-900 mb-2">🏗️ Arquitectura Transformer</h1>
+  <p class="text-lg text-neutral-600 mb-8">
+    El Transformer es una fábrica con estaciones de trabajo dispuestas en cadena. Cada estación transforma los datos y los pasa a la siguiente.
+  </p>
+
+  <!-- ====== VISIÓN GLOBAL ====== -->
+  <section id="vision-global" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Una fábrica de palabras</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          El Transformer procesa la información en una cadena de estaciones:
+        </p>
+        <div class="flex flex-wrap items-center gap-2 text-sm font-mono mb-4">
+          <span class="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-lg">Entrada</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">Tokenizar</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">Embedding</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-primary-100 text-primary-700 rounded-lg">Capa 1</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-primary-100 text-primary-700 rounded-lg">Capa 2</span>
+          <span class="text-neutral-300">→</span>
+          <span class="text-neutral-400">...</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-primary-100 text-primary-700 rounded-lg">Capa N</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg">Salida</span>
+        </div>
+        <p class="text-neutral-700 leading-relaxed">
+          Cada <strong>Capa</strong> (Transformer Block) tiene 2 estaciones:
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-neutral-700 mt-3">
+          <li><strong>Atención</strong>: cada palabra "mira a las demás" para entender contexto</li>
+          <li><strong>Feed-Forward</strong>: cada palabra "piensa en lo que ha visto"</li>
+        </ol>
+        <p class="text-neutral-700 leading-relaxed mt-3">
+          Al final, una estación de salida convierte los vectores en probabilidades para elegir la siguiente palabra.
+        </p>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Diagrama de una capa</h2>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>     ┌─────────────────────────────────────┐
+     │         ENTRADA (x)                 │
+     │    [seq_len × d_model]              │
+     └────────────┬────────────────────────┘
+                  │
+                  ▼
+     ┌──────────────────────┐
+     │     RMSNorm          │  ← normalización
+     └────────────┬─────────┘
+                  │
+                  ▼
+     ┌─────────────────────────────────────┐
+     │  Multi-Head Self-Attention          │
+     │                                     │
+     │  Q = x · W_Q   [d_model → d_model] │
+     │  K = x · W_K   [d_model → d_model] │
+     │  V = x · W_V   [d_model → d_model] │
+     │                                     │
+     │  heads = split(Q,K,V, n_heads)     │
+     │  for each head:                     │
+     │    attn = softmax(Q·K^T/√d_k)·V     │
+     │                                     │
+     │  out = concat(heads) · W_O          │
+     └────────────┬────────────────────────┘
+                  │
+                  ▼
+     ┌──────────────────────┐
+     │  Residual: x + out   │  ← la conexión que salva el gradiente
+     └────────────┬─────────┘
+                  │
+                  ▼
+     ┌──────────────────────┐
+     │     RMSNorm          │
+     └────────────┬─────────┘
+                  │
+                  ▼
+     ┌─────────────────────────────────────┐
+     │  Feed-Forward (SwiGLU)              │
+     │                                     │
+     │  gate = SiLU(x · W_gate)            │
+     │  up   = x · W_up                    │
+     │  hidden = gate × up                 │
+     │  out   = hidden · W_down            │
+     │                                     │
+     │  d_model → d_ff → d_model           │
+     │  (d_ff ≈ 4 × d_model)              │
+     └────────────┬────────────────────────┘
+                  │
+                  ▼
+     ┌──────────────────────┐
+     │  Residual: x + out   │
+     └────────────┬─────────┘
+                  │
+                  ▼
+     ┌──────────────────────┐
+     │        SALIDA        │
+     │   (misma forma)      │
+     └──────────────────────┘</code></pre>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Parámetros clave por tamaño de modelo</h2>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Modelo</th><th class="px-3 py-2 text-right font-medium text-neutral-700">d_model</th><th class="px-3 py-2 text-right font-medium text-neutral-700">n_layers</th><th class="px-3 py-2 text-right font-medium text-neutral-700">n_heads</th><th class="px-3 py-2 text-right font-medium text-neutral-700">d_ff</th><th class="px-3 py-2 text-right font-medium text-neutral-700">n_params</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">TinyLLaMA 1.1B</td><td class="px-3 py-2 text-right">2048</td><td class="px-3 py-2 text-right">22</td><td class="px-3 py-2 text-right">16</td><td class="px-3 py-2 text-right">5632</td><td class="px-3 py-2 text-right">1.1B</td></tr>
+              <tr><td class="px-3 py-2">LLaMA 3.2 3B</td><td class="px-3 py-2 text-right">3072</td><td class="px-3 py-2 text-right">28</td><td class="px-3 py-2 text-right">24</td><td class="px-3 py-2 text-right">8192</td><td class="px-3 py-2 text-right">3.2B</td></tr>
+              <tr><td class="px-3 py-2 font-semibold">LLaMA 3.1 8B</td><td class="px-3 py-2 text-right font-semibold">4096</td><td class="px-3 py-2 text-right font-semibold">32</td><td class="px-3 py-2 text-right font-semibold">32</td><td class="px-3 py-2 text-right font-semibold">11008</td><td class="px-3 py-2 text-right font-semibold">8.0B</td></tr>
+              <tr><td class="px-3 py-2">Mistral 7B</td><td class="px-3 py-2 text-right">4096</td><td class="px-3 py-2 text-right">32</td><td class="px-3 py-2 text-right">32</td><td class="px-3 py-2 text-right">14336</td><td class="px-3 py-2 text-right">7.3B</td></tr>
+              <tr><td class="px-3 py-2">Qwen 2.5 14B</td><td class="px-3 py-2 text-right">5120</td><td class="px-3 py-2 text-right">48</td><td class="px-3 py-2 text-right">40</td><td class="px-3 py-2 text-right">13696</td><td class="px-3 py-2 text-right">14.3B</td></tr>
+              <tr><td class="px-3 py-2">LLaMA 3 70B</td><td class="px-3 py-2 text-right">8192</td><td class="px-3 py-2 text-right">80</td><td class="px-3 py-2 text-right">64</td><td class="px-3 py-2 text-right">22016</td><td class="px-3 py-2 text-right">70.6B</td></tr>
+              <tr><td class="px-3 py-2">DeepSeek V3 (MoE)</td><td class="px-3 py-2 text-right">7168</td><td class="px-3 py-2 text-right">67</td><td class="px-3 py-2 text-right">64</td><td class="px-3 py-2 text-right">2048×256</td><td class="px-3 py-2 text-right">671B</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Fórmula de total de parámetros (LLaMA-like):</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto"><code>Total = vocab × d_model                     (embedding + LM head)
+      + n_layers × 4 × d_model²             (attention: Q,K,V,O)
+      + n_layers × 3 × d_model × d_ff       (FFN: gate, up, down)
+      + n_layers × 2 × d_model              (2× RMSNorm por capa)
+      + 1 × d_model                         (RMSNorm final)</code></pre>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== ATENCIÓN ====== -->
+  <section id="atencion" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">El núcleo del Transformer</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          La atención es el mecanismo que permite a cada palabra <strong>mirar a las demás</strong> para entender el contexto.
+        </p>
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4">
+          <p class="text-sm text-blue-800">
+            💡 <strong>Analogía:</strong> estás en una fiesta y alguien dice "¡mira eso!". No sabes qué es "eso" hasta que ves hacia dónde mira. Eso es la atención: cada palabra mira a las demás para entender qué significan en este contexto.
+          </p>
+        </div>
+        <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
+          <p class="text-sm font-medium text-neutral-700 mb-2">Ejemplo:</p>
+          <p class="text-sm text-neutral-600"><em>"El banco cerró la cuenta"</em> → "banco" mira a "cerró" y "cuenta" → banco = entidad financiera</p>
+          <p class="text-sm text-neutral-600 mt-1"><em>"Me senté en el banco del parque"</em> → "banco" mira a "senté" y "parque" → banco = asiento</p>
+        </div>
+
+        <div class="mt-6">
+          <h3 class="text-lg font-semibold text-neutral-900 mb-3">Mapa de Atención Interactivo</h3>
+          <p class="text-sm text-neutral-600 mb-3">Escribe una frase y observa cómo cada token presta atención a los demás.</p>
+          <AttentionHeatmap client:only="vue" />
+        </div>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Scaled Dot-Product Attention</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Para cada token, creamos tres vectores:
+        </p>
+        <ul class="list-disc list-inside space-y-1 text-neutral-700 mb-4">
+          <li><strong>Q (Query)</strong>: "¿qué estoy buscando?"</li>
+          <li><strong>K (Key)</strong>: "¿qué información tengo?"</li>
+          <li><strong>V (Value)</strong>: "¿qué información doy?"</li>
+        </ul>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Score = Q · K^T           ← similitud entre cada par de tokens
+Scale: / √d_k             ← evitar que scores crezcan con dimensión
+Mask (causal): −∞ para tokens futuros ← en autoatención causal
+Softmax: normalizar a [0,1]
+Output: scores × V         ← suma ponderada de valores</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Multi-Head Attention</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          En lugar de una atención, hacemos h en paralelo. Para un modelo 7B: h=32 cabezas, d_head=128.
+          Cada cabeza aprende un tipo de relación diferente:
+        </p>
+        <ul class="list-disc list-inside space-y-1 text-neutral-700">
+          <li>Cabeza 1: relaciones sintácticas (sujeto-verbo)</li>
+          <li>Cabeza 2: relaciones anafóricas (pronombre → referente)</li>
+          <li>Cabeza 3: patrones posicionales</li>
+          <li>Cabeza 4: relaciones semánticas profundas</li>
+          <li>Cabeza 5-8: relaciones de negación, condición...</li>
+        </ul>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Variantes de atención</h2>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Tipo</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Ratio K,V compartidas</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Ahorro KV Cache</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Modelos</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">MHA (Multi-Head)</td><td class="px-3 py-2 text-right">1:1</td><td class="px-3 py-2 text-right">1×</td><td class="px-3 py-2">GPT-2, LLaMA 1</td></tr>
+              <tr><td class="px-3 py-2">GQA (Grouped Query)</td><td class="px-3 py-2 text-right">8 queries → 1 par K,V</td><td class="px-3 py-2 text-right">8×</td><td class="px-3 py-2">LLaMA 2/3, Mistral</td></tr>
+              <tr><td class="px-3 py-2">MQA (Multi-Query)</td><td class="px-3 py-2 text-right">todas → 1 par K,V</td><td class="px-3 py-2 text-right">32×</td><td class="px-3 py-2">Falcon, PaLM</td></tr>
+              <tr><td class="px-3 py-2">MLA (Multi-Latent)</td><td class="px-3 py-2 text-right">compresión latente</td><td class="px-3 py-2 text-right">~10×</td><td class="px-3 py-2">DeepSeek V2/V3</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <InfoBox type="tip" client:only="vue">
+          <strong>FlashAttention:</strong> optimización de memoria que no materializa la matriz de atención completa (N²), procesa por bloques (tiling), usa memoria compartida del SM (mucho más rápida que VRAM). Logra 2-4× más velocidad y usa mucha menos VRAM.
+        </InfoBox>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== FEED-FORWARD ====== -->
+  <section id="feed-forward" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">La memoria del conocimiento</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Si la atención decide <strong>qué información</strong> considerar, el Feed-Forward decide <strong>qué hacer con ella</strong>.
+        </p>
+        <div class="flex flex-wrap items-center gap-2 text-sm font-mono mb-4">
+          <span class="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-lg">Entrada</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">Expansión 4×</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">Activación</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">Compresión</span>
+          <span class="text-neutral-300">→</span>
+          <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg">Salida</span>
+        </div>
+        <p class="text-neutral-700 leading-relaxed">
+          Es como preguntar a un experto: le das la información, el experto consulta su memoria (expansión), filtra lo relevante (activación), y te da una respuesta elaborada (compresión).
+        </p>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">SwiGLU en detalle</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          En LLaMA y modelos modernos se usa <strong>SwiGLU</strong> (una variante de GLU con activación SiLU):
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>RMSNorm(x)   → normalización
+
+x · W_up     → proyección UP: [d_model] → [d_ff]     (expansión)
+x · W_gate   → proyección GATE: [d_model] → [d_ff]   (control)
+SiLU(x_gate) × x_up   → activación elemento a elemento
+resultado · W_down   → proyección DOWN: [d_ff] → [d_model] (compresión)</code></pre>
+        <p class="text-sm text-neutral-600 mb-4">Donde d_ff ≈ 4 × d_model (para 7B: 4096 → 11008).</p>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">¿Qué hace realmente cada neurona?</h3>
+        <p class="text-neutral-700 leading-relaxed mb-3">
+          Se ha observado que neuronas individuales se especializan:
+        </p>
+        <ul class="list-disc list-inside space-y-1 text-neutral-700">
+          <li>Neurona 5723: se activa con contextos relacionados a París</li>
+          <li>Neurona 8921: se activa con términos de programación</li>
+          <li>Neurona 1452: se activa con conceptos matemáticos</li>
+        </ul>
+        <p class="text-sm text-neutral-600 mt-3">
+          Eliminar una neurona específica puede eliminar la capacidad de hablar de un tema concreto. Esto se llama <strong>"surgical model editing"</strong> y se usa para corregir hechos sin reentrenar.
+        </p>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Activaciones en modelos modernos</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Tipo</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Fórmula</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Usado en</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">ReLU</td><td class="px-3 py-2 font-mono text-xs">max(0, x)</td><td class="px-3 py-2">GPT-1, modelos antiguos</td></tr>
+              <tr><td class="px-3 py-2">GELU</td><td class="px-3 py-2 font-mono text-xs">x · Φ(x) (CDF gaussiana)</td><td class="px-3 py-2">GPT-2, BERT</td></tr>
+              <tr><td class="px-3 py-2">Swish/SiLU</td><td class="px-3 py-2 font-mono text-xs">x · σ(x)</td><td class="px-3 py-2">LLaMA 1</td></tr>
+              <tr><td class="px-3 py-2 font-semibold">SwiGLU</td><td class="px-3 py-2 font-mono text-xs">SiLU(x·W_gate) × (x·W_up)</td><td class="px-3 py-2">LLaMA 2/3, Mistral</td></tr>
+              <tr><td class="px-3 py-2">GeGLU</td><td class="px-3 py-2 font-mono text-xs">GELU(x·W_gate) × (x·W_up)</td><td class="px-3 py-2">PaLM</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== BLOQUE COMPLETO ====== -->
+  <section id="bloque-completo" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">El bloque Transformer completo</h2>
+    <p class="text-neutral-700 leading-relaxed mb-4">
+      32 capas como esta apiladas forman un modelo de 7B parámetros.
+    </p>
+    <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto"><code>        ┌────────────────────────────┐
+        │  x ∈ [seq_len × 4096]      │  ← activación de la capa anterior
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  RMSNorm                   │  4096 params (escala)
+        │  y = x / sqrt(mean(x²) + ε)│
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌──────────────────────────────────────────────────┐
+        │  ATTENTION (4 matrices de 4096×4096 ≈ 67M params)│
+        │                                                  │
+        │  Q = x · W_Q    →  [s, 4096]                    │
+        │  K = x · W_K    →  [s, 4096]                    │
+        │  V = x · W_V    →  [s, 4096]                    │
+        │                                                  │
+        │  Reshape: [s, 32×128] → 32 cabezas [s, 128]     │
+        │  for head in 32:                                 │
+        │    attn = softmax(Q·K^T/11.3) · V   √128 = 11.3 │
+        │  Concat + W_O    →  [s, 4096]                   │
+        └────────────┬─────────────────────────────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  + x (residual)            │  → [s, 4096]
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  RMSNorm                   │
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌──────────────────────────────────────────────────┐
+        │  FFN (SwiGLU) (3 matrices ≈ 135M params)         │
+        │                                                  │
+        │  gate = SiLU(x · W_gate)    [4096→11008]        │
+        │  up   = x · W_up           [4096→11008]         │
+        │  hidden = gate × up        [11008]              │
+        │  out   = hidden · W_down   [11008→4096]         │
+        └────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  + x (residual)            │
+        └────────────┬───────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────┐
+        │  x' ∈ [seq_len × 4096]    │  ← salida = entrada de la sig. capa
+        └────────────────────────────┘</code></pre>
+  </section>
+</DocLayout>

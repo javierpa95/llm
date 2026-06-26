@@ -1,0 +1,217 @@
+---
+import DocLayout from '../layouts/DocLayout.astro'
+import LevelTabs from '../components/content/LevelTabs.vue'
+import InfoBox from '../components/content/InfoBox.vue'
+---
+
+<DocLayout
+  title="Entrenamiento"
+  description="Cómo se entrenan los LLMs: pre-training, SFT, RLHF, y por qué alucinan."
+  currentPath="/entrenamiento"
+  :sections={[
+    { id: 'como-se-entrenan', label: '¿Cómo se entrenan?', level: 'beginner' },
+    { id: 'fases-entrenamiento', label: 'Fases del entrenamiento', level: 'deep' },
+    { id: 'paralelismo', label: 'Paralelismo', level: 'advanced' },
+    { id: 'alucinaciones', label: 'Alucinaciones', level: 'deep' },
+  ]}
+>
+  <h1 class="text-3xl font-bold text-neutral-900 mb-2">📚 Entrenamiento</h1>
+  <p class="text-lg text-neutral-600 mb-8">
+    Cómo se ajustan los millones de parámetros para que el modelo aprenda a predecir la siguiente palabra, y por qué a veces se inventa cosas.
+  </p>
+
+  <!-- ====== CÓMO SE ENTRENAN ====== -->
+  <section id="como-se-entrenan" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Ajustar los parámetros</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          El entrenamiento es el proceso de <strong>ajustar los millones de parámetros</strong> para que el modelo acierte la siguiente palabra.
+        </p>
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4">
+          <p class="text-sm text-blue-800">
+            💡 Imagina a un estudiante (el modelo) que tiene que hacer un examen de rellenar la palabra que falta en millones de frases. Cada vez que falla, ajusta ligeramente sus "conexiones cerebrales" (parámetros) para acertar la próxima vez.
+          </p>
+        </div>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">3 fases del entrenamiento moderno:</h3>
+        <ol class="list-decimal list-inside space-y-2 text-neutral-700">
+          <li><strong>Pre-training</strong>: aprende de Internet (billones de palabras)</li>
+          <li><strong>SFT (Supervised Fine-Tuning)</strong>: aprende a conversar con ejemplos</li>
+          <li><strong>RLHF / GRPO</strong>: aprende qué respuestas prefiere un humano</li>
+        </ol>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Pre-training (Next Token Prediction)</h2>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Dataset: CommonCrawl + libros + artículos + código (~15T tokens)
+Objetivo: predecir el siguiente token
+
+Cada batch:
+  1. Forward: calcula P(token_i | token_&#123;&lt;i&#125;) para todos los tokens
+  2. Loss: cross-entropy entre predicción y token real
+  3. Backward: gradiente de la pérdida respecto a cada parámetro
+     (regla de la cadena, backpropagation)
+  4. Optimizer step: ajustar parámetros (AdamW)
+
+Coste estimado:
+  LLaMA 3 70B: ~6.4M GPU-hours en H100 (~3 meses con 3000 GPUs)
+  Coste: ~$50-100M USD</code></pre>
+
+        <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl mb-4">
+          <p class="text-sm font-medium text-neutral-700 mb-2">Secuencia completa en cada paso:</p>
+          <pre class="text-xs font-mono">input_ids → Forward → logits → Loss → loss_value
+labels → Backward → gradients → Optimizer → pesos w'</pre>
+        </div>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">SFT (Fine-tuning supervisado)</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Dataset: pares (instrucción, respuesta ideal) — ~100k-1M ejemplos
+Objetivo: que el modelo imite las respuestas correctas
+
+Ejemplo:
+  Input: "Explica la fotosíntesis en una frase"
+  Target: "Las plantas convierten luz solar en energía química"
+
+Coste: horas o días en una GPU (vs meses para pre-training)</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">RLHF / GRPO (Alineamiento)</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto"><code>1. Generar varias respuestas para un prompt
+2. Un reward model (modelo entrenado para evaluar) las puntúa
+3. El LLM se ajusta para maximizar la recompensa esperada
+   (PPO: Proximal Policy Optimization, o GRPO: Group Relative Policy Opt.)
+
+GRPO (DeepSeek R1):
+  - Genera un grupo de respuestas para el mismo prompt
+  - Puntúa cada una
+  - Actualiza el modelo para favorecer las mejor puntuadas
+  - No necesita reward model externo (más eficiente que RLHF)</code></pre>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Training vs Inference cost</h2>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Training:
+  - Forward + Backward + Optimizer step
+  - Necesita almacenar activaciones (muchísima VRAM)
+  - Necesita almacenar gradientes
+  - Necesita almacenar estados del optimizer (Adam: 2× params)
+  - Ej: LLaMA 70B training necesita ~500 GB de VRAM
+
+Inference:
+  - Solo Forward
+  - No necesita gradientes ni optimizer states
+  - Ej: LLaMA 70B inference en Q4_K_M necesita ~40+5 GB
+  - Ratio: training cuesta 10-20× más que inference</code></pre>
+
+        <InfoBox type="hot" client:only="vue">
+          <strong>Entrenar un modelo 70B cuesta ~$50-100M USD</strong> y requiere meses con miles de GPUs. Ejecutarlo (inferencia) cuesta unos céntimos por hora.
+        </InfoBox>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== PARALELISMO ====== -->
+  <section id="paralelismo" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">Paralelismo de entrenamiento</h2>
+
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Los modelos más grandes no caben en una sola GPU. Por eso se usan técnicas de paralelismo para distribuir el trabajo entre muchas GPUs.
+        </p>
+      </template>
+
+      <template #deep>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Tipo</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Divide</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Cuándo se usa</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">DDP (Data Parallel)</td><td class="px-3 py-2">Datos: cada GPU procesa batch distinto</td><td class="px-3 py-2">Modelos que caben en 1 GPU</td></tr>
+              <tr><td class="px-3 py-2">TP (Tensor Parallel)</td><td class="px-3 py-2">Capas: parte la matriz entre GPUs</td><td class="px-3 py-2">Modelos medianos (7-70B)</td></tr>
+              <tr><td class="px-3 py-2">PP (Pipeline Parallel)</td><td class="px-3 py-2">Capas: cada GPU tiene capas distintas</td><td class="px-3 py-2">Modelos grandes</td></tr>
+              <tr><td class="px-3 py-2">FSDP</td><td class="px-3 py-2">Parámetros: sharding de pesos, activaciones, gradientes</td><td class="px-3 py-2">Alternativa a TP+PP</td></tr>
+              <tr><td class="px-3 py-2">ZeRO (Stages 1-3)</td><td class="px-3 py-2">Estados del optimizer, gradientes, parámetros</td><td class="px-3 py-2">Base de FSDP</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+
+      <template #advanced>
+        <p class="text-neutral-700 leading-relaxed">
+          En la práctica, los entrenamientos de modelos grandes combinan varias técnicas simultáneamente. Por ejemplo, LLaMA 3 405B usó TP=8, PP=8, DP=1024 en 16,384 GPUs H100, con comunicación a través de NVLink y redes InfiniBand.
+        </p>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== ALUCINACIONES ====== -->
+  <section id="alucinaciones" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">¿Por qué alucinan?</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Los LLMs <strong>no saben qué es verdad</strong>. Solo saben qué palabra es más probable estadísticamente.
+        </p>
+        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl mb-4">
+          <p class="text-sm text-yellow-800">
+            ⚠️ Cuando un LLM dice algo falso con total confianza, es porque esa secuencia de palabras era probable según su entrenamiento. No "miente" porque no tiene intención. <strong>Alucina</strong>.
+          </p>
+        </div>
+        <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
+          <p class="text-sm font-medium text-neutral-700 mb-2">Ejemplo:</p>
+          <p class="text-sm text-neutral-600">Prompt: "¿Qué tratado firmó Napoleón con la reina de Marte?"</p>
+          <p class="text-sm text-neutral-600">El modelo podría decir: "El Tratado de Olympus Mons"</p>
+          <p class="text-sm text-neutral-500 mt-1">porque "Tratado de..." + "Napoleón" + "Marte" → secuencia plausible estadísticamente</p>
+        </div>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Causas técnicas</h2>
+        <ol class="list-decimal list-inside space-y-3 text-neutral-700 mb-4">
+          <li><strong>Next-token prediction no busca verdad</strong>: el objetivo es maximizar P(token | contexto). No hay penalización por falsedades, solo por baja probabilidad.</li>
+          <li><strong>Knowledge cutoff</strong>: el modelo solo sabe lo que había en sus datos de entrenamiento. No tiene acceso a información nueva.</li>
+          <li><strong>Overconfidence</strong>: para preguntas raras, todas las opciones tienen baja probabilidad, pero softmax siempre elige una con confianza alta.</li>
+          <li><strong>Memorización vs generalización</strong>: hechos frecuentes se memorizan; hechos raros se "reconstruyen" mezclando patrones.</li>
+          <li><strong>Ambigüedad del contexto</strong>: "El banco..." sin más contexto: el modelo distribuye 50/50 entre financiero y parque.</li>
+        </ol>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Soluciones parciales</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Técnica</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Cómo ayuda</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">RAG (Retrieval Augmented Generation)</td><td class="px-3 py-2">Añadir búsqueda en BD antes de generar</td></tr>
+              <tr><td class="px-3 py-2">Tool use</td><td class="px-3 py-2">Dejar que el modelo ejecute código (cálculos)</td></tr>
+              <tr><td class="px-3 py-2">Chain-of-Thought</td><td class="px-3 py-2">Forzar razonamiento paso a paso</td></tr>
+              <tr><td class="px-3 py-2">Temperatura baja</td><td class="px-3 py-2">Reduce creatividad (pero también variedad)</td></tr>
+              <tr><td class="px-3 py-2">Verificación externa</td><td class="px-3 py-2">Validar hechos contra fuentes externas</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Métrica de calibración</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          La calibración mide si la confianza del modelo coincide con su precisión.
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Perfect calibration: cuando el modelo dice P=0.9, acierta el 90% de las veces.
+
+Expected Calibration Error (ECE) = Σ |accuracy(bin) - confidence(bin)|
+
+Ejemplo: de todas las veces que el modelo asigna P=0.7, solo acierta el 40%
+  → ECE = |0.4 - 0.7| = 0.3 (mal calibrado)</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Investigación sobre alucinaciones (2025-2026)</h3>
+        <ul class="list-disc list-inside space-y-1 text-neutral-700">
+          <li><strong>Model editing</strong>: modificar pesos específicos para corregir hechos falsos (ROME, MEMIT, FT)</li>
+          <li><strong>Contrastive decoding</strong>: restar la distribución de un modelo más pequeño para reducir tokens "demasiado obvios"</li>
+          <li><strong>Entropy-based detection</strong>: detectar alucinaciones midiendo la entropía de la distribución de atención</li>
+        </ul>
+      </template>
+    </LevelTabs>
+  </section>
+</DocLayout>

@@ -1,0 +1,267 @@
+---
+import DocLayout from '../layouts/DocLayout.astro'
+import LevelTabs from '../components/content/LevelTabs.vue'
+import InfoBox from '../components/content/InfoBox.vue'
+import SpeedCalculator from '../components/interactive/SpeedCalculator.vue'
+---
+
+<DocLayout
+  title="Inferencia"
+  description="Bucle autoregresivo, KV Cache, velocidad real y calculadora de tokens/s para tu GPU."
+  currentPath="/inferencia"
+  :sections={[
+    { id: 'bucle-autoregresivo', label: 'Bucle autoregresivo', level: 'beginner' },
+    { id: 'kv-cache', label: 'KV Cache', level: 'deep' },
+    { id: 'velocidad', label: 'Velocidad', level: 'deep' },
+    { id: 'speed-calculator', label: 'Calculadora', level: 'deep' },
+  ]}
+>
+  <h1 class="text-3xl font-bold text-neutral-900 mb-2">⚡ Inferencia</h1>
+  <p class="text-lg text-neutral-600 mb-8">
+    Cómo un LLM genera texto paso a paso, qué optimizaciones existen y a qué velocidad puedes esperar que funcione en tu hardware.
+  </p>
+
+  <!-- ====== BUCLE AUTOREGRESIVO ====== -->
+  <section id="bucle-autoregresivo" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Un token cada vez</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          <strong>Un LLM genera un token cada vez.</strong> No es como una imagen que aparece entera. Es como alguien que escribe letra por letra: cada nueva letra depende de todo lo que ha escrito antes.
+        </p>
+        <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-mono text-sm mb-4">
+          <div class="text-neutral-500 text-xs mb-2">Mensaje original: "La capital de Francia es"</div>
+          <div class="space-y-1">
+            <div><span class="text-blue-600">Iteración 1:</span> prompt = "La capital de Francia es" → <span class="text-green-600 font-bold">genera "París"</span></div>
+            <div><span class="text-blue-600">Iteración 2:</span> prompt = "La capital de Francia es París" → <span class="text-green-600 font-bold">genera "."</span></div>
+            <div><span class="text-blue-600">Iteración 3:</span> prompt = "La capital de Francia es París." → <span class="text-green-600 font-bold">genera "Es"</span></div>
+            <div><span class="text-blue-600">Iteración 4:</span> prompt = "La capital de Francia es París. Es" → <span class="text-green-600 font-bold">genera "una"</span></div>
+            <div><span class="text-blue-600">Iteración 5:</span> prompt = "La capital de Francia es París. Es una" → <span class="text-green-600 font-bold">genera "ciudad"</span></div>
+          </div>
+        </div>
+        <p class="text-neutral-700 leading-relaxed">
+          Cada iteración = <strong>forward pass completo</strong> del modelo.
+        </p>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">El coste O(N²)</h2>
+        <p class="text-neutral-700 leading-relaxed mb-3">Sin ninguna optimización:</p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Paso 1: Forward([t1, t2, t3, t4, t5])    → t6
+Paso 2: Forward([t1, t2, t3, t4, t5, t6]) → t7
+...
+Paso N: Forward([t1 ... t_&#123;M+N&#125;])        → t_&#123;M+N+1&#125;
+
+Donde M = tokens de entrada, N = tokens de salida.
+
+FLOPs totales ≈ Σ_&#123;i=1&#125;^&#123;N&#125; (M + i) × O(d_model²)
+              ≈ N × (M + N/2) × O(d_model²)
+              ≈ O(N × (M+N))   ← CUADRÁTICO en tokens generados</code></pre>
+
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <p class="text-sm text-blue-800">
+            💡 <strong>Ejemplo:</strong> M=50 tokens de prompt, N=100 tokens generados, d_model=4096. FLOPs totales = 100 × (50+50) × 4096² = 167 GFLOP. Pero el 98% del tiempo es mover memoria, no computar. Tiempo real ≈ 14 GB (pesos) / 1008 GB/s × 100 pasos ≈ 1.4 segundos.
+          </p>
+        </div>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Speculative Decoding</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Técnica para acelerar el bucle autoregresivo usando un modelo pequeño (draft) para generar K tokens rápidamente, luego el modelo grande (target) los verifica en paralelo.
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>1. Draft (modelo pequeño, rápido): genera K tokens especulativos
+2. Verify (modelo grande): procesa los K tokens en UN forward pass
+   (paralelo, porque la atención puede ver todos a la vez)
+3. Si todos son aceptados → ahorro de K-1 forward passes
+   Si alguno es rechazado → retroceder y regenerar
+
+Ahorro típico: 2-3× en velocidad.</code></pre>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== KV CACHE ====== -->
+  <section id="kv-cache" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">La optimización que lo cambia todo</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          <strong>El problema:</strong> en cada paso del bucle, recalculamos las mismas cosas una y otra vez. Los tokens del prompt original no cambian, pero los procesamos cada vez.
+        </p>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          <strong>La solución:</strong> guardar (cachear) las matrices K y V de cada token. Cuando generamos un nuevo token, solo procesamos ese token nuevo y reutilizamos lo guardado de los anteriores.
+        </p>
+        <div class="grid sm:grid-cols-2 gap-4 mb-4">
+          <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+            <p class="text-sm font-semibold text-red-700 mb-2">❌ Sin KV Cache</p>
+            <p class="text-xs text-red-600 font-mono">Paso 1: [A, B, C] → D</p>
+            <p class="text-xs text-red-600 font-mono">Paso 2: [A, B, C, D] → E</p>
+            <p class="text-xs text-red-600 font-mono">Paso 3: [A, B, C, D, E] → F</p>
+          </div>
+          <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
+            <p class="text-sm font-semibold text-green-700 mb-2">✅ Con KV Cache</p>
+            <p class="text-xs text-green-600 font-mono">Paso 1: [A, B, C] → D → guardar</p>
+            <p class="text-xs text-green-600 font-mono">Paso 2: [D] → E → guardar K_D, V_D</p>
+            <p class="text-xs text-green-600 font-mono">Paso 3: [E] → F → guardar K_E, V_E</p>
+          </div>
+        </div>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Prefill y Decode</h2>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-2">Fase 1: Prefill — procesar el prompt (paralelo)</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Entrada: [t1, t2, ..., tM] (todos a la vez)
+- Forward completo para todos los tokens
+- Atención: matriz M×M
+- Se genera el primer token de salida
+- Se guarda K_i, V_i para todos los tokens en KV Cache
+
+Coste: ~1 forward pass de tamaño M (rápido, ~50 ms para 100 tokens)</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-2">Fase 2: Decode — generar tokens uno a uno (serial)</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Entrada: [t_&#123;M+k&#125;] (solo el nuevo token)
+- Forward de UN SOLO token
+- Q_&#123;nuevo&#125;: se calcula para el token nuevo
+- K_&#123;nuevo&#125;, V_&#123;nuevo&#125;: se calculan y se añaden a la cache
+- Atención: Q_&#123;nuevo&#125; mira a [K_cache + K_&#123;nuevo&#125;]
+- FFN para el token nuevo
+
+Coste: ~1 forward pass de tamaño 1 (rápido, ~5 ms por token)</code></pre>
+
+        <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
+          <p class="text-sm text-green-800">
+            🟢 <strong>Ahorro:</strong> Para M=50, N=100 tokens: sin KV Cache → ~10,050 unidades; con KV Cache → 150 unidades. <strong>Ahorro: ~98%.</strong>
+          </p>
+        </div>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">El coste oculto: VRAM</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          La KV Cache ocupa mucha VRAM, proporcional a:
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>KV_Cache_bytes = 2 × n_layers × d_model × n_tokens × bytes_por_param
+
+Para LLaMA 7B, 4096 tokens, FP16:
+  = 2 × 32 × 4096 × 4096 × 2
+  = 2.147 GB
+
+Para 128k tokens (LLaMA 3.1 8B):
+  = 2 × 32 × 4096 × 131072 × 2
+  = 68.7 GB   ← más que el propio modelo (16 GB en FP16)</code></pre>
+
+        <InfoBox type="hot" client:only="vue">
+          <strong>Para contexto largo, la KV Cache es el nuevo modelo.</strong>
+        </InfoBox>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mt-6 mb-3">Técnicas de compresión de KV Cache</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Técnica</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Factor</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Cómo</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">GQA</td><td class="px-3 py-2 text-right">8×</td><td class="px-3 py-2">8 queries comparten 1 par KV</td></tr>
+              <tr><td class="px-3 py-2">KV Cache quantization</td><td class="px-3 py-2 text-right">2×</td><td class="px-3 py-2">Guardar KV en INT8</td></tr>
+              <tr><td class="px-3 py-2">Budget forcing</td><td class="px-3 py-2 text-right">Variable</td><td class="px-3 py-2">Solo guardar los últimos N tokens</td></tr>
+              <tr><td class="px-3 py-2">H2O (Heavy Hitter)</td><td class="px-3 py-2 text-right">5×</td><td class="px-3 py-2">Solo guardar tokens con alta atención</td></tr>
+              <tr><td class="px-3 py-2">MLA (DeepSeek)</td><td class="px-3 py-2 text-right">~10×</td><td class="px-3 py-2">Comprimir KV en espacio latente</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== VELOCIDAD ====== -->
+  <section id="velocidad" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Ancho de banda → tokens/s</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          La velocidad a la que un LLM genera texto depende casi exclusivamente del <strong>ancho de banda de memoria de tu GPU</strong>, no de lo rápida que sea haciendo cálculos.
+        </p>
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <p class="text-sm text-blue-800">
+            💡 Es como una fábrica embotellando agua: la línea de embotellado es rapidísima (TFLOPS), pero el agua llega por una tubería estrecha (ancho de banda). El cuello de botella es la tubería, no la embotelladora.
+          </p>
+        </div>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">La fórmula</h2>
+        <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-mono text-sm mb-4">
+          tokens/s ≈ BW_memoria / (n_params × bytes_por_param)
+        </div>
+
+        <p class="text-sm font-semibold text-neutral-700 mb-2">Tabla para modelo 7B (batch=1):</p>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">GPU</th><th class="px-3 py-2 text-right font-medium text-neutral-700">BW (GB/s)</th><th class="px-3 py-2 text-right font-medium text-neutral-700">FP16</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Q4_K_M</th><th class="px-3 py-2 text-right font-medium text-neutral-700">INT8</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">RTX 4090</td><td class="px-3 py-2 text-right">1008</td><td class="px-3 py-2 text-right">72 t/s</td><td class="px-3 py-2 text-right">240 t/s</td><td class="px-3 py-2 text-right">144 t/s</td></tr>
+              <tr><td class="px-3 py-2">RTX 4080</td><td class="px-3 py-2 text-right">716</td><td class="px-3 py-2 text-right">51 t/s</td><td class="px-3 py-2 text-right">170 t/s</td><td class="px-3 py-2 text-right">102 t/s</td></tr>
+              <tr><td class="px-3 py-2">RTX 4070</td><td class="px-3 py-2 text-right">504</td><td class="px-3 py-2 text-right">36 t/s</td><td class="px-3 py-2 text-right">120 t/s</td><td class="px-3 py-2 text-right">72 t/s</td></tr>
+              <tr><td class="px-3 py-2">RTX 4060</td><td class="px-3 py-2 text-right">272</td><td class="px-3 py-2 text-right">19 t/s</td><td class="px-3 py-2 text-right">65 t/s</td><td class="px-3 py-2 text-right">39 t/s</td></tr>
+              <tr><td class="px-3 py-2">RTX 3090</td><td class="px-3 py-2 text-right">936</td><td class="px-3 py-2 text-right">67 t/s</td><td class="px-3 py-2 text-right">223 t/s</td><td class="px-3 py-2 text-right">134 t/s</td></tr>
+              <tr><td class="px-3 py-2">A100</td><td class="px-3 py-2 text-right">2039</td><td class="px-3 py-2 text-right">146 t/s</td><td class="px-3 py-2 text-right">486 t/s</td><td class="px-3 py-2 text-right">291 t/s</td></tr>
+              <tr><td class="px-3 py-2">H100</td><td class="px-3 py-2 text-right">3352</td><td class="px-3 py-2 text-right">239 t/s</td><td class="px-3 py-2 text-right">798 t/s</td><td class="px-3 py-2 text-right">479 t/s</td></tr>
+              <tr><td class="px-3 py-2">DDR5-4800 (CPU)</td><td class="px-3 py-2 text-right">50</td><td class="px-3 py-2 text-right">3.6 t/s</td><td class="px-3 py-2 text-right">12 t/s</td><td class="px-3 py-2 text-right">7.1 t/s</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+          <p class="text-sm text-yellow-800">
+            ⚠️ Las velocidades reales suelen ser 60-80% de la teórica por overhead de atención, softmax y normalización. llama.cpp logra ~70-80% de eficiencia.
+          </p>
+        </div>
+
+        <p class="text-sm text-neutral-600 mt-4">
+          <strong>Qué significan estas velocidades:</strong> 240 t/s → respuesta instantánea (como ChatGPT); 50 t/s → cómodo; 10 t/s → visiblemente lento; 2 t/s → doloroso.
+        </p>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">¿Por qué el ancho de banda y no los TFLOPS?</h2>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Modelo 7B FP16: 14 GB de pesos
+GPU RTX 4090:   1008 GB/s, 82 TFLOPS
+
+Por token:
+  Leer pesos de VRAM: 14 GB / 1008 GB/s = 13.9 ms
+  Operaciones: 14 GFLOP / 82 TFLOPS = 0.17 ms
+
+  → 98.8% del tiempo es I/O de memoria
+  → 1.2% es cómputo real
+
+Si la GPU fuera 10× más rápida en cómputo:
+  → Velocidad pasaría de 72 t/s a 73 t/s  (casi nada)</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mt-6 mb-3">Batch Size > 1 (throughput)</h3>
+        <p class="text-neutral-700 leading-relaxed mb-3">
+          En servidores de producción, se usa batch size > 1 para atender a varios usuarios simultáneamente:
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto"><code>Batch=1:  14 GB de pesos → 1 usuario     → 72 t/s
+Batch=4:  14 GB de pesos → 4 usuarios    → 4 × 50 t/s = 200 t/s total
+Batch=16: 14 GB de pesos → 16 usuarios   → 16 × 30 t/s = 480 t/s total</code></pre>
+
+        <InfoBox type="tip" client:only="vue">
+          <strong>vLLM y PagedAttention:</strong> Gestiona KV Cache como páginas de memoria virtual, elimina fragmentación, comparte KV Cache entre requests con el mismo prefijo (Prompt Caching). Mejora el throughput 2-4× respecto a implementación naive.
+        </InfoBox>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== CALCULADORA DE VELOCIDAD ====== -->
+  <section id="speed-calculator" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">Calculadora de Velocidad</h2>
+    <p class="text-neutral-600 mb-6">
+      Selecciona un modelo, una GPU y una precisión para calcular los tokens/s estimados y ver el cuello de botella.
+    </p>
+    <SpeedCalculator client:only="vue" />
+  </section>
+</DocLayout>

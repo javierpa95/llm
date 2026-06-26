@@ -1,0 +1,242 @@
+---
+import DocLayout from '../layouts/DocLayout.astro'
+import LevelTabs from '../components/content/LevelTabs.vue'
+import InfoBox from '../components/content/InfoBox.vue'
+import VrmCalculator from '../components/interactive/VrmCalculator.vue'
+---
+
+<DocLayout
+  title="Fundamentos"
+  description="Parámetros, memoria, cuantización y calculadora de VRAM — los fundamentos de los LLMs explicados en 3 niveles."
+  currentPath="/fundamentos"
+  :sections={[
+    { id: 'parametros', label: 'Parámetros', level: 'beginner' },
+    { id: 'memoria', label: 'Memoria', level: 'deep' },
+    { id: 'cuantizacion', label: 'Cuantización', level: 'advanced' },
+    { id: 'vram-calculator', label: 'Calculadora VRAM', level: 'deep' },
+  ]}
+>
+  <h1 class="text-3xl font-bold text-neutral-900 mb-2">Fundamentos</h1>
+  <p class="text-lg text-neutral-600 mb-8">
+    Los números que hacen funcionar un LLM: cuántos hay, dónde viven y cómo ocupar menos espacio.
+  </p>
+
+  <!-- ====== PARÁMETROS ====== -->
+  <section id="parametros" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">¿Qué es un parámetro?</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Un <strong>parámetro</strong> es un número que el modelo aprendió durante el entrenamiento.
+        </p>
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4">
+          <p class="text-sm text-blue-800">
+            💡 Imagina una máquina de palancas. Cada palanca (parámetro) tiene un valor numérico que modifica cómo se transforma la señal de entrada. Durante el entrenamiento, millones de estas palancas se ajustan minuciosamente hasta que la máquina acierta la siguiente palabra.
+          </p>
+        </div>
+        <ul class="list-disc list-inside space-y-2 text-neutral-700">
+          <li>7 mil millones de parámetros = 7 mil millones de números</li>
+          <li>Cada número ocupa espacio en memoria</li>
+          <li>Más parámetros = más capacidad = más memoria</li>
+        </ul>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Distribución de parámetros</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Los parámetros están organizados en <strong>matrices</strong> (tensores). Cada capa del modelo contiene una o más matrices de pesos.
+        </p>
+        <p class="text-sm font-semibold text-neutral-700 mb-2">Distribución típica en un Transformer estilo LLaMA 7B (~6.7B params):</p>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Componente</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">Parámetros</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">%</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Descripción</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">Attention (Q,K,V,O)</td><td class="px-3 py-2 text-right">~1.1B</td><td class="px-3 py-2 text-right">16%</td><td class="px-3 py-2">4 proyecciones lineales</td></tr>
+              <tr><td class="px-3 py-2">Feed-Forward (gate,up,down)</td><td class="px-3 py-2 text-right">~4.2B</td><td class="px-3 py-2 text-right">63%</td><td class="px-3 py-2">3 proyecciones con expansión 4×</td></tr>
+              <tr><td class="px-3 py-2">Token Embedding</td><td class="px-3 py-2 text-right">~0.5B</td><td class="px-3 py-2 text-right">8%</td><td class="px-3 py-2">Lookup table vocab → d_model</td></tr>
+              <tr><td class="px-3 py-2">LM Head (output)</td><td class="px-3 py-2 text-right">~0.5B</td><td class="px-3 py-2 text-right">8%</td><td class="px-3 py-2">Proyección d_model → logits</td></tr>
+              <tr><td class="px-3 py-2">RMSNorm + biases</td><td class="px-3 py-2 text-right">~0.1B</td><td class="px-3 py-2 text-right">1.5%</td><td class="px-3 py-2">Normalizaciones capa a capa</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <InfoBox type="tip" client:only="vue">
+          <strong>Dato clave:</strong> el Feed-Forward (MLP) ocupa ~2/3 de todos los parámetros. La atención es pequeña en comparación. Cada neurona del FFN parece especializarse en recuperar hechos concretos.
+        </InfoBox>
+        <p class="text-sm font-semibold text-neutral-700 mb-2 mt-4">Tamaños más comunes en 2025-2026:</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Etiqueta</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Params reales</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Modelos</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">1-3B</td><td class="px-3 py-2 text-right">1.3-3B</td><td class="px-3 py-2">TinyLLaMA, Phi-3, Gemma 2</td></tr>
+              <tr><td class="px-3 py-2">7-8B</td><td class="px-3 py-2 text-right">6.7-8B</td><td class="px-3 py-2">LLaMA 3, Mistral, Qwen 2.5</td></tr>
+              <tr><td class="px-3 py-2">14B</td><td class="px-3 py-2 text-right">12.5-14B</td><td class="px-3 py-2">LLaMA 2, CodeLLaMA</td></tr>
+              <tr><td class="px-3 py-2">30-34B</td><td class="px-3 py-2 text-right">30-34B</td><td class="px-3 py-2">Yi-34B, DeepSeek-Coder</td></tr>
+              <tr><td class="px-3 py-2">70B</td><td class="px-3 py-2 text-right">65-72B</td><td class="px-3 py-2">LLaMA 3 70B, Qwen 72B</td></tr>
+              <tr><td class="px-3 py-2">405B</td><td class="px-3 py-2 text-right">~405B</td><td class="px-3 py-2">LLaMA 3.1 405B</td></tr>
+              <tr><td class="px-3 py-2">671B (MoE)</td><td class="px-3 py-2 text-right">671B total / 37B activos</td><td class="px-3 py-2">DeepSeek V3/R1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Arquitecturas y densidades</h2>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Arquitectura</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Params por capa attn</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Params por capa FFN</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">LLaMA 7B (dense)</td><td class="px-3 py-2 text-right">4 × 4096² ≈ 67M</td><td class="px-3 py-2 text-right">3 × 4096 × 11008 ≈ 135M</td></tr>
+              <tr><td class="px-3 py-2">DeepSeek V3 (MoE)</td><td class="px-3 py-2 text-right">4 × 7168² ≈ 205M</td><td class="px-3 py-2 text-right">n_experts × 3 × d_model × d_ff_per_expert</td></tr>
+              <tr><td class="px-3 py-2">Qwen 2.5 72B (dense)</td><td class="px-3 py-2 text-right">4 × 8192² = 268M</td><td class="px-3 py-2 text-right">3 × 8192 × 24576 ≈ 604M</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-neutral-700 leading-relaxed">
+          En MoE, cada token solo activa un subconjunto de expertos (típicamente 2-8 de 64-256). Los parámetros totales son enormes, pero el coste por token es solo el de los expertos activos.
+        </p>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== MEMORIA ====== -->
+  <section id="memoria" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">¿Dónde vive el modelo?</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Un modelo de 7B parámetros en FP32 son <strong>28 GB de números</strong>. No caben en la RAM de un móvil. Necesitas una GPU con suficiente VRAM.
+        </p>
+        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+          <p class="text-sm text-yellow-800">
+            ⚠️ Piensa en un libro gigante. Para leerlo (inferencia), necesitas tenerlo abierto en la mesa. La mesa es la VRAM. Si el libro es muy grande, no cabe en la mesa y tienes que ir a buscarlo a la estantería (RAM), que es mucho más lento.
+          </p>
+        </div>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Fórmula de peso en memoria</h2>
+        <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-mono text-sm mb-4">
+          Peso (GB) = Parámetros_numericos × Bytes_por_param / 1024³<br />
+          &nbsp;&nbsp;≈ Params_en_miles_de_millones × Bytes_por_param
+        </div>
+        <p class="text-sm font-semibold text-neutral-700 mb-2">Pesos según precisión:</p>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Modelo</th><th class="px-3 py-2 text-right font-medium text-neutral-700">FP32</th><th class="px-3 py-2 text-right font-medium text-neutral-700">FP16</th><th class="px-3 py-2 text-right font-medium text-neutral-700">INT8</th><th class="px-3 py-2 text-right font-medium text-neutral-700">INT4</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">1.3B</td><td class="px-3 py-2 text-right">5.2 GB</td><td class="px-3 py-2 text-right">2.6 GB</td><td class="px-3 py-2 text-right">1.3 GB</td><td class="px-3 py-2 text-right">0.65 GB</td></tr>
+              <tr><td class="px-3 py-2">7B</td><td class="px-3 py-2 text-right">28 GB</td><td class="px-3 py-2 text-right">14 GB</td><td class="px-3 py-2 text-right">7 GB</td><td class="px-3 py-2 text-right">3.5 GB</td></tr>
+              <tr><td class="px-3 py-2">13B</td><td class="px-3 py-2 text-right">52 GB</td><td class="px-3 py-2 text-right">26 GB</td><td class="px-3 py-2 text-right">13 GB</td><td class="px-3 py-2 text-right">6.5 GB</td></tr>
+              <tr><td class="px-3 py-2">34B</td><td class="px-3 py-2 text-right">136 GB</td><td class="px-3 py-2 text-right">68 GB</td><td class="px-3 py-2 text-right">34 GB</td><td class="px-3 py-2 text-right">17 GB</td></tr>
+              <tr><td class="px-3 py-2">70B</td><td class="px-3 py-2 text-right">280 GB</td><td class="px-3 py-2 text-right">140 GB</td><td class="px-3 py-2 text-right">70 GB</td><td class="px-3 py-2 text-right">35 GB</td></tr>
+              <tr><td class="px-3 py-2">405B</td><td class="px-3 py-2 text-right">1620 GB</td><td class="px-3 py-2 text-right">810 GB</td><td class="px-3 py-2 text-right">405 GB</td><td class="px-3 py-2 text-right">202.5 GB</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Formatos de precisión en detalle</h2>
+        <div class="space-y-4">
+          <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
+            <p class="font-mono text-sm mb-1"><strong>FP32</strong> (IEEE 754 single):</p>
+            <p class="font-mono text-xs text-neutral-500">[1 bit signo | 8 bits exponente | 23 bits mantisa]</p>
+            <p class="text-sm text-neutral-700">Rango: ±3.4×10³⁸, Precisión: ~7 dígitos decimales</p>
+          </div>
+          <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
+            <p class="font-mono text-sm mb-1"><strong>FP16</strong> (IEEE 754 half):</p>
+            <p class="font-mono text-xs text-neutral-500">[1 bit signo | 5 bits exponente | 10 bits mantisa]</p>
+            <p class="text-sm text-neutral-700">Rango: ±6.5×10⁴, Precisión: ~3 dígitos. ⚠️ El rango pequeño causa overflow fácilmente → popularizó BF16</p>
+          </div>
+          <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
+            <p class="font-mono text-sm mb-1"><strong>BF16</strong> (Google Brain float):</p>
+            <p class="font-mono text-xs text-neutral-500">[1 bit signo | 8 bits exponente | 7 bits mantisa]</p>
+            <p class="text-sm text-neutral-700">Rango: ±3.4×10³⁸ (igual que FP32), Precisión: ~2 dígitos. ✅ Perfecto para training.</p>
+          </div>
+          <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
+            <p class="font-mono text-sm mb-1"><strong>INT8</strong> (cuantización simétrica):</p>
+            <p class="font-mono text-xs text-neutral-500">[1 bit signo | 7 bits valor]</p>
+            <p class="text-sm text-neutral-700">Mapea W_fp32 a W_int8: W_int8 = round(W_fp32 / scale), scale = max(|W_fp32|) / 127</p>
+          </div>
+        </div>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== CUANTIZACIÓN ====== -->
+  <section id="cuantizacion" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Cuantización: menos bits, mismo modelo</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          La cuantización reduce la precisión de los números para que ocupen menos espacio. Es como hacer fotos con menos calidad para que pesen menos.
+        </p>
+        <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
+          <p class="text-sm text-green-800">
+            🟢 Un modelo de 7B en FP32 ocupa 28 GB y no cabe en una RTX 4090 (24 GB). Pero en INT4 ocupa solo 3.5 GB y funciona casi igual de bien.
+          </p>
+        </div>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">GGUF quantization types</h2>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Tipo</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Bits medio</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Calidad vs FP16</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">Q2_K</td><td class="px-3 py-2 text-right">~2.56</td><td class="px-3 py-2 text-right">~85%</td></tr>
+              <tr><td class="px-3 py-2">Q3_K_M</td><td class="px-3 py-2 text-right">~3.35</td><td class="px-3 py-2 text-right">~91%</td></tr>
+              <tr><td class="px-3 py-2">Q4_K_M</td><td class="px-3 py-2 text-right">~4.5</td><td class="px-3 py-2 text-right">~96%</td></tr>
+              <tr><td class="px-3 py-2">Q5_K_M</td><td class="px-3 py-2 text-right">~5.5</td><td class="px-3 py-2 text-right">~98%</td></tr>
+              <tr><td class="px-3 py-2">Q6_K</td><td class="px-3 py-2 text-right">~6.5</td><td class="px-3 py-2 text-right">~99%</td></tr>
+              <tr><td class="px-3 py-2">Q8_0</td><td class="px-3 py-2 text-right">~8.5</td><td class="px-3 py-2 text-right">~99.5%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-neutral-700 leading-relaxed text-sm">
+          La pérdida de calidad con Q4_K_M (~96%) es imperceptible para la mayoría de usos, pero el modelo ocupa 4× menos. Por eso es el formato más popular para ejecución local.
+        </p>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Matemática de la cuantización</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          La cuantización simétrica mapea un rango de valores float a un rango entero usando un factor de escala. La pérdida de información depende de la distribución de los pesos originales.
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto"><code># Cuantización INT8 simétrica
+scale = max(|W|) / 127
+W_int8 = round(W / scale)
+
+# De-cuantización
+W_fp32 ≈ W_int8 × scale
+
+# Error de cuantización
+error = |W - W_int8 × scale|</code></pre>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== CALCULADORA VRAM ====== -->
+  <section id="vram-calculator" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">Calculadora de VRAM</h2>
+    <p class="text-neutral-600 mb-6">
+      Selecciona un modelo, precisión y contexto para calcular cuánta VRAM necesitas y en qué GPU cabe.
+    </p>
+    <VrmCalculator client:only="vue" />
+  </section>
+</DocLayout>

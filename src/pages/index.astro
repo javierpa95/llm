@@ -1,0 +1,189 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Header from '../components/layout/Header.astro'
+import Footer from '../components/layout/Footer.astro'
+import { NAV_ITEMS } from '../consts'
+---
+
+<BaseLayout>
+  <Header currentPath="/" />
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-blue-50">
+    <div class="max-w-page mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+      <div class="max-w-3xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium mb-6">
+          <span class="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></span>
+          Proyecto divulgativo-técnico interactivo
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 tracking-tight text-balance leading-tight">
+          Anatomía de un<br />
+          <span class="text-primary-600">Modelo de Lenguaje Grande</span>
+        </h1>
+        <p class="mt-6 text-lg sm:text-xl text-neutral-600 max-w-2xl mx-auto leading-relaxed">
+          Quítale la magia. Entiende qué son, cómo funcionan y qué implica ejecutar LLMs reales,
+          desde el concepto hasta el bit que viaja por un bus de silicio.
+        </p>
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <a href="/fundamentos" class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200">
+            Empezar a aprender →
+          </a>
+          <a href="/glosario" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-neutral-700 font-semibold rounded-xl border border-neutral-300 hover:border-primary-300 hover:text-primary-600 transition-colors">
+            📖 Glosario rápido
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decorative gradient blobs -->
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/30 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-200/20 rounded-full blur-3xl pointer-events-none"></div>
+  </section>
+
+  <!-- Overview / Concept Cards -->
+  <section class="max-w-page mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-neutral-900">Un LLM no es magia</h2>
+      <p class="mt-3 text-lg text-neutral-600 max-w-2xl mx-auto">
+        Es matemáticas sobre silicio. Todo se puede medir, todo se puede explicar.
+      </p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <a href="/fundamentos" class="group p-6 rounded-2xl border border-neutral-200 hover:border-primary-200 hover:shadow-md hover:shadow-primary-50 transition-all bg-white">
+        <span class="text-3xl">🧠</span>
+        <h3 class="mt-3 text-lg font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">Fundamentos</h3>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed">
+          Parámetros, memoria, cuantización y la calculadora de VRAM. ¿Cuánto ocupa un modelo? ¿En qué GPU cabe?
+        </p>
+        <span class="mt-3 inline-flex items-center text-sm font-medium text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+          Explorar →
+        </span>
+      </a>
+
+      <a href="/hardware" class="group p-6 rounded-2xl border border-neutral-200 hover:border-primary-200 hover:shadow-md hover:shadow-primary-50 transition-all bg-white">
+        <span class="text-3xl">🔌</span>
+        <h3 class="mt-3 text-lg font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">Hardware</h3>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed">
+          El bus de memoria, el ancho de banda, la jerarquía completa y por qué la inferencia es <em>memory-bound</em>.
+        </p>
+        <span class="mt-3 inline-flex items-center text-sm font-medium text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+          Explorar →
+        </span>
+      </a>
+
+      <a href="/arquitectura" class="group p-6 rounded-2xl border border-neutral-200 hover:border-primary-200 hover:shadow-md hover:shadow-primary-50 transition-all bg-white">
+        <span class="text-3xl">🏗️</span>
+        <h3 class="mt-3 text-lg font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">Arquitectura Transformer</h3>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed">
+          Atención, Feed-Forward, el bloque completo y cómo se ensamblan 32 capas para formar un LLM.
+        </p>
+        <span class="mt-3 inline-flex items-center text-sm font-medium text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+          Explorar →
+        </span>
+      </a>
+
+      <a href="/inferencia" class="group p-6 rounded-2xl border border-neutral-200 hover:border-primary-200 hover:shadow-md hover:shadow-primary-50 transition-all bg-white">
+        <span class="text-3xl">⚡</span>
+        <h3 class="mt-3 text-lg font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">Inferencia</h3>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed">
+          Bucle autoregresivo, KV Cache, velocidad real y la calculadora de tokens/s para tu GPU.
+        </p>
+        <span class="mt-3 inline-flex items-center text-sm font-medium text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+          Explorar →
+        </span>
+      </a>
+
+      <a href="/tokenizacion" class="group p-6 rounded-2xl border border-neutral-200 hover:border-primary-200 hover:shadow-md hover:shadow-primary-50 transition-all bg-white">
+        <span class="text-3xl">🔤</span>
+        <h3 class="mt-3 text-lg font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">Tokenización & Embeddings</h3>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed">
+          De texto a números, BPE, el espacio semántico 3D y cómo las palabras encuentran su lugar.
+        </p>
+        <span class="mt-3 inline-flex items-center text-sm font-medium text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+          Explorar →
+        </span>
+      </a>
+
+      <a href="/entrenamiento" class="group p-6 rounded-2xl border border-neutral-200 hover:border-primary-200 hover:shadow-md hover:shadow-primary-50 transition-all bg-white">
+        <span class="text-3xl">📚</span>
+        <h3 class="mt-3 text-lg font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">Entrenamiento</h3>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed">
+          Pre-training, SFT, RLHF, alucinaciones y por qué el modelo no sabe qué es verdad.
+        </p>
+        <span class="mt-3 inline-flex items-center text-sm font-medium text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+          Explorar →
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Cómo funciona: quick explainer -->
+  <section class="bg-neutral-50 border-t border-neutral-200">
+    <div class="max-w-page mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-bold text-neutral-900 text-center mb-8">¿Qué es un LLM en 30 segundos?</h2>
+
+        <div class="bg-white rounded-2xl border border-neutral-200 p-6 sm:p-8 shadow-sm">
+          <p class="text-lg text-neutral-700 leading-relaxed">
+            Un LLM es una máquina que <strong class="text-primary-600">predice la siguiente palabra</strong>.
+          </p>
+
+          <div class="mt-6 flex flex-col items-center gap-2 font-mono text-sm sm:text-base">
+            <div class="flex flex-wrap justify-center gap-1">
+              <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">"El</span>
+              <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">gato</span>
+              <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">está</span>
+              <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">sobre</span>
+              <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg">la"</span>
+              <span class="px-3 py-1.5 bg-primary-500 text-white rounded-lg animate-pulse">→</span>
+              <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg font-bold">"mesa"</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-neutral-400 mt-1">
+              <span>Prompt</span>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+              <span>Predicción</span>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-3 text-sm text-neutral-600">
+            <p>No "piensa", no "razona", no "entiende" como un humano. Simplemente:</p>
+            <ol class="list-decimal list-inside space-y-1 pl-2">
+              <li>Recibe una secuencia de palabras</li>
+              <li>Calcula cuál es la palabra más probable que sigue</li>
+              <li>La elige (con algo de creatividad)</li>
+              <li>La añade a la secuencia y vuelve al paso 1</li>
+            </ol>
+          </div>
+
+          <div class="mt-6 p-4 bg-primary-50 rounded-xl border border-primary-100">
+            <p class="text-sm text-primary-800">
+              💡 Eso es <strong>todo</strong>. La magia está en cómo hace ese cálculo.
+              Y de eso trata esta guía: desmontar la máquina pieza por pieza.
+            </p>
+          </div>
+
+          <div class="mt-6 text-center">
+            <a href="/fundamentos" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors">
+              Empezar por los fundamentos →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filosofía -->
+  <section class="max-w-page mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="max-w-2xl mx-auto text-center">
+      <blockquote class="text-xl italic text-neutral-500 leading-relaxed">
+        "Un LLM no es magia. Es matemáticas sobre silicio.
+        El conocimiento cabe en números que viajan por autopistas de bits
+        a velocidades finitas. Todo se puede medir, todo se puede explicar."
+      </blockquote>
+      <p class="mt-4 text-sm text-neutral-400">— Filosofía del proyecto</p>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

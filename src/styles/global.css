@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply bg-white text-neutral-900 font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-primary-200 text-primary-900;
+  }
+}
+
+@layer components {
+  .content-section {
+    @apply mb-8 last:mb-0;
+  }
+
+  .level-tab-beginner {
+    @apply border-beginner text-beginner;
+  }
+  .level-tab-deep {
+    @apply border-deep text-deep;
+  }
+  .level-tab-advanced {
+    @apply border-advanced text-advanced;
+  }
+
+  .card {
+    @apply bg-neutral-50 border border-neutral-200 rounded-xl p-6;
+  }
+
+  .calc-output {
+    @apply text-3xl font-bold text-primary-600;
+  }
+
+  .gpu-ok {
+    @apply text-green-600 bg-green-50 border-green-200;
+  }
+  .gpu-tight {
+    @apply text-yellow-600 bg-yellow-50 border-yellow-200;
+  }
+  .gpu-no {
+    @apply text-red-600 bg-red-50 border-red-200;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Expressive Code overrides */
+.expressive-code {
+  @apply my-4 rounded-lg overflow-hidden;
+}

@@ -1,0 +1,227 @@
+---
+import DocLayout from '../layouts/DocLayout.astro'
+---
+
+<DocLayout
+  title="Glosario"
+  description="Glosario visual de términos sobre LLMs con búsqueda y filtros por categoría."
+  currentPath="/glosario"
+  :sections={[
+    { id: 'glosario', label: 'Glosario', level: 'beginner' },
+    { id: 'referencias', label: 'Referencias', level: 'deep' },
+  ]}
+>
+  <h1 class="text-3xl font-bold text-neutral-900 mb-2">📖 Glosario</h1>
+  <p class="text-lg text-neutral-600 mb-8">
+    Términos clave explicados de forma breve. Usa el buscador o filtra por categoría.
+  </p>
+
+  <!-- ====== GLOSARIO ====== -->
+  <section id="glosario" class="content-section">
+    <div id="glossary-app" class="space-y-6">
+      <!-- Search and Filter -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="flex-1">
+          <input
+            type="text"
+            id="glossary-search"
+            placeholder="Buscar términos..."
+            class="w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          />
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          <button data-category="all" class="filter-btn active px-3 py-2 text-sm font-medium rounded-lg border border-primary-300 bg-primary-50 text-primary-700 transition-colors hover:bg-primary-100">
+            Todos
+          </button>
+          <button data-category="concepto" class="filter-btn px-3 py-2 text-sm font-medium rounded-lg border border-neutral-300 text-neutral-600 transition-colors hover:bg-neutral-50">
+            Conceptos
+          </button>
+          <button data-category="hardware" class="filter-btn px-3 py-2 text-sm font-medium rounded-lg border border-neutral-300 text-neutral-600 transition-colors hover:bg-neutral-50">
+            🔌 Hardware
+          </button>
+          <button data-category="arquitectura" class="filter-btn px-3 py-2 text-sm font-medium rounded-lg border border-neutral-300 text-neutral-600 transition-colors hover:bg-neutral-50">
+            🏗️ Arquitectura
+          </button>
+          <button data-category="entrenamiento" class="filter-btn px-3 py-2 text-sm font-medium rounded-lg border border-neutral-300 text-neutral-600 transition-colors hover:bg-neutral-50">
+            📚 Training
+          </button>
+        </div>
+      </div>
+
+      <!-- Glossary terms will be populated by JS -->
+      <div id="glossary-list" class="grid gap-4">
+        <!-- Terms injected by JS -->
+      </div>
+
+      <div id="glossary-empty" class="hidden text-center py-12">
+        <p class="text-neutral-400 text-lg">No se encontraron términos 😕</p>
+        <p class="text-neutral-300 text-sm mt-1">Prueba con otra búsqueda o categoría.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== REFERENCIAS ====== -->
+  <section id="referencias" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">Referencias</h2>
+
+    <h3 class="text-lg font-semibold text-neutral-800 mb-3">Papers fundacionales</h3>
+    <ul class="list-disc list-inside space-y-1 text-sm text-neutral-700 mb-6">
+      <li><em>Attention Is All You Need</em> — Vaswani et al. (2017)</li>
+      <li><em>Language Models are Unsupervised Multitask Learners</em> (GPT-2) — Radford et al. (2019)</li>
+      <li><em>Scaling Laws for Neural Language Models</em> — Kaplan et al. (2020)</li>
+      <li><em>Training Compute-Optimal Large Language Models</em> (Chinchilla) — Hoffmann et al. (2022)</li>
+    </ul>
+
+    <h3 class="text-lg font-semibold text-neutral-800 mb-3">Modelos abiertos</h3>
+    <ul class="list-disc list-inside space-y-1 text-sm text-neutral-700 mb-6">
+      <li><em>LLaMA: Open and Efficient Foundation Language Models</em> — Meta (2023)</li>
+      <li><em>LLaMA 2: Open Foundation and Fine-Tuned Chat Models</em> — Meta (2023)</li>
+      <li><em>The Llama 3 Herd of Models</em> — Meta (2024)</li>
+      <li><em>DeepSeek-V2: A Strong, Economical, and Efficient MoE</em> — DeepSeek (2024)</li>
+      <li><em>DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via RL</em> — DeepSeek (2025)</li>
+    </ul>
+
+    <h3 class="text-lg font-semibold text-neutral-800 mb-3">Hardware e inferencia</h3>
+    <ul class="list-disc list-inside space-y-1 text-sm text-neutral-700 mb-6">
+      <li><em>FlashAttention: Fast and Memory-Efficient Exact Attention</em> — Dao et al. (2022)</li>
+      <li><em>Efficient Memory Management for LLM Serving</em> (vLLM) — Kwon et al. (2023)</li>
+      <li><em>llama.cpp</em> — Gerganov et al. (2023-2026)</li>
+      <li><em>NVIDIA Ada GPU Architecture Whitepaper</em> — NVIDIA (2022)</li>
+      <li><em>H100 Tensor Core GPU Architecture</em> — NVIDIA (2022)</li>
+    </ul>
+
+    <h3 class="text-lg font-semibold text-neutral-800 mb-3">Alineamiento y alucinaciones</h3>
+    <ul class="list-disc list-inside space-y-1 text-sm text-neutral-700">
+      <li><em>Training Language Models to Follow Instructions with Human Feedback</em> (InstructGPT) — Ouyang et al. (2022)</li>
+      <li><em>Constitutional AI</em> — Anthropic (2023)</li>
+      <li><em>GRPO: Group Relative Policy Optimization</em> — DeepSeek (2025)</li>
+    </ul>
+
+    <div class="mt-8 p-4 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-neutral-500 italic text-center">
+      Documento v2 — Hermes — Junio 2026
+    </div>
+  </section>
+</DocLayout>
+
+<script>
+  // Glossary data from the canonical source
+  const GLOSSARY = [
+    { term: 'Parámetro', short: 'Un número que el modelo aprendió durante el entrenamiento.', long: 'Cada parámetro es un peso sináptico que se ajusta durante el entrenamiento para minimizar el error de predicción. En un modelo de 7B hay aproximadamente 7 mil millones de parámetros, organizados en matrices de pesos.', category: 'concepto' },
+    { term: 'd_model', short: 'Dimensión oculta del modelo (ej: 4096 para 7B).', long: 'Es el tamaño del vector que representa cada token en las capas internas del Transformer. Modelos más grandes tienen d_model mayor (8192 para 70B). Determina la capacidad de representación del modelo.', category: 'arquitectura' },
+    { term: 'n_layers', short: 'Número de bloques Transformer apilados (32-80).', long: 'Cada capa contiene atención + feed-forward. Más capas permiten mayor profundidad de razonamiento, pero aumentan el coste computacional linealmente.', category: 'arquitectura' },
+    { term: 'n_heads', short: 'Número de cabezas de atención paralelas (32 para 7B).', long: 'Cada cabeza aprende un tipo diferente de relación entre tokens: sintáctica, semántica, posicional, etc. Más cabezas permiten capturar más tipos de relaciones simultáneamente.', category: 'arquitectura' },
+    { term: 'd_head', short: 'd_model / n_heads (128 en modelos modernos).', long: 'Dimensión de cada cabeza de atención. En modelos estilo LLaMA siempre es 128, independientemente del tamaño total. Esto permite escalar n_heads sin cambiar la semántica de cada cabeza.', category: 'arquitectura' },
+    { term: 'Contexto', short: 'Ventana máxima de tokens que el modelo puede procesar.', long: 'El contexto limita cuánto texto "recuerda" el modelo al generar. Contextos más largos requieren más VRAM para la KV Cache. Modelos modernos soportan 32k-128k tokens, pero el coste en VRAM es significativo.', category: 'concepto' },
+    { term: 'KV Cache', short: 'Memoria que evita recalcular atención en cada paso.', long: 'Durante el bucle autoregresivo, las matrices K y V de tokens ya procesados se guardan en VRAM para no recalcularlas. Ahorra ~98% del cómputo pero consume VRAM proporcional al contexto.', category: 'arquitectura' },
+    { term: 'Prefill', short: 'Procesamiento del prompt completo (rápido, paralelo).', long: 'Fase inicial donde todos los tokens del prompt se procesan simultáneamente. La atención puede ver todos los tokens a la vez. Produce el primer token de salida.', category: 'concepto' },
+    { term: 'Decode', short: 'Generación de tokens uno a uno (lento, serial).', long: 'Fase donde cada nuevo token se genera individualmente, con atención solo al token nuevo contra la KV Cache existente. Es el cuello de botella de la inferencia.', category: 'concepto' },
+    { term: 'Ancho de banda (BW)', short: 'Velocidad a la que la VRAM alimenta a los núcleos.', long: 'Es el factor limitante en inferencia de LLMs. Se mide en GB/s y se calcula como Bus × Frecuencia × Transferencias/ciclo. Determina directamente los tokens/s que puede generar el modelo.', category: 'hardware' },
+    { term: 'Bus de memoria', short: 'Autopista de bits entre VRAM y GPU.', long: 'Conexión física entre los chips de memoria y el núcleo GPU. Cuanto más ancho (128, 256, 384, 512 bits), más datos pueden viajar simultáneamente. HBM usa 5120 bits mediante stacks apilados.', category: 'hardware' },
+    { term: 'Tensor Core', short: 'Unidad especializada en multiplicación de matrices.', long: 'Realiza operaciones matriciales 4×4×4 en un solo ciclo (vs 16 operaciones individuales). Esencial para LLMs porque ~90% del tiempo se va en matmuls de las proyecciones.', category: 'hardware' },
+    { term: 'Cuantización', short: 'Reducir precisión de los números para que pesen menos.', long: 'Técnica que mapea pesos de FP32/FP16 a formatos INT8 o INT4 usando un factor de escala. Reduce el tamaño del modelo 2-8× con pérdida mínima de calidad (1-3%).', category: 'entrenamiento' },
+    { term: 'Perplejidad', short: 'Métrica de calidad: menor = mejor predicción.', long: 'Mide cuán "sorprendido" está el modelo por el texto. Una perplejidad de 10 significa que el modelo tiene tanta incertidumbre como si tuviera que elegir entre 10 opciones equiprobables.', category: 'entrenamiento' },
+    { term: 'Alucinación', short: 'Decir algo falso con confianza (es estadística, no mentira).', long: 'Ocurre porque el modelo maximiza P(token | contexto) no la veracidad. Si una secuencia de palabras es estadísticamente plausible según el entrenamiento, el modelo la generará aunque sea falsa.', category: 'entrenamiento' },
+    { term: 'MoE (Mixture of Experts)', short: 'Arquitectura con múltiples FFN "expertos" y una puerta de selección.', long: 'Cada token activa solo unos pocos expertos (2-8 de 64-256). Permite tener parámetros totales enormes (671B) con coste por token mucho menor (~37B activos).', category: 'arquitectura' },
+    { term: 'GQA (Grouped Query Attention)', short: 'Varias queries comparten un par K,V para ahorrar memoria.', long: 'En lugar de tener K,V por cada cabeza (MHA), grupos de 4-8 queries comparten el mismo par. Reduce la KV Cache 4-8× sin pérdida significativa de calidad. Usado en LLaMA 2/3 y Mistral.', category: 'arquitectura' },
+    { term: 'RoPE', short: 'Codificación posicional rotatoria.', long: 'Aplica una rotación a los vectores de embedding basada en la posición del token. Permite que el modelo sepa el orden de las palabras sin tokens posicionales.', category: 'arquitectura' },
+    { term: 'SwiGLU', short: 'Activación del Feed-Forward (SiLU × Gate).', long: 'Función de activación usada en LLaMA y modelos modernos. La entrada pasa por dos proyecciones (up y gate), se aplica SiLU a gate, y se multiplican. Requiere 3 matrices de peso.', category: 'arquitectura' },
+    { term: 'Speculative Decoding', short: 'Usar un modelo pequeño para adivinar tokens antes que el grande.', long: 'Técnica de aceleración: un draft model genera K tokens especulativos, el modelo grande los verifica en un solo forward pass paralelo. Ahorro típico: 2-3× en velocidad.', category: 'entrenamiento' },
+  ]
+
+  const CATEGORY_LABELS = {
+    concepto: 'Concepto',
+    hardware: '🔌 Hardware',
+    arquitectura: '🏗️ Arquitectura',
+    entrenamiento: '📚 Training',
+  }
+
+  let currentCategory = 'all'
+  let currentSearch = ''
+
+  function renderGlossary() {
+    const list = document.getElementById('glossary-list')
+    const empty = document.getElementById('glossary-empty')
+    if (!list) return
+
+    const filtered = GLOSSARY.filter(item => {
+      // Category filter
+      if (currentCategory !== 'all' && item.category !== currentCategory) return false
+      // Search filter
+      if (currentSearch) {
+        const q = currentSearch.toLowerCase()
+        return item.term.toLowerCase().includes(q) || item.short.toLowerCase().includes(q) || item.long.toLowerCase().includes(q)
+      }
+      return true
+    })
+
+    if (filtered.length === 0) {
+      list.innerHTML = ''
+      empty.classList.remove('hidden')
+      return
+    }
+
+    empty.classList.add('hidden')
+    list.innerHTML = filtered.map(item => `
+      <div class="group bg-white border border-neutral-200 rounded-xl p-5 hover:border-primary-200 hover:shadow-sm transition-all">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h3 class="text-base font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">${item.term}</h3>
+            <p class="mt-1 text-sm text-neutral-500">${item.short}</p>
+            <div class="mt-2 text-xs text-neutral-400 leading-relaxed hidden long-text">${item.long}</div>
+          </div>
+          <div class="shrink-0 flex flex-col items-end gap-1">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-500 font-medium">${CATEGORY_LABELS[item.category] || item.category}</span>
+            <button class="toggle-long text-xs text-primary-500 hover:text-primary-700 font-medium opacity-0 group-hover:opacity-100 transition-opacity" aria-label="Ver más">+ info</button>
+          </div>
+        </div>
+      </div>
+    `).join('')
+
+    // Add toggle listeners for long descriptions
+    list.querySelectorAll('.toggle-long').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const card = e.currentTarget.closest('.group')
+        const longText = card.querySelector('.long-text')
+        const isHidden = longText.classList.contains('hidden')
+        longText.classList.toggle('hidden')
+        e.currentTarget.textContent = isHidden ? '- info' : '+ info'
+      })
+    })
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderGlossary()
+
+    // Search
+    const searchInput = document.getElementById('glossary-search')
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value
+        renderGlossary()
+      })
+    }
+
+    // Category filters
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'border-primary-300')
+          b.classList.add('bg-white', 'text-neutral-600', 'border-neutral-300')
+        })
+        btn.classList.remove('bg-white', 'text-neutral-600', 'border-neutral-300')
+        btn.classList.add('bg-primary-50', 'text-primary-700', 'border-primary-300')
+        currentCategory = btn.dataset.category
+        renderGlossary()
+      })
+    })
+  })
+</script>
+
+<style>
+  .filter-btn.active {
+    @apply bg-primary-50 text-primary-700 border-primary-300;
+  }
+  #glossary-list {
+    scroll-margin-top: 5rem;
+  }
+</style>

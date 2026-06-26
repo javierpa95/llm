@@ -1,0 +1,188 @@
+---
+import DocLayout from '../layouts/DocLayout.astro'
+import LevelTabs from '../components/content/LevelTabs.vue'
+import InfoBox from '../components/content/InfoBox.vue'
+---
+
+<DocLayout
+  title="Hardware"
+  description="El bus de memoria, el ancho de banda, la jerarquía completa y por qué la inferencia es memory-bound."
+  currentPath="/hardware"
+  :sections={[
+    { id: 'realidad-fisica', label: 'Realidad física', level: 'beginner' },
+    { id: 'bus-memoria', label: 'El bus de memoria', level: 'deep' },
+    { id: 'jerarquia', label: 'Jerarquía de memoria', level: 'advanced' },
+    { id: 'organizacion-gpu', label: 'Organización GPU', level: 'advanced' },
+  ]}
+>
+  <h1 class="text-3xl font-bold text-neutral-900 mb-2">🔌 Hardware: la realidad física</h1>
+  <p class="text-lg text-neutral-600 mb-8">
+    Un LLM no es más que un archivo de números que se mueven físicamente por cables de silicio, a velocidades finitas, gobernados por un reloj.
+  </p>
+
+  <!-- ====== REALIDAD FÍSICA ====== -->
+  <section id="realidad-fisica" class="content-section">
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">El modelo es un archivo</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Como un .mp3, como un .pdf. Cuando ejecutas un LLM:
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-neutral-700 mb-4">
+          <li><strong>El archivo (pesos) está en el disco</strong> (SSD, NVMe)</li>
+          <li><strong>Se carga a VRAM</strong> (la memoria de la GPU) — esto tarda segundos</li>
+          <li><strong>Cada token requiere mover TODOS esos pesos</strong> desde VRAM hasta los núcleos de cómputo</li>
+          <li><strong>Ese movimiento tiene un límite de velocidad</strong>: el bus de memoria</li>
+        </ol>
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <p class="text-sm text-blue-800">
+            💡 El bus de memoria es como una autopista. Cuantos más carriles (bits de ancho), más datos caben por cada viaje. La frecuencia del reloj es la velocidad a la que los coches (bits) circulan.
+          </p>
+        </div>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-sm mt-4"><code>Ancho de banda = Ancho del bus × Frecuencia × Transferencias por ciclo
+               =   carriles     ×    viajes/s    ×    paquetes/viaje</code></pre>
+      </template>
+
+      <template #deep>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Anchos de bus comunes en GPUs</h2>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">GPU</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Bus (bits)</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Memoria</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Frec. efectiva</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Ancho de banda</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">RTX 4060</td><td class="px-3 py-2 text-right">128-bit</td><td class="px-3 py-2">GDDR6</td><td class="px-3 py-2 text-right">17 Gbps</td><td class="px-3 py-2 text-right">272 GB/s</td></tr>
+              <tr><td class="px-3 py-2">RTX 4070</td><td class="px-3 py-2 text-right">192-bit</td><td class="px-3 py-2">GDDR6X</td><td class="px-3 py-2 text-right">21 Gbps</td><td class="px-3 py-2 text-right">504 GB/s</td></tr>
+              <tr><td class="px-3 py-2">RTX 4080</td><td class="px-3 py-2 text-right">256-bit</td><td class="px-3 py-2">GDDR6X</td><td class="px-3 py-2 text-right">22.4 Gbps</td><td class="px-3 py-2 text-right">716 GB/s</td></tr>
+              <tr><td class="px-3 py-2 font-semibold">RTX 4090</td><td class="px-3 py-2 text-right font-semibold">384-bit</td><td class="px-3 py-2">GDDR6X</td><td class="px-3 py-2 text-right">21 Gbps</td><td class="px-3 py-2 text-right font-semibold">1008 GB/s</td></tr>
+              <tr><td class="px-3 py-2">RTX 5090</td><td class="px-3 py-2 text-right">512-bit</td><td class="px-3 py-2">GDDR7</td><td class="px-3 py-2 text-right">28-30 Gbps</td><td class="px-3 py-2 text-right">~1792 GB/s</td></tr>
+              <tr><td class="px-3 py-2">RTX 3090</td><td class="px-3 py-2 text-right">384-bit</td><td class="px-3 py-2">GDDR6X</td><td class="px-3 py-2 text-right">19.5 Gbps</td><td class="px-3 py-2 text-right">936 GB/s</td></tr>
+              <tr><td class="px-3 py-2">A100</td><td class="px-3 py-2 text-right">5120-bit*</td><td class="px-3 py-2">HBM2e</td><td class="px-3 py-2 text-right">2.4 Gbps</td><td class="px-3 py-2 text-right">2039 GB/s</td></tr>
+              <tr><td class="px-3 py-2">H100</td><td class="px-3 py-2 text-right">5120-bit*</td><td class="px-3 py-2">HBM3</td><td class="px-3 py-2 text-right">3.2 Gbps</td><td class="px-3 py-2 text-right">3352 GB/s</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-neutral-400 mb-4">*HBM usa múltiples stacks apilados con interposer, creando un bus extraordinariamente ancho.</p>
+
+        <InfoBox type="tip" client:only="vue">
+          <strong>¿Qué significa esto físicamente?</strong> Una RTX 4090 mueve <strong>1 TB de datos cada segundo</strong> entre VRAM y núcleos. En el tiempo que parpadeas (100 ms), ha movido ~100 GB. Pero un modelo de 7B en Q4 pesa ~4.2 GB, por tanto cada segundo puede cargar el modelo completo ~240 veces. <strong>Ese es el límite: ~240 tokens/s</strong>.
+        </InfoBox>
+      </template>
+
+      <template #advanced>
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Cálculo del ancho de banda</h2>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>GDDR6X (RTX 4090):
+  BW = 384 bits × 21 Gbps ÷ 8 bits/byte
+  BW = 384 × 21 × 10⁹ ÷ 8
+  BW = 1.008 × 10¹² bytes/s
+  BW = 1008 GB/s ✓
+
+GDDR7 (RTX 5090, estimado):
+  BW = 512 bits × 28 Gbps ÷ 8
+  BW = 1792 GB/s
+
+DDR5-4800 (CPU):
+  BW = 64 bits × 4800 MT/s ÷ 8
+  BW = 38.4 GB/s (un canal)
+  Típicamente 2 canales → ~76.8 GB/s</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mt-6 mb-3">¿Por qué la inferencia es memory-bound?</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto"><code>Para 1 token con un modelo 7B FP16:
+
+  Pesos VRAM a cargar: 14 GB
+  Operaciones aritméticas: ~14 GFLOP
+
+  Tiempo de carga (BW 1008 GB/s): 14 GB / 1008 GB/s = 13.9 ms
+  Tiempo de cómputo (82 TFLOPS): 14G / 82T = 0.17 ms
+
+  ➜ 98.8% del tiempo es mover datos
+  ➜ 1.2% del tiempo es calcular
+
+  ¡Es un ejercicio de logística, no de matemáticas!</code></pre>
+
+        <InfoBox type="hot" client:only="vue">
+          <strong>Memory Wall:</strong> desde 2005, los CPUs/GPUs duplican su capacidad de cómputo cada ~2 años, pero el ancho de banda de memoria solo crece ~15% anual. Cada año estamos más limitados por memoria.
+        </InfoBox>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== JERARQUÍA DE MEMORIA ====== -->
+  <section id="jerarquia" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">Jerarquía de memoria</h2>
+    <LevelTabs client:only="vue">
+      <template #beginner>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          La memoria en una GPU tiene varios niveles, desde la más rápida (y pequeña) hasta la más lenta (y grande). Es como tener el boli en la mano (registros), en el bolsillo (caché L1), en la mochila (caché L2), o en casa (VRAM).
+        </p>
+      </template>
+
+      <template #deep>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Jerarquía completa</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100"><th class="px-3 py-2 text-left font-medium text-neutral-700">Nivel</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Tamaño típico</th><th class="px-3 py-2 text-right font-medium text-neutral-700">Latencia</th><th class="px-3 py-2 text-right font-medium text-neutral-700">BW</th><th class="px-3 py-2 text-left font-medium text-neutral-700">Quién</th></tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr><td class="px-3 py-2">Registros (SRAM)</td><td class="px-3 py-2 text-right">256 KB / SM</td><td class="px-3 py-2 text-right">~1 ciclo</td><td class="px-3 py-2 text-right">~50 TB/s</td><td class="px-3 py-2">Cada thread</td></tr>
+              <tr><td class="px-3 py-2">L1 Cache (SRAM)</td><td class="px-3 py-2 text-right">128 KB / SM</td><td class="px-3 py-2 text-right">~10 ciclos</td><td class="px-3 py-2 text-right">~30 TB/s</td><td class="px-3 py-2">Bloque SM</td></tr>
+              <tr><td class="px-3 py-2">L2 Cache (SRAM)</td><td class="px-3 py-2 text-right">6-12 MB total</td><td class="px-3 py-2 text-right">~50 ciclos</td><td class="px-3 py-2 text-right">~5 TB/s</td><td class="px-3 py-2">Global</td></tr>
+              <tr><td class="px-3 py-2 font-semibold">HBM / VRAM</td><td class="px-3 py-2 text-right font-semibold">8-80 GB</td><td class="px-3 py-2 text-right font-semibold">~200 ciclos</td><td class="px-3 py-2 text-right font-semibold">1-3 TB/s</td><td class="px-3 py-2">Global</td></tr>
+              <tr><td class="px-3 py-2">PCIe → RAM</td><td class="px-3 py-2 text-right">Hasta CPU</td><td class="px-3 py-2 text-right">~1000 ciclos</td><td class="px-3 py-2 text-right">32 GB/s</td><td class="px-3 py-2">CPU host</td></tr>
+              <tr><td class="px-3 py-2">NVMe / SSD</td><td class="px-3 py-2 text-right">TB</td><td class="px-3 py-2 text-right">~10⁶ ciclos</td><td class="px-3 py-2 text-right">7 GB/s</td><td class="px-3 py-2">Almacén</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+
+      <template #advanced>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Un ciclo de reloj en GPU moderna</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>RTX 4090: reloj base ~2.23 GHz
+  1 ciclo = 1 / 2.23×10⁹ ≈ 0.45 nanosegundos
+  La luz recorre 13.5 cm en ese tiempo
+
+Para cargar 4 bytes desde VRAM a un núcleo:
+  1. Dirección viaja por bus de direcciones: ~10 ciclos
+  2. VRAM busca los datos: ~50-100 ciclos (CAS latency)
+  3. Datos viajan por bus de datos: ~20-50 ciclos
+  4. Pasan por L2, L1: ~10-20 ciclos
+  Total: ~200 ciclos
+
+  → Cargar 4 bytes (FP32) desde VRAM tarda ~90 nanosegundos
+  → Una multiplicación tarda 1-4 ciclos
+
+  Ratio: mover datos cuesta ~50-200× más que computar</code></pre>
+      </template>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== ORGANIZACIÓN GPU ====== -->
+  <section id="organizacion-gpu" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">Organización de una GPU</h2>
+    <p class="text-neutral-700 leading-relaxed mb-4">
+      Una GPU no es una caja negra. Está organizada jerárquicamente en clústeres, procesadores y núcleos.
+    </p>
+
+    <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-sm overflow-x-auto mb-4"><code>GPU (ej: AD102 de RTX 4090)
+├── 11 GPC (Graphics Processing Clusters)
+│   └── 6 TPC (Texture Processing Clusters) cada uno
+│       └── 2 SM (Streaming Multiprocessors) cada uno
+│           ├── 128 CUDA Cores  ← aquí se hacen las operaciones
+│           ├── 4 Tensor Cores  ← aquí se hacen operaciones matriciales
+│           ├── L1/Shared Memory (128 KB)
+│           ├── 65536 Registros (256 KB)
+│           └── Warp Scheduler (lanza instrucciones)
+
+Total RTX 4090:
+  - 128 SM × 128 CUDA cores = 16384 CUDA cores
+  - 128 SM × 4 Tensor Cores = 512 Tensor Cores
+  - L2 Cache: 72 MB
+  - VRAM: 24 GB GDDR6X
+  - Bus: 384-bit</code></pre>
+
+    <InfoBox type="tip" client:only="vue">
+      <strong>Tensor Cores vs CUDA Cores:</strong> Para multiplicación de matrices 4×4 en FP16, CUDA Core necesita 16 operaciones individuales (16 ciclos), mientras que Tensor Core lo hace en 1 operación matricial (1 ciclo). <strong>16× más rápido.</strong> En inferencia de LLMs, el ~90% del tiempo se va en matmuls → Tensor Cores.
+    </InfoBox>
+  </section>
+</DocLayout>
