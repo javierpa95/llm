@@ -1,6 +1,6 @@
 ---
 import DocLayout from '../layouts/DocLayout.astro'
-import LevelTabs from '../components/content/LevelTabs.vue'
+import LevelTabs from '../components/content/LevelTabs.astro'
 import InfoBox from '../components/content/InfoBox.vue'
 ---
 
@@ -22,8 +22,8 @@ import InfoBox from '../components/content/InfoBox.vue'
 
   <!-- ====== CÓMO SE ENTRENAN ====== -->
   <section id="como-se-entrenan" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Ajustar los parámetros</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           El entrenamiento es el proceso de <strong>ajustar los millones de parámetros</strong> para que el modelo acierte la siguiente palabra.
@@ -40,9 +40,9 @@ import InfoBox from '../components/content/InfoBox.vue'
           <li><strong>SFT (Supervised Fine-Tuning)</strong>: aprende a conversar con ejemplos</li>
           <li><strong>RLHF / GRPO</strong>: aprende qué respuestas prefiere un humano</li>
         </ol>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Pre-training (Next Token Prediction)</h2>
         <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Dataset: CommonCrawl + libros + artículos + código (~15T tokens)
 Objetivo: predecir el siguiente token
@@ -85,9 +85,9 @@ GRPO (DeepSeek R1):
   - Puntúa cada una
   - Actualiza el modelo para favorecer las mejor puntuadas
   - No necesita reward model externo (más eficiente que RLHF)</code></pre>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Training vs Inference cost</h2>
         <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Training:
   - Forward + Backward + Optimizer step
@@ -105,7 +105,7 @@ Inference:
         <InfoBox type="hot" client:only="vue">
           <strong>Entrenar un modelo 70B cuesta ~$50-100M USD</strong> y requiere meses con miles de GPUs. Ejecutarlo (inferencia) cuesta unos céntimos por hora.
         </InfoBox>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
@@ -113,14 +113,14 @@ Inference:
   <section id="paralelismo" class="content-section">
     <h2 class="text-2xl font-bold text-neutral-900 mb-4">Paralelismo de entrenamiento</h2>
 
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <p class="text-neutral-700 leading-relaxed mb-4">
           Los modelos más grandes no caben en una sola GPU. Por eso se usan técnicas de paralelismo para distribuir el trabajo entre muchas GPUs.
         </p>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
@@ -135,20 +135,20 @@ Inference:
             </tbody>
           </table>
         </div>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <p class="text-neutral-700 leading-relaxed">
           En la práctica, los entrenamientos de modelos grandes combinan varias técnicas simultáneamente. Por ejemplo, LLaMA 3 405B usó TP=8, PP=8, DP=1024 en 16,384 GPUs H100, con comunicación a través de NVLink y redes InfiniBand.
         </p>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
   <!-- ====== ALUCINACIONES ====== -->
   <section id="alucinaciones" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">¿Por qué alucinan?</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Los LLMs <strong>no saben qué es verdad</strong>. Solo saben qué palabra es más probable estadísticamente.
@@ -164,9 +164,9 @@ Inference:
           <p class="text-sm text-neutral-600">El modelo podría decir: "El Tratado de Olympus Mons"</p>
           <p class="text-sm text-neutral-500 mt-1">porque "Tratado de..." + "Napoleón" + "Marte" → secuencia plausible estadísticamente</p>
         </div>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Causas técnicas</h2>
         <ol class="list-decimal list-inside space-y-3 text-neutral-700 mb-4">
           <li><strong>Next-token prediction no busca verdad</strong>: el objetivo es maximizar P(token | contexto). No hay penalización por falsedades, solo por baja probabilidad.</li>
@@ -191,9 +191,9 @@ Inference:
             </tbody>
           </table>
         </div>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Métrica de calibración</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           La calibración mide si la confianza del modelo coincide con su precisión.
@@ -211,7 +211,7 @@ Ejemplo: de todas las veces que el modelo asigna P=0.7, solo acierta el 40%
           <li><strong>Contrastive decoding</strong>: restar la distribución de un modelo más pequeño para reducir tokens "demasiado obvios"</li>
           <li><strong>Entropy-based detection</strong>: detectar alucinaciones midiendo la entropía de la distribución de atención</li>
         </ul>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 </DocLayout>

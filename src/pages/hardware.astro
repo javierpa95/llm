@@ -1,6 +1,6 @@
 ---
 import DocLayout from '../layouts/DocLayout.astro'
-import LevelTabs from '../components/content/LevelTabs.vue'
+import LevelTabs from '../components/content/LevelTabs.astro'
 import InfoBox from '../components/content/InfoBox.vue'
 ---
 
@@ -22,8 +22,8 @@ import InfoBox from '../components/content/InfoBox.vue'
 
   <!-- ====== REALIDAD FÍSICA ====== -->
   <section id="realidad-fisica" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">El modelo es un archivo</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Como un .mp3, como un .pdf. Cuando ejecutas un LLM:
@@ -41,9 +41,9 @@ import InfoBox from '../components/content/InfoBox.vue'
         </div>
         <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-sm mt-4"><code>Ancho de banda = Ancho del bus × Frecuencia × Transferencias por ciclo
                =   carriles     ×    viajes/s    ×    paquetes/viaje</code></pre>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Anchos de bus comunes en GPUs</h2>
         <div class="overflow-x-auto mb-4">
           <table class="w-full text-sm">
@@ -67,9 +67,9 @@ import InfoBox from '../components/content/InfoBox.vue'
         <InfoBox type="tip" client:only="vue">
           <strong>¿Qué significa esto físicamente?</strong> Una RTX 4090 mueve <strong>1 TB de datos cada segundo</strong> entre VRAM y núcleos. En el tiempo que parpadeas (100 ms), ha movido ~100 GB. Pero un modelo de 7B en Q4 pesa ~4.2 GB, por tanto cada segundo puede cargar el modelo completo ~240 veces. <strong>Ese es el límite: ~240 tokens/s</strong>.
         </InfoBox>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Cálculo del ancho de banda</h2>
         <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>GDDR6X (RTX 4090):
   BW = 384 bits × 21 Gbps ÷ 8 bits/byte
@@ -103,21 +103,21 @@ DDR5-4800 (CPU):
         <InfoBox type="hot" client:only="vue">
           <strong>Memory Wall:</strong> desde 2005, los CPUs/GPUs duplican su capacidad de cómputo cada ~2 años, pero el ancho de banda de memoria solo crece ~15% anual. Cada año estamos más limitados por memoria.
         </InfoBox>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
   <!-- ====== JERARQUÍA DE MEMORIA ====== -->
   <section id="jerarquia" class="content-section">
     <h2 class="text-2xl font-bold text-neutral-900 mb-4">Jerarquía de memoria</h2>
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <p class="text-neutral-700 leading-relaxed mb-4">
           La memoria en una GPU tiene varios niveles, desde la más rápida (y pequeña) hasta la más lenta (y grande). Es como tener el boli en la mano (registros), en el bolsillo (caché L1), en la mochila (caché L2), o en casa (VRAM).
         </p>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h3 class="text-lg font-semibold text-neutral-900 mb-3">Jerarquía completa</h3>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
@@ -134,9 +134,9 @@ DDR5-4800 (CPU):
             </tbody>
           </table>
         </div>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h3 class="text-lg font-semibold text-neutral-900 mb-3">Un ciclo de reloj en GPU moderna</h3>
         <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>RTX 4090: reloj base ~2.23 GHz
   1 ciclo = 1 / 2.23×10⁹ ≈ 0.45 nanosegundos
@@ -153,7 +153,7 @@ Para cargar 4 bytes desde VRAM a un núcleo:
   → Una multiplicación tarda 1-4 ciclos
 
   Ratio: mover datos cuesta ~50-200× más que computar</code></pre>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 

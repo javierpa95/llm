@@ -1,6 +1,6 @@
 ---
 import DocLayout from '../layouts/DocLayout.astro'
-import LevelTabs from '../components/content/LevelTabs.vue'
+import LevelTabs from '../components/content/LevelTabs.astro'
 import InfoBox from '../components/content/InfoBox.vue'
 import AttentionHeatmap from '../components/interactive/AttentionHeatmap.vue'
 ---
@@ -23,8 +23,8 @@ import AttentionHeatmap from '../components/interactive/AttentionHeatmap.vue'
 
   <!-- ====== VISIÓN GLOBAL ====== -->
   <section id="vision-global" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Una fábrica de palabras</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           El Transformer procesa la información en una cadena de estaciones:
@@ -56,9 +56,9 @@ import AttentionHeatmap from '../components/interactive/AttentionHeatmap.vue'
         <p class="text-neutral-700 leading-relaxed mt-3">
           Al final, una estación de salida convierte los vectores en probabilidades para elegir la siguiente palabra.
         </p>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Diagrama de una capa</h2>
         <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>     ┌─────────────────────────────────────┐
      │         ENTRADA (x)                 │
@@ -118,9 +118,9 @@ import AttentionHeatmap from '../components/interactive/AttentionHeatmap.vue'
      │        SALIDA        │
      │   (misma forma)      │
      └──────────────────────┘</code></pre>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Parámetros clave por tamaño de modelo</h2>
         <div class="overflow-x-auto mb-4">
           <table class="w-full text-sm">
@@ -144,14 +144,14 @@ import AttentionHeatmap from '../components/interactive/AttentionHeatmap.vue'
       + n_layers × 3 × d_model × d_ff       (FFN: gate, up, down)
       + n_layers × 2 × d_model              (2× RMSNorm por capa)
       + 1 × d_model                         (RMSNorm final)</code></pre>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
   <!-- ====== ATENCIÓN ====== -->
   <section id="atencion" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">El núcleo del Transformer</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           La atención es el mecanismo que permite a cada palabra <strong>mirar a las demás</strong> para entender el contexto.
@@ -172,9 +172,9 @@ import AttentionHeatmap from '../components/interactive/AttentionHeatmap.vue'
           <p class="text-sm text-neutral-600 mb-3">Escribe una frase y observa cómo cada token presta atención a los demás.</p>
           <AttentionHeatmap client:only="vue" />
         </div>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Scaled Dot-Product Attention</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Para cada token, creamos tres vectores:
@@ -202,9 +202,9 @@ Output: scores × V         ← suma ponderada de valores</code></pre>
           <li>Cabeza 4: relaciones semánticas profundas</li>
           <li>Cabeza 5-8: relaciones de negación, condición...</li>
         </ul>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Variantes de atención</h2>
         <div class="overflow-x-auto mb-4">
           <table class="w-full text-sm">
@@ -223,14 +223,14 @@ Output: scores × V         ← suma ponderada de valores</code></pre>
         <InfoBox type="tip" client:only="vue">
           <strong>FlashAttention:</strong> optimización de memoria que no materializa la matriz de atención completa (N²), procesa por bloques (tiling), usa memoria compartida del SM (mucho más rápida que VRAM). Logra 2-4× más velocidad y usa mucha menos VRAM.
         </InfoBox>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
   <!-- ====== FEED-FORWARD ====== -->
   <section id="feed-forward" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">La memoria del conocimiento</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Si la atención decide <strong>qué información</strong> considerar, el Feed-Forward decide <strong>qué hacer con ella</strong>.
@@ -249,9 +249,9 @@ Output: scores × V         ← suma ponderada de valores</code></pre>
         <p class="text-neutral-700 leading-relaxed">
           Es como preguntar a un experto: le das la información, el experto consulta su memoria (expansión), filtra lo relevante (activación), y te da una respuesta elaborada (compresión).
         </p>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">SwiGLU en detalle</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           En LLaMA y modelos modernos se usa <strong>SwiGLU</strong> (una variante de GLU con activación SiLU):
@@ -276,9 +276,9 @@ resultado · W_down   → proyección DOWN: [d_ff] → [d_model] (compresión)</
         <p class="text-sm text-neutral-600 mt-3">
           Eliminar una neurona específica puede eliminar la capacidad de hablar de un tema concreto. Esto se llama <strong>"surgical model editing"</strong> y se usa para corregir hechos sin reentrenar.
         </p>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Activaciones en modelos modernos</h2>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
@@ -294,7 +294,7 @@ resultado · W_down   → proyección DOWN: [d_ff] → [d_model] (compresión)</
             </tbody>
           </table>
         </div>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 

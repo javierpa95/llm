@@ -1,6 +1,6 @@
 ---
 import DocLayout from '../layouts/DocLayout.astro'
-import LevelTabs from '../components/content/LevelTabs.vue'
+import LevelTabs from '../components/content/LevelTabs.astro'
 import InfoBox from '../components/content/InfoBox.vue'
 import TokenizerDemo from '../components/interactive/TokenizerDemo.vue'
 import EmbeddingSpace from '../components/interactive/EmbeddingSpace.vue'
@@ -24,8 +24,8 @@ import EmbeddingSpace from '../components/interactive/EmbeddingSpace.vue'
 
   <!-- ====== TOKENIZACIÓN ====== -->
   <section id="tokenizacion" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">De texto a números</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           El modelo solo entiende números. El tokenizador convierte texto en una secuencia de IDs numéricos.
@@ -50,9 +50,9 @@ import EmbeddingSpace from '../components/interactive/EmbeddingSpace.vue'
             ⚠️ El tokenizador afecta directamente al <strong>coste</strong> porque el precio de APIs y el contexto máximo se miden en tokens.
           </p>
         </div>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Byte-Pair Encoding (BPE)</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">El algoritmo de tokenización más usado:</p>
         <ol class="list-decimal list-inside space-y-2 text-neutral-700 mb-4">
@@ -92,9 +92,9 @@ Vocabulario final: [a, b, aa, ab, aa_, ...] + espacio de bytes</code></pre>
           <div>"一只猫在桌子上" → <span class="text-blue-600">5 tokens</span> (chino: muy eficiente)</div>
           <div>"Un gato está encima de la mesa" → <span class="text-blue-600">10 tokens</span> (español verboso)</div>
         </div>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">SentencePiece vs tiktoken</h2>
         <ul class="list-disc list-inside space-y-2 text-neutral-700 mb-4">
           <li><strong>SentencePiece</strong> (LLaMA 2): entrena directamente sobre texto raw, sin pre-tokenización. Soporta BPE y unigram LM.</li>
@@ -109,7 +109,7 @@ Vocabulario final: [a, b, aa, ab, aa_, ...] + espacio de bytes</code></pre>
 
 Esto garantiza que cualquier string se puede tokenizar, pero multiplica
 la longitud para caracteres no latinos.</code></pre>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
@@ -124,8 +124,8 @@ la longitud para caracteres no latinos.</code></pre>
 
   <!-- ====== EMBEDDINGS ====== -->
   <section id="embeddings" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">El espacio semántico</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Un embedding es un <strong>mapa</strong>. Cada palabra tiene una coordenada en un espacio de muchas dimensiones. Palabras con significado parecido tienen coordenadas cercanas.
@@ -147,9 +147,9 @@ la longitud para caracteres no latinos.</code></pre>
         <p class="text-neutral-700 leading-relaxed">
           En realidad es <strong>4096 dimensiones</strong>. No podemos visualizarlo, pero la idea es la misma: <strong>cercanía en el espacio = similitud semántica</strong>.
         </p>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">La capa de embedding</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           La capa de embedding es una matriz E de tamaño <code>[vocab_size × d_model]</code>.
@@ -176,9 +176,9 @@ Toda la secuencia:
         <InfoBox type="tip" client:only="vue">
           <strong>Weight Tying:</strong> en muchos modelos, la matriz de embedding (input) y la de salida (LM Head) comparten los mismos pesos. Esto reduce parámetros y mejora la calidad porque fuerza simetría entre cómo se reciben y cómo se emiten los tokens.
         </InfoBox>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Teoría de espacios semánticos</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Los embeddings capturan la <strong>distribución contextual</strong> de las palabras (hipótesis distribucional de Harris: "palabras en contextos similares tienen significados similares").
@@ -193,7 +193,7 @@ Toda la secuencia:
           <li>t-SNE/UMAP capturan estructura local pero globalmente distorsionan</li>
           <li>En 4096D, dos vectores aleatorios en [-1,1] tienen una distancia coseno cercana a 0 (ortogonalidad accidental rara en alta dimensionalidad)</li>
         </ul>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 

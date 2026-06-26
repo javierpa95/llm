@@ -1,6 +1,6 @@
 ---
 import DocLayout from '../layouts/DocLayout.astro'
-import LevelTabs from '../components/content/LevelTabs.vue'
+import LevelTabs from '../components/content/LevelTabs.astro'
 import InfoBox from '../components/content/InfoBox.vue'
 import SpeedCalculator from '../components/interactive/SpeedCalculator.vue'
 ---
@@ -23,8 +23,8 @@ import SpeedCalculator from '../components/interactive/SpeedCalculator.vue'
 
   <!-- ====== BUCLE AUTOREGRESIVO ====== -->
   <section id="bucle-autoregresivo" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Un token cada vez</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           <strong>Un LLM genera un token cada vez.</strong> No es como una imagen que aparece entera. Es como alguien que escribe letra por letra: cada nueva letra depende de todo lo que ha escrito antes.
@@ -42,9 +42,9 @@ import SpeedCalculator from '../components/interactive/SpeedCalculator.vue'
         <p class="text-neutral-700 leading-relaxed">
           Cada iteración = <strong>forward pass completo</strong> del modelo.
         </p>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">El coste O(N²)</h2>
         <p class="text-neutral-700 leading-relaxed mb-3">Sin ninguna optimización:</p>
         <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Paso 1: Forward([t1, t2, t3, t4, t5])    → t6
@@ -63,9 +63,9 @@ FLOPs totales ≈ Σ_&#123;i=1&#125;^&#123;N&#125; (M + i) × O(d_model²)
             💡 <strong>Ejemplo:</strong> M=50 tokens de prompt, N=100 tokens generados, d_model=4096. FLOPs totales = 100 × (50+50) × 4096² = 167 GFLOP. Pero el 98% del tiempo es mover memoria, no computar. Tiempo real ≈ 14 GB (pesos) / 1008 GB/s × 100 pasos ≈ 1.4 segundos.
           </p>
         </div>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Speculative Decoding</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Técnica para acelerar el bucle autoregresivo usando un modelo pequeño (draft) para generar K tokens rápidamente, luego el modelo grande (target) los verifica en paralelo.
@@ -77,14 +77,14 @@ FLOPs totales ≈ Σ_&#123;i=1&#125;^&#123;N&#125; (M + i) × O(d_model²)
    Si alguno es rechazado → retroceder y regenerar
 
 Ahorro típico: 2-3× en velocidad.</code></pre>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
   <!-- ====== KV CACHE ====== -->
   <section id="kv-cache" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">La optimización que lo cambia todo</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           <strong>El problema:</strong> en cada paso del bucle, recalculamos las mismas cosas una y otra vez. Los tokens del prompt original no cambian, pero los procesamos cada vez.
@@ -106,9 +106,9 @@ Ahorro típico: 2-3× en velocidad.</code></pre>
             <p class="text-xs text-green-600 font-mono">Paso 3: [E] → F → guardar K_E, V_E</p>
           </div>
         </div>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Prefill y Decode</h2>
 
         <h3 class="text-lg font-semibold text-neutral-900 mb-2">Fase 1: Prefill — procesar el prompt (paralelo)</h3>
@@ -135,9 +135,9 @@ Coste: ~1 forward pass de tamaño 1 (rápido, ~5 ms por token)</code></pre>
             🟢 <strong>Ahorro:</strong> Para M=50, N=100 tokens: sin KV Cache → ~10,050 unidades; con KV Cache → 150 unidades. <strong>Ahorro: ~98%.</strong>
           </p>
         </div>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">El coste oculto: VRAM</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           La KV Cache ocupa mucha VRAM, proporcional a:
@@ -171,14 +171,14 @@ Para 128k tokens (LLaMA 3.1 8B):
             </tbody>
           </table>
         </div>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
   <!-- ====== VELOCIDAD ====== -->
   <section id="velocidad" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Ancho de banda → tokens/s</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           La velocidad a la que un LLM genera texto depende casi exclusivamente del <strong>ancho de banda de memoria de tu GPU</strong>, no de lo rápida que sea haciendo cálculos.
@@ -188,9 +188,9 @@ Para 128k tokens (LLaMA 3.1 8B):
             💡 Es como una fábrica embotellando agua: la línea de embotellado es rapidísima (TFLOPS), pero el agua llega por una tubería estrecha (ancho de banda). El cuello de botella es la tubería, no la embotelladora.
           </p>
         </div>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">La fórmula</h2>
         <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-mono text-sm mb-4">
           tokens/s ≈ BW_memoria / (n_params × bytes_por_param)
@@ -224,9 +224,9 @@ Para 128k tokens (LLaMA 3.1 8B):
         <p class="text-sm text-neutral-600 mt-4">
           <strong>Qué significan estas velocidades:</strong> 240 t/s → respuesta instantánea (como ChatGPT); 50 t/s → cómodo; 10 t/s → visiblemente lento; 2 t/s → doloroso.
         </p>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">¿Por qué el ancho de banda y no los TFLOPS?</h2>
         <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Modelo 7B FP16: 14 GB de pesos
 GPU RTX 4090:   1008 GB/s, 82 TFLOPS
@@ -252,7 +252,7 @@ Batch=16: 14 GB de pesos → 16 usuarios   → 16 × 30 t/s = 480 t/s total</cod
         <InfoBox type="tip" client:only="vue">
           <strong>vLLM y PagedAttention:</strong> Gestiona KV Cache como páginas de memoria virtual, elimina fragmentación, comparte KV Cache entre requests con el mismo prefijo (Prompt Caching). Mejora el throughput 2-4× respecto a implementación naive.
         </InfoBox>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 

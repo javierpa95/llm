@@ -1,6 +1,6 @@
 ---
 import DocLayout from '../layouts/DocLayout.astro'
-import LevelTabs from '../components/content/LevelTabs.vue'
+import LevelTabs from '../components/content/LevelTabs.astro'
 import InfoBox from '../components/content/InfoBox.vue'
 import VrmCalculator from '../components/interactive/VrmCalculator.vue'
 ---
@@ -23,8 +23,8 @@ import VrmCalculator from '../components/interactive/VrmCalculator.vue'
 
   <!-- ====== PARÁMETROS ====== -->
   <section id="parametros" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">¿Qué es un parámetro?</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Un <strong>parámetro</strong> es un número que el modelo aprendió durante el entrenamiento.
@@ -39,9 +39,9 @@ import VrmCalculator from '../components/interactive/VrmCalculator.vue'
           <li>Cada número ocupa espacio en memoria</li>
           <li>Más parámetros = más capacidad = más memoria</li>
         </ul>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Distribución de parámetros</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Los parámetros están organizados en <strong>matrices</strong> (tensores). Cada capa del modelo contiene una o más matrices de pesos.
@@ -86,9 +86,9 @@ import VrmCalculator from '../components/interactive/VrmCalculator.vue'
             </tbody>
           </table>
         </div>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Arquitecturas y densidades</h2>
         <div class="overflow-x-auto mb-4">
           <table class="w-full text-sm">
@@ -105,14 +105,14 @@ import VrmCalculator from '../components/interactive/VrmCalculator.vue'
         <p class="text-neutral-700 leading-relaxed">
           En MoE, cada token solo activa un subconjunto de expertos (típicamente 2-8 de 64-256). Los parámetros totales son enormes, pero el coste por token es solo el de los expertos activos.
         </p>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
   <!-- ====== MEMORIA ====== -->
   <section id="memoria" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">¿Dónde vive el modelo?</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Un modelo de 7B parámetros en FP32 son <strong>28 GB de números</strong>. No caben en la RAM de un móvil. Necesitas una GPU con suficiente VRAM.
@@ -122,9 +122,9 @@ import VrmCalculator from '../components/interactive/VrmCalculator.vue'
             ⚠️ Piensa en un libro gigante. Para leerlo (inferencia), necesitas tenerlo abierto en la mesa. La mesa es la VRAM. Si el libro es muy grande, no cabe en la mesa y tienes que ir a buscarlo a la estantería (RAM), que es mucho más lento.
           </p>
         </div>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Fórmula de peso en memoria</h2>
         <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-mono text-sm mb-4">
           Peso (GB) = Parámetros_numericos × Bytes_por_param / 1024³<br />
@@ -146,9 +146,9 @@ import VrmCalculator from '../components/interactive/VrmCalculator.vue'
             </tbody>
           </table>
         </div>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Formatos de precisión en detalle</h2>
         <div class="space-y-4">
           <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
@@ -172,14 +172,14 @@ import VrmCalculator from '../components/interactive/VrmCalculator.vue'
             <p class="text-sm text-neutral-700">Mapea W_fp32 a W_int8: W_int8 = round(W_fp32 / scale), scale = max(|W_fp32|) / 127</p>
           </div>
         </div>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
   <!-- ====== CUANTIZACIÓN ====== -->
   <section id="cuantizacion" class="content-section">
-    <LevelTabs client:only="vue">
-      <template #beginner>
+    <LevelTabs>
+      <Fragment slot="beginner">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Cuantización: menos bits, mismo modelo</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           La cuantización reduce la precisión de los números para que ocupen menos espacio. Es como hacer fotos con menos calidad para que pesen menos.
@@ -189,9 +189,9 @@ import VrmCalculator from '../components/interactive/VrmCalculator.vue'
             🟢 Un modelo de 7B en FP32 ocupa 28 GB y no cabe en una RTX 4090 (24 GB). Pero en INT4 ocupa solo 3.5 GB y funciona casi igual de bien.
           </p>
         </div>
-      </template>
+      </Fragment>
 
-      <template #deep>
+      <Fragment slot="deep">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">GGUF quantization types</h2>
         <div class="overflow-x-auto mb-4">
           <table class="w-full text-sm">
@@ -211,9 +211,9 @@ import VrmCalculator from '../components/interactive/VrmCalculator.vue'
         <p class="text-neutral-700 leading-relaxed text-sm">
           La pérdida de calidad con Q4_K_M (~96%) es imperceptible para la mayoría de usos, pero el modelo ocupa 4× menos. Por eso es el formato más popular para ejecución local.
         </p>
-      </template>
+      </Fragment>
 
-      <template #advanced>
+      <Fragment slot="advanced">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">Matemática de la cuantización</h2>
         <p class="text-neutral-700 leading-relaxed mb-4">
           La cuantización simétrica mapea un rango de valores float a un rango entero usando un factor de escala. La pérdida de información depende de la distribución de los pesos originales.
@@ -227,7 +227,7 @@ W_fp32 ≈ W_int8 × scale
 
 # Error de cuantización
 error = |W - W_int8 × scale|</code></pre>
-      </template>
+      </Fragment>
     </LevelTabs>
   </section>
 
