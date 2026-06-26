@@ -1,0 +1,268 @@
+---
+// ClockCycleDemo.astro — Visualizador interactivo de ciclos de reloj
+// Muestra cómo las operaciones ocupan diferentes cantidades de ciclos
+---
+
+<div class="clock-demo" id="clock-demo">
+  <h3 class="text-lg font-semibold text-neutral-900 mb-3 text-center">⏱️ El ciclo de reloj: el latido de la GPU</h3>
+  
+  <div class="p-4 bg-neutral-50 rounded-xl border border-neutral-200 mb-4">
+    <p class="text-sm text-neutral-700 mb-3">
+      <strong>¿Qué es un ciclo de reloj?</strong> 
+      Es un <strong>pulso eléctrico</strong> que sincroniza todo el chip. Como un metrónomo para músicos o el ritmo cardiaco para el cuerpo. En cada pulso, el chip puede avanzar un paso.
+    </p>
+    <div class="flex items-center gap-2 justify-center mb-3">
+      <span class="w-4 h-4 rounded-full bg-blue-500 animate-pulse"></span>
+      <span class="text-xs text-neutral-500 font-mono">1 ciclo = 0.45 nanosegundos en RTX 4090 (2.23 GHz)</span>
+    </div>
+  </div>
+
+  <!-- Visualización del metrónomo -->
+  <div class="p-4 bg-white rounded-xl border border-neutral-200 mb-4">
+    <p class="text-sm font-semibold text-neutral-700 mb-2 text-center">Un ciclo es un "tic" del reloj:</p>
+    <div class="flex items-center justify-center gap-1 mb-2">
+      <div class="clock-tick w-6 h-12 bg-blue-100 rounded border border-blue-300 flex items-center justify-center text-[8px] text-blue-600 font-bold transition-all" style="animation: tickPulse 0.5s ease infinite alternate;">🔄</div>
+    </div>
+    <p class="text-[10px] text-neutral-400 text-center">⬆️ subida del pulso &nbsp;|&nbsp; ⬇️ bajada del pulso &nbsp;|&nbsp; 1 ciclo completo</p>
+  </div>
+
+  <!-- Las 3 operaciones con sus ciclos -->
+  <div class="grid gap-3 mb-4">
+    <!-- Suma: 1 ciclo -->
+    <div class="op-card p-3 rounded-xl border border-green-200 bg-green-50 cursor-pointer transition-all hover:shadow-md" data-cycles="1" data-name="Suma">
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-bold shrink-0">+</div>
+        <div>
+          <p class="text-sm font-semibold text-green-800">Sumar dos números <code class="text-xs ml-1">1 + 1 = 2</code></p>
+          <p class="text-xs text-green-700">Tarda <strong>1 ciclo</strong>. Es la operación más simple. Un solo paso.</p>
+        </div>
+      </div>
+      <div class="cycle-display mt-2 hidden">
+        <div class="flex items-center gap-0.5">
+          <div class="px-2 py-1 bg-green-500 text-white rounded text-[9px] font-mono">ciclo 1</div>
+          <div class="text-[9px] text-green-600 ml-1">← 1+1 se resuelve aquí</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multiplicación FP32: 4 ciclos -->
+    <div class="op-card p-3 rounded-xl border border-amber-200 bg-amber-50 cursor-pointer transition-all hover:shadow-md" data-cycles="4" data-name="Multiplicación">
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white text-sm font-bold shrink-0">×</div>
+        <div>
+          <p class="text-sm font-semibold text-amber-800">Multiplicar <code class="text-xs ml-1">123 × 456 = 56,088</code></p>
+          <p class="text-xs text-amber-700">Tarda <strong>~4 ciclos</strong>. Tiene varios pasos internos: multiplicar dígito a dígito y sumar parciales.</p>
+        </div>
+      </div>
+      <div class="cycle-display mt-2 hidden">
+        <div class="flex items-center gap-0.5">
+          <div class="px-2 py-1 bg-amber-400 text-white rounded text-[8px] font-mono">ciclo 1</div>
+          <div class="px-2 py-1 bg-amber-400 text-white rounded text-[8px] font-mono">ciclo 2</div>
+          <div class="px-2 py-1 bg-amber-500 text-white rounded text-[8px] font-mono">ciclo 3</div>
+          <div class="px-2 py-1 bg-amber-600 text-white rounded text-[8px] font-mono">ciclo 4</div>
+          <div class="text-[9px] text-amber-600 ml-1">← 4 ciclos para el resultado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leer de VRAM: 200 ciclos -->
+    <div class="op-card p-3 rounded-xl border border-red-200 bg-red-50 cursor-pointer transition-all hover:shadow-md" data-cycles="200" data-name="VRAM">
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white text-sm font-bold shrink-0">📡</div>
+        <div>
+          <p class="text-sm font-semibold text-red-800">Leer un peso desde VRAM</p>
+          <p class="text-xs text-red-700">Tarda <strong>~200 ciclos</strong>. No es una sola operación: es un viaje de ida y vuelta con escalas.</p>
+        </div>
+      </div>
+      <div class="cycle-display mt-2 hidden">
+        <div class="space-y-1">
+          <div class="flex items-center gap-0.5 flex-wrap">
+            <div class="px-2 py-1 bg-blue-300 text-white rounded text-[7px] font-mono" title="La dirección de memoria viaja por el bus">dir: 10 ciclos</div>
+            <div class="px-2 py-1 bg-purple-300 text-white rounded text-[7px] font-mono" title="La VRAM busca el dato en su interior">busca: 80 ciclos</div>
+            <div class="px-2 py-1 bg-amber-300 text-white rounded text-[7px] font-mono" title="El dato viaja de vuelta">vuelta: 50 ciclos</div>
+            <div class="px-2 py-1 bg-green-300 text-white rounded text-[7px] font-mono" title="Pasa por L2, L1 hasta el registro">cachés: 60 ciclos</div>
+          </div>
+          <div class="text-[9px] text-red-600 mt-1">
+            ← 200 ciclos en total. <strong>Pero solo 1 operación útil: obtener 4 bytes de un peso.</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Línea de tiempo interactiva -->
+  <div class="p-4 bg-white rounded-xl border border-neutral-200 mb-4">
+    <p class="text-sm font-semibold text-neutral-700 mb-3 text-center">🔄 Así se ven en una línea de tiempo:</p>
+    
+    <div class="relative overflow-x-auto pb-4">
+      <div class="timeline relative" style="min-width: 800px;">
+        <!-- Ciclos visualizados como celdas -->
+        <div class="flex gap-0.5 mb-2">
+          <div class="cycle-cell w-8 h-8 bg-blue-100 border border-blue-300 rounded flex items-center justify-center text-[8px] text-blue-700 shrink-0">1</div>
+          <div class="cycle-cell w-8 h-8 bg-blue-100 border border-blue-300 rounded flex items-center justify-center text-[8px] text-blue-700 shrink-0">2</div>
+          <div class="cycle-cell w-8 h-8 bg-blue-100 border border-blue-300 rounded flex items-center justify-center text-[8px] text-blue-700 shrink-0">3</div>
+          <div class="cycle-cell w-8 h-8 bg-blue-100 border border-blue-300 rounded flex items-center justify-center text-[8px] text-blue-700 shrink-0">4</div>
+          <div class="text-[9px] text-neutral-400 mx-1 self-center">...</div>
+          <div class="cycle-cell w-8 h-8 bg-blue-100 border border-blue-300 rounded flex items-center justify-center text-[8px] text-blue-700 shrink-0">197</div>
+          <div class="cycle-cell w-8 h-8 bg-blue-100 border border-blue-300 rounded flex items-center justify-center text-[8px] text-blue-700 shrink-0">198</div>
+          <div class="cycle-cell w-8 h-8 bg-blue-100 border border-blue-300 rounded flex items-center justify-center text-[8px] text-blue-700 shrink-0">199</div>
+          <div class="cycle-cell w-8 h-8 bg-blue-100 border border-blue-300 rounded flex items-center justify-center text-[8px] text-blue-700 shrink-0">200</div>
+        </div>
+        
+        <!-- Operación de suma (ocupa 1 celda en el ciclo 1) -->
+        <div class="flex gap-0.5 mb-1">
+          <div class="w-8 h-6 bg-green-400 rounded flex items-center justify-center text-[6px] text-white shrink-0" style="grid-column: span 1;">+</div>
+          <div class="text-[9px] text-green-700 ml-1 self-center">Suma: ocupa 1 ciclo</div>
+        </div>
+        
+        <!-- Operación de multiplicación (ocupa 4 celdas) -->
+        <div class="flex gap-0.5 mb-1">
+          <div class="w-8 h-6 bg-amber-400 rounded-l flex items-center justify-center text-[6px] text-white shrink-0">×₁</div>
+          <div class="w-8 h-6 bg-amber-400 flex items-center justify-center text-[6px] text-white shrink-0">×₂</div>
+          <div class="w-8 h-6 bg-amber-500 flex items-center justify-center text-[6px] text-white shrink-0">×₃</div>
+          <div class="w-8 h-6 bg-amber-600 rounded-r flex items-center justify-center text-[6px] text-white shrink-0">×₄</div>
+          <div class="text-[9px] text-amber-700 ml-1 self-center">Multiplicación: ocupa 4 ciclos</div>
+        </div>
+
+        <!-- Lectura de VRAM (ocupa 3 celdas comprimidas visualmente) -->
+        <div class="flex gap-0.5 mb-1">
+          <div class="w-8 h-6 bg-blue-400 rounded-l flex items-center justify-center text-[5px] text-white shrink-0">📡</div>
+          <div class="w-16 h-6 bg-purple-400 flex items-center justify-center text-[6px] text-white shrink-0">busca...</div>
+          <div class="w-16 h-6 bg-amber-400 flex items-center justify-center text-[6px] text-white shrink-0">viaja...</div>
+          <div class="w-12 h-6 bg-green-500 rounded-r flex items-center justify-center text-[6px] text-white shrink-0">caché</div>
+          <div class="text-[9px] text-red-700 ml-1 self-center">Leer VRAM: ocupa ~200 ciclos <span class="text-[7px] text-neutral-500">(comprimido visualmente)</span></div>
+        </div>
+
+        <!-- Diferencia de escala -->
+        <div class="mt-3 p-3 bg-red-50 rounded-xl border border-red-200">
+          <p class="text-xs text-red-700 text-center">
+            ⚠️ <strong>Diferencia de escala:</strong> Mientras la VRAM hace <strong>1 sola lectura</strong> (200 ciclos), 
+            el núcleo podría haber hecho <strong>200 sumas</strong> o <strong>50 multiplicaciones</strong>. 
+            La VRAM es el cuello de botella porque el chip se pasa 200 ciclos esperando a que llegue 1 dato.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón de animación -->
+  <div class="text-center mb-4">
+    <button id="animate-btn" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+      ▶️ Animar ciclo a ciclo
+    </button>
+    <p class="text-[10px] text-neutral-400 mt-1">Muestra cómo avanza cada operación ciclo a ciclo</p>
+  </div>
+
+  <div id="animation-area" class="p-4 bg-neutral-900 rounded-xl text-white font-mono text-xs min-h-[120px] hidden">
+    <p class="text-neutral-400 mb-2">// Simulación ciclo a ciclo:</p>
+    <div id="animation-log"></div>
+  </div>
+
+  <!-- Analogía de la cinta transportadora -->
+  <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+    <p class="text-sm text-indigo-800">
+      🏭 <strong>Analogía: la fábrica y la cinta transportadora</strong>
+      <br><br>
+      Imagina una fábrica con una cinta transportadora que avanza un paso cada segundo (1 paso = 1 ciclo).
+      <br><br>
+      • <strong>Sumar</strong> es como poner un tornillo en una caja: se hace en 1 paso, la caja sigue adelante. ✅
+      <br>
+      • <strong>Multiplicar</strong> es como montar 4 piezas: necesitas 4 pasos. En cada paso, la pieza se mueve a la siguiente estación de montaje. ✅
+      <br>
+      • <strong>Leer de VRAM</strong> es como pedir un repuesto al almacén externo: el trabajador tiene que ir al almacén (paso 1-10), el almacenero busca el repuesto (paso 11-90), el trabajador vuelve (paso 91-140), y lo lleva a la línea de montaje (paso 141-200). Durante esos 200 pasos, <strong>la fábrica está parada esperando el repuesto.</strong> 🔴
+      <br><br>
+      <strong>Esa espera es el cuello de botella de los LLM.</strong> Cada multiplicación de matrices necesita un "repuesto" (peso) del almacén (VRAM), y tarda 200 pasos en llegar. La fábrica (GPU) pasa el 99% del tiempo esperando repuestos.
+    </p>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // Click en tarjetas para expandir detalles de ciclos
+    document.querySelectorAll('.op-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var details = card.querySelector('.cycle-display');
+        if (details) {
+          var isHidden = details.classList.contains('hidden');
+          document.querySelectorAll('.cycle-display').forEach(function(d) { d.classList.add('hidden'); });
+          if (isHidden) {
+            details.classList.remove('hidden');
+          }
+        }
+      });
+    });
+
+    // Botón de animación
+    document.getElementById('animate-btn')?.addEventListener('click', function() {
+      var area = document.getElementById('animation-area');
+      var log = document.getElementById('animation-log');
+      area.classList.remove('hidden');
+      log.innerHTML = '';
+      
+      var cycles = [
+        { op: 'Suma', cycles: 1 },
+        { op: 'Multiplicación', cycles: 4 },
+        { op: 'Lectura VRAM', cycles: 200 },
+      ];
+
+      var totalCycles = 205;
+      var currentCycle = 0;
+      var sumDone = false, mulDone = false, vramStatus = 'idle';
+      var vramProgress = 0;
+      
+      function addLog(msg, color) {
+        var p = document.createElement('p');
+        p.className = 'mb-0.5';
+        p.innerHTML = '<span class="text-blue-300">[' + currentCycle + ']</span> ' + msg;
+        log.appendChild(p);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      function step() {
+        currentCycle++;
+        
+        // Suma: se hace en el ciclo 1
+        if (currentCycle === 1) {
+          addLog('<span class="text-green-300">Suma:</span> 1+1 → <span class="text-green-400">2</span> ✅ (1 ciclo)');
+          sumDone = true;
+        }
+        
+        // Multiplicación: pasos del 1 al 4
+        if (currentCycle === 1) addLog('<span class="text-amber-300">Multiplicación:</span> paso 1/4: multiplicar dígitos');
+        if (currentCycle === 2) addLog('<span class="text-amber-300">Multiplicación:</span> paso 2/4: sumar parciales');
+        if (currentCycle === 3) addLog('<span class="text-amber-300">Multiplicación:</span> paso 3/4: llevar');
+        if (currentCycle === 4) {
+          addLog('<span class="text-amber-300">Multiplicación:</span> paso 4/4: resultado <span class="text-amber-400">56,088</span> ✅');
+          mulDone = true;
+        }
+        
+        // VRAM: 200 ciclos
+        if (currentCycle === 1) {
+          vramStatus = 'started';
+          addLog('<span class="text-red-300">VRAM:</span> 🏁 Solicitud iniciada...');
+        }
+        if (currentCycle === 10) addLog('<span class="text-red-300">VRAM:</span> 📤 Dirección enviada (10 ciclos)');
+        if (currentCycle === 90) addLog('<span class="text-red-300">VRAM:</span> 🔍 VRAM encontró el dato (80 ciclos de búsqueda)');
+        if (currentCycle === 140) addLog('<span class="text-red-300">VRAM:</span> 📥 Datos viajando de vuelta (50 ciclos)');
+        if (currentCycle === 200) {
+          addLog('<span class="text-red-300">VRAM:</span> ✅ Dato recibido en el registro! <span class="text-red-400">(200 ciclos totales)</span>');
+          addLog('');
+          addLog('<span class="text-yellow-300">📊 Resumen:</span> En 200 ciclos la VRAM hizo <strong>1 lectura</strong>. En el mismo tiempo, el núcleo podría haber hecho <strong>200 sumas</strong>. La VRAM es 200× más lenta.');
+        }
+        
+        if (currentCycle < totalCycles) {
+          setTimeout(step, 30 + (currentCycle > 4 ? 2 : 50));
+        }
+      }
+      
+      step();
+    });
+  })();
+</script>
+
+<style>
+  @keyframes tickPulse {
+    0% { transform: scaleY(0.5); background: #dbeafe; }
+    100% { transform: scaleY(1); background: #3b82f6; }
+  }
+</style>

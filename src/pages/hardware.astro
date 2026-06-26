@@ -2,6 +2,7 @@
 import DocLayout from '../layouts/DocLayout.astro'
 import LevelTabs from '../components/content/LevelTabs.astro'
 import HardwareDiagram from '../components/content/HardwareDiagram.astro'
+import ClockCycleDemo from '../components/content/ClockCycleDemo.astro'
 import InfoBox from '../components/content/InfoBox.vue'
 ---
 
@@ -26,29 +27,9 @@ import InfoBox from '../components/content/InfoBox.vue'
     <h2 class="text-2xl font-bold text-neutral-900 mb-4">⏱️ El ciclo de reloj: el latido de la GPU</h2>
     <LevelTabs>
       <Fragment slot="beginner">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">1. ¿Qué es un ciclo de reloj?</h3>
-        <p class="text-neutral-700 leading-relaxed mb-4">
-          Imagina un metrónomo dando 2.23 mil millones de pulsos por segundo. Eso es el <strong>reloj de la GPU</strong>. Cada pulso es un <strong>ciclo</strong>. En cada ciclo pueden ocurrir cosas:
-        </p>
-        <ul class="list-disc list-inside space-y-2 text-neutral-700 mb-4">
-          <li>Una señal eléctrica avanza por un cable</li>
-          <li>Un núcleo empieza una multiplicación</li>
-          <li>Un dato se lee de la caché</li>
-        </ul>
+        <ClockCycleDemo />
 
-        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-6">
-          <p class="text-sm text-blue-800">
-            💡 <strong>RTX 4090: 2.23 GHz</strong> → 1 ciclo = <strong>0.45 nanosegundos</strong> (ns).
-            <br><br>
-            En 0.45 ns, la luz recorre <strong>13.5 centímetros</strong>. La señal eléctrica en un cable de cobre es más lenta (~70% de la velocidad de la luz), así que recorre <strong>~9 centímetros por ciclo</strong>.
-            <br><br>
-            El chip de la GPU mide ~3 cm. La señal lo cruza en ~0.3 ciclos.
-            <br><br>
-            Pero la VRAM está a ~2 cm del chip. Ida + vuelta = 4 cm ≈ medio ciclo si fuera en línea recta... pero no lo es.
-          </p>
-        </div>
-
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">2. El mapa físico de la GPU</h3>
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3 mt-6">2. El mapa físico de la GPU</h3>
         <p class="text-neutral-700 leading-relaxed mb-4">
           Una GPU tiene una jerarquía física muy clara. Visualmente:
         </p>
