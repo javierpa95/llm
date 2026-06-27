@@ -9,10 +9,10 @@ export interface Props {
 const { title, description = '', url = Astro.url.toString(), compact = false } = Astro.props
 const encodedUrl = encodeURIComponent(url)
 const encodedTitle = encodeURIComponent(title)
-const encodedDesc = encodeURIComponent(description)
+const shareText = `${title}\n${url}`
 ---
 
-<div class="share-buttons {compact ? 'share-compact' : ''}">
+<div class:list={['share-buttons', compact && 'share-compact']}>
   {!compact && <span class="share-label">Compartir</span>}
   <div class="share-grid">
     <!-- X (Twitter) -->
@@ -57,20 +57,12 @@ const encodedDesc = encodeURIComponent(description)
       <span class="share-btn-label">WhatsApp</span>
     </a>
 
-    <!-- Copiar enlace -->
+    <!-- Copiar enlace (JS, sin escaped quotes rotas) -->
     <button
       class="share-btn share-copy"
       aria-label="Copiar enlace"
+      id="share-copy-btn"
       data-copy-url={url}
-      onclick="
-        const btn = this;
-        const url = btn.getAttribute('data-copy-url');
-        navigator.clipboard.writeText(url).then(() => {
-          const original = btn.innerHTML;
-          btn.innerHTML = '<svg width=\\'18\\' height=\\'18\\' viewBox=\\'0 0 24 24\\' fill=\\'currentColor\\'><path d=\\'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z\\'/></svg><span class=\\'share-btn-label\\'>Copiado</span>';
-          setTimeout(() => { btn.innerHTML = original; }, 2000);
-        });
-      "
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
         <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
@@ -79,6 +71,33 @@ const encodedDesc = encodeURIComponent(description)
     </button>
   </div>
 </div>
+
+<script>
+  // Manejador de copiar enlace (separado del HTML, sin escapes rotos)
+  document.querySelectorAll('.share-copy').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const url = btn.getAttribute('data-copy-url')
+      if (!url) return
+      try {
+        await navigator.clipboard.writeText(url)
+        const label = btn.querySelector('.share-btn-label')
+        if (label) {
+          const original = label.textContent
+          label.textContent = '✓ Copiado'
+          setTimeout(() => { label.textContent = original }, 2000)
+        }
+      } catch (e) {
+        // fallback para móviles sin clipboard API
+        const textarea = document.createElement('textarea')
+        textarea.value = url
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
+    })
+  })
+</script>
 
 <style>
   .share-buttons {
