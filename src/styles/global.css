@@ -4,6 +4,11 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+/* ══════════════════════════════════════════════════════════════
+   DESIGN SYSTEM TOKENS
+   Ver design.md para documentación completa
+   ══════════════════════════════════════════════════════════════ */
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -20,36 +25,116 @@
 }
 
 @layer components {
+  /* ───── Secciones ───── */
   .content-section {
-    @apply mb-8 last:mb-0;
+    @apply mb-10 last:mb-0;
   }
 
-  .level-tab-beginner {
-    @apply border-beginner text-beginner;
-  }
-  .level-tab-deep {
-    @apply border-deep text-deep;
-  }
-  .level-tab-advanced {
-    @apply border-advanced text-advanced;
-  }
-
+  /* ───── Cards ───── */
   .card {
-    @apply bg-neutral-50 border border-neutral-200 rounded-xl p-6;
+    @apply bg-white border border-neutral-200 rounded-xl shadow-sm transition-shadow;
+  }
+  .card-hover {
+    @apply card hover:shadow-md;
   }
 
-  .calc-output {
-    @apply text-3xl font-bold text-primary-600;
+  /* ───── Info boxes (semánticos) ───── */
+  .info-box {
+    @apply p-4 rounded-xl;
+  }
+  .info-box-blue {
+    @apply info-box bg-blue-50 border border-blue-200;
+  }
+  .info-box-blue p { @apply text-blue-800; }
+
+  .info-box-yellow {
+    @apply info-box bg-yellow-50 border border-yellow-200;
+  }
+  .info-box-yellow p { @apply text-yellow-800; }
+
+  .info-box-green {
+    @apply info-box bg-green-50 border border-green-200;
+  }
+  .info-box-green p { @apply text-green-800; }
+
+  .info-box-red {
+    @apply info-box bg-red-50 border border-red-200;
+  }
+  .info-box-red p { @apply text-red-800; }
+
+  .info-box-indigo {
+    @apply info-box bg-indigo-50 border border-indigo-200;
+  }
+  .info-box-indigo p { @apply text-indigo-800; }
+
+  .info-box-amber {
+    @apply info-box bg-amber-50 border border-amber-200;
+  }
+  .info-box-amber p { @apply text-amber-800; }
+
+  .info-box-purple {
+    @apply info-box bg-purple-50 border border-purple-200;
+  }
+  .info-box-purple p { @apply text-purple-800; }
+
+  /* ───── Tablas ───── */
+  .table-wrap {
+    @apply overflow-x-auto mb-4 -mx-4 sm:mx-0;
+  }
+  .table-wrap table {
+    @apply w-full text-sm min-w-[600px];
+  }
+  .table-wrap thead tr {
+    @apply bg-neutral-100;
+  }
+  .table-wrap th {
+    @apply px-3 py-2 text-left font-medium text-neutral-700;
+  }
+  .table-wrap tbody {
+    @apply divide-y divide-neutral-200;
+  }
+  .table-wrap tbody tr {
+    @apply even:bg-neutral-50 hover:bg-neutral-100 transition-colors;
+  }
+  .table-wrap td {
+    @apply px-3 py-2;
   }
 
-  .gpu-ok {
-    @apply text-green-600 bg-green-50 border-green-200;
+  /* ───── Bloques de código ───── */
+  .code-block {
+    @apply p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto shadow-sm mb-4;
   }
-  .gpu-tight {
-    @apply text-yellow-600 bg-yellow-50 border-yellow-200;
+
+  /* ───── Botones ───── */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors;
   }
-  .gpu-no {
-    @apply text-red-600 bg-red-50 border-red-200;
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-white text-neutral-700 text-sm font-semibold rounded-xl border border-neutral-300 hover:border-primary-300 hover:text-primary-600 transition-colors;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-2 text-neutral-500 text-sm font-medium rounded-lg hover:bg-neutral-100 transition-colors;
+  }
+
+  /* ───── Badges / Tags ───── */
+  .badge {
+    @apply inline-flex px-2 py-0.5 rounded-lg text-xs font-medium;
+  }
+  .badge-modelos { @apply badge bg-purple-100 text-purple-700; }
+  .badge-hardware { @apply badge bg-amber-100 text-amber-700; }
+  .badge-investigacion { @apply badge bg-blue-100 text-blue-700; }
+  .badge-industria { @apply badge bg-green-100 text-green-700; }
+  .badge-herramientas { @apply badge bg-neutral-100 text-neutral-700; }
+
+  /* ───── Niveles de LevelTabs ───── */
+  .level-tab {
+    @apply px-4 py-2 text-sm font-medium transition-colors rounded-t-lg border-b-2 -mb-px;
+  }
+  .level-tab[data-active="true"] {
+    @apply border-current bg-neutral-50;
+  }
+  .level-tab[data-active="false"] {
+    @apply text-neutral-500 hover:text-neutral-700 border-transparent;
   }
 }
 
@@ -59,7 +144,7 @@
   }
 }
 
-/* Expressive Code overrides */
-.expressive-code {
-  @apply my-4 rounded-lg overflow-hidden;
+/* ───── Tablas en contenido: filas alternas globales ───── */
+.content-section tbody tr {
+  @apply even:bg-neutral-50 hover:bg-neutral-100 transition-colors;
 }

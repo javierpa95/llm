@@ -17,7 +17,7 @@ export default {
           900: '#312e81',
           950: '#1e1b4b',
         },
-        begin: '#22c55e',
+        beginner: '#22c55e',
         deep: '#eab308',
         advanced: '#ef4444',
       },
