@@ -1,0 +1,102 @@
+---
+import DocLayout from '../layouts/DocLayout.astro'
+import { getAllNews, CATEGORY_EMOJIS } from '../data/news'
+import { SITE } from '../consts'
+
+const allNews = getAllNews()
+const categories = [...new Set(allNews.map(n => n.category).filter(Boolean))]
+---
+
+<DocLayout
+  title="Noticias"
+  description="Últimas noticias sobre LLMs, hardware, investigación y herramientas del mundo de la inteligencia artificial."
+  currentPath="/noticias"
+  :sections={[
+    { id: 'archivo', label: '📰 Archivo de noticias', level: 'beginner' },
+    ...categories.map(c => ({ id: `cat-${c}`, label: `${CATEGORY_EMOJIS[c] || '📄'} ${c}`, level: 'beginner' as const })),
+  ]}
+>
+  <h1 class="text-3xl font-bold text-neutral-900 mb-2">📰 Noticias LLM</h1>
+  <p class="text-lg text-neutral-600 mb-8">
+    Noticias curadas sobre el mundo de los modelos de lenguaje: nuevos modelos, hardware, investigación aplicada y herramientas.
+    Seleccionadas por <strong>{SITE.author}</strong> para mantenerte al día sin ruido.
+  </p>
+
+  <section id="archivo" class="content-section">
+    {allNews.length === 0 ? (
+      <div class="p-8 text-center text-neutral-400 border-2 border-dashed border-neutral-200 rounded-2xl">
+        <p class="text-4xl mb-3">📭</p>
+        <p class="text-sm font-medium">No hay noticias publicadas aún</p>
+        <p class="text-xs mt-1">El sistema de noticias está configurado. Pronto llegarán las primeras.</p>
+      </div>
+    ) : (
+      <div class="space-y-4">
+        {allNews.map((news) => (
+          <a
+            href={`/noticias/${news.slug}`}
+            class="block group p-5 bg-white border border-neutral-200 rounded-xl hover:border-primary-200 hover:shadow-md transition-all"
+          >
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                  <span class="text-xs px-2 py-0.5 rounded-full font-medium" 
+                    class:list={{
+                      'bg-purple-100 text-purple-700': news.category === 'modelos',
+                      'bg-amber-100 text-amber-700': news.category === 'hardware',
+                      'bg-blue-100 text-blue-700': news.category === 'investigación',
+                      'bg-green-100 text-green-700': news.category === 'industria',
+                      'bg-neutral-100 text-neutral-700': !['modelos','hardware','investigación','industria'].includes(news.category),
+                    }}
+                  >
+                    {CATEGORY_EMOJIS[news.category] || '📄'} {news.category}
+                  </span>
+                  <span class="text-xs text-neutral-400">{news.date}</span>
+                  {news.reading_time && <span class="text-xs text-neutral-300">·</span>}
+                  {news.reading_time && <span class="text-xs text-neutral-400">{news.reading_time}</span>}
+                </div>
+                <h3 class="text-base font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
+                  {news.title}
+                </h3>
+                {news.summary && (
+                  <p class="text-sm text-neutral-600 mt-1 line-clamp-2">
+                    {news.summary}
+                  </p>
+                )}
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="text-xs text-neutral-400">Fuente: {news.source}</span>
+                  <span class="text-xs text-neutral-300">·</span>
+                  <span class="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Leer →
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+
+  <!-- Categorías como secciones de anclaje -->
+  {categories.map(cat => {
+    const catNews = allNews.filter(n => n.category === cat)
+    if (catNews.length === 0) return null
+    return (
+      <section id={`cat-${cat}`} class="content-section">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">{CATEGORY_EMOJIS[cat] || '📄'} {cat}</h2>
+        <div class="space-y-3">
+          {catNews.map(news => (
+            <a href={`/noticias/${news.slug}`} class="block p-4 bg-white border border-neutral-200 rounded-xl hover:border-primary-200 transition-all">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs text-neutral-400">{news.date}</span>
+                <span class="text-xs text-neutral-300">·</span>
+                <span class="text-xs text-neutral-400">{news.source}</span>
+              </div>
+              <p class="text-sm font-medium text-neutral-900 hover:text-primary-600 transition-colors">{news.title}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  })}
+</DocLayout>

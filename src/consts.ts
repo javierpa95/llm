@@ -8,6 +8,7 @@ export const SITE = {
 
 export const NAV_ITEMS = [
   { label: 'Inicio', href: '/' },
+  { label: 'Noticias', href: '/noticias' },
   { label: 'Hardware', href: '/hardware' },
   { label: 'Fundamentos', href: '/fundamentos' },
   { label: 'Arquitectura', href: '/arquitectura' },

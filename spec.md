@@ -1090,5 +1090,146 @@ Cada fase completada debe pasar estos gates antes de avanzar:
 
 ---
 
-*Spec v1.0 — Hermes — Junio 2026*
-*Siguiente paso: comenzar Fase 0 → crear el proyecto Astro y hacer el primer deploy*
+*Spec v1.1 — Hermes — Junio 2026*
+
+---
+
+## 12. Sistema de Noticias LLM
+
+Un sistema de noticias curadas que convierte el sitio en un destino recurrente. Las noticias son generadas por un cron diario, filtradas por un agente, y publicadas manualmente por el editor (Javier).
+
+### 12.1 Fuentes seleccionadas
+
+| Fuente | URL | Tipo | Por qué |
+|--------|-----|------|---------|
+| **Import AI** (Jack Clark) | https://importai.substack.com | Newsletter semanal | Referencia del sector — análisis profundo de tendencias |
+| **The Decoder** | https://the-decoder.com | Medio digital | Cobertura técnica exhaustiva en inglés/alemán |
+| **Simon Willison's blog** | https://simonwillison.net | Blog personal | Referente en LLMs prácticos, tool use, seguridad |
+| **Interconnects** (Nathan Lambert) | https://interconnects.ai | Newsletter/Substack | ML research desde dentro (ex-Tesla, ex-HF, ahora Ai2) |
+| **Sebastian Raschka's newsletter** | https://sebastianraschka.com/blog | Newsletter | Lo mejor en investigación aplicada (LoRA, fine-tuning) |
+| **Ars Technica — AI** | https://arstechnica.com/ai | Medio digital | Periodismo técnico de calidad, riguroso |
+
+**Fuentes secundarias** (consultadas si las principales no dan suficiente contenido):
+- HuggingFace Blog (https://huggingface.co/blog)
+- NVIDIA Technical Blog (https://developer.nvidia.com/blog)
+- Llama / DeepSeek / Mistral release notes
+- ArXiv — papers trending en ML (cs.CL, cs.LG)
+
+### 12.2 Flujo de trabajo
+
+```
+Cron diario (08:00 UTC)
+  ─► 1. Walker: visita fuentes, extrae titulares y enlaces
+  ─► 2. Filter: evalúa relevancia para LLM site
+  ─► 3. Draft: escribe 1-3 noticias en noticias/pending/
+  ─► 4. Notify: envía resumen a Telegram "📰 N noticias pendientes"
+  
+Editor (Javier)
+  ─► 5. Revisa los drafts en Telegram
+  ─► 6. Responde "publica X" o "borra Y"
+  ─► 7. Si publica:
+       a. Mueve de pending/ a published/
+       b. Actualiza noticias/published/index.md
+       c. La home muestra las 3 últimas
+       d. /noticias tiene el archivo completo
+```
+
+### 12.3 Estructura de archivos
+
+```
+noticias/
+├── pending/
+│   └── YYYY-MM-DD-slug.md           ← Borrador generado por el cron
+└── published/
+    ├── index.md                       ← Lista completa de publicadas
+    ├── YYYY-MM-DD-slug.md            ← Noticia publicada
+    └── YYYY-MM-DD-slug.md
+```
+
+### 12.4 Formato de cada noticia
+
+```yaml
+---
+title: "NVIDIA lanza Nemotron-340B"
+date: 2026-06-27
+source: "The Decoder"
+source_url: "https://the-decoder.com/..."
+category: "modelos"         # modelos | hardware | investigación | industria | herramientas
+summary: "Nvidia ha presentado Nemotron-340B, un modelo abierto que..."
+reading_time: "3 min"
+tags: [nvidia, nemotron, modelos-abiertos, 2026]
+---
+
+Cuerpo de la noticia en markdown. 2-3 párrafos como máximo.
+```
+
+### 12.5 Criterios de relevancia (para el agente que filtra)
+
+Una noticia es relevante si cumple AL MENOS UNO de:
+
+- **Nuevo modelo abierto** (Llama, Mistral, DeepSeek, Qwen, etc.)
+- **Hardware nuevo para inferencia/entrenamiento** (GPU, NPU, accelerators)
+- **Técnica nueva de inferencia** (cuantización, speculative decoding, KV cache)
+- **Investigación aplicada** (fine-tuning, RAG, tool use, agents)
+- **Seguridad / alignment** (jailbreaks, red teaming, regulación)
+- **Local AI** (modelos que se puedan ejecutar en casa, gguf, ollama)
+
+NO relevante (se descarta directamente):
+- Rumores sin fuente contrastada
+- Política de IA general (regulación UE, etc. — salvo que sea muy relevante)
+- Noticias de empresas que no aporten detalle técnico
+- Opiniones sin datos
+
+### 12.6 Página /noticias
+
+Ruta: `src/pages/noticias.astro`
+
+- Lista cronológica inversa (más reciente arriba)
+- Cada entrada: título, fecha, fuente, categoría, extracto, enlace
+- Paginación: 10 noticias por página
+- Misma apariencia que el resto del sitio (DocLayout heredado)
+- Sidebar con filtro por categoría (opcional, v2)
+
+### 12.7 Sección en la home
+
+En `src/pages/index.astro`, añadir después de las cards:
+
+```astro
+<section id="ultimas-noticias">
+  <h2>📰 Últimas noticias</h2>
+  <div class="grid">
+    <!-- Lista de las 3 noticias más recientes de published/index.md -->
+    <!-- Cada una: título, fecha, extracto, categoría -->
+  </div>
+  <a href="/noticias">Ver todas →</a>
+</section>
+```
+
+### 12.8 Cron job (Hermes Agent)
+
+```bash
+# Se ejecuta diariamente a las 08:00 UTC
+# Skills: web (búsqueda), file (escritura)
+# Workdir: /opt/data/LLM
+
+hermes cron create \
+  --schedule "0 8 * * *" \
+  --prompt "Ejecuta el script de noticias: busca en las fuentes principales (Import AI, The Decoder, Simon Willison, Interconnects, Sebastian Raschka, Ars Technica AI) noticias sobre LLMs. Filtra por relevancia. Escribe drafts en noticias/pending/. Envía resumen al editor." \
+  --workdir /opt/data/LLM
+```
+
+### 12.9 Comandos de gestión
+
+```bash
+# Publicar una noticia (mover de pending a published)
+mv noticias/pending/2026-06-28-slug.md noticias/published/
+# Actualizar índice
+# Lanzar build y deploy
+
+# Revisar pendientes
+ls noticias/pending/
+
+# Borrar pendiente (no relevante)
+rm noticias/pending/2026-06-28-slug.md
+```
+
