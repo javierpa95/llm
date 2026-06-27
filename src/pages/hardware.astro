@@ -3,77 +3,243 @@ import DocLayout from '../layouts/DocLayout.astro'
 import LevelTabs from '../components/content/LevelTabs.astro'
 import HardwareDiagram from '../components/content/HardwareDiagram.astro'
 import ClockCycleDemo from '../components/content/ClockCycleDemo.astro'
-import InfoBox from '../components/content/InfoBox.vue'
 ---
 
 <DocLayout
   title="Hardware"
-  description="Desde el ciclo de reloj hasta el bus de memoria: cómo funciona físicamente una GPU al ejecutar un LLM."
+  description="De los píxeles a los parámetros: cómo la evolución del hardware ha hecho posibles los LLMs que usamos hoy."
   currentPath="/hardware"
   :sections={[
-    { id: 'reloj-distancias', label: 'Ciclo de reloj y distancias', level: 'beginner' },
-    { id: 'componentes-gpu', label: 'Componentes de la GPU', level: 'beginner' },
-    { id: 'flujo-datos', label: 'El viaje de los pesos', level: 'deep' },
-    { id: 'memory-bound', label: 'El cuello de botella', level: 'advanced' },
+    { id: 'historia', label: 'De los píxeles a los parámetros', level: 'beginner' },
+    { id: 'mapa-gpu', label: 'El mapa físico de la GPU', level: 'beginner' },
+    { id: 'ciclos-distancias', label: 'Ciclos, distancias y latencias', level: 'deep' },
+    { id: 'viaje-pesos', label: 'El viaje de los pesos por el bus', level: 'deep' },
+    { id: 'cuello-botella', label: 'El cuello de botella', level: 'advanced' },
+    { id: 'resumen', label: 'Resumen y conclusiones', level: 'beginner' },
   ]}
 >
   <h1 class="text-3xl font-bold text-neutral-900 mb-2">🔌 Hardware: la realidad física</h1>
   <p class="text-lg text-neutral-600 mb-8">
-    Todo lo que hace un LLM —cada multiplicación, cada token— se traduce al final en señales eléctricas viajando por cables de silicio a velocidades finitas. Esta página explica <strong>qué hay físicamente</strong> dentro de la GPU y <strong>por qué los datos tardan lo que tardan</strong>.
+    Todo lo que hace un LLM —cada multiplicación, cada token— se traduce al final en señales eléctricas viajando por cables de silicio a velocidades finitas. Esta página explica <strong>qué hay físicamente</strong> dentro de la GPU, <strong>por qué los datos tardan lo que tardan</strong>, y <strong>cómo hemos llegado hasta aquí</strong>.
   </p>
 
-  <!-- ====== CICLO DE RELOJ Y DISTANCIAS ====== -->
-  <section id="reloj-distancias" class="content-section">
-    <h2 class="text-2xl font-bold text-neutral-900 mb-4">⏱️ El ciclo de reloj: el latido de la GPU</h2>
+  <!-- ======================================================================
+       SECCIÓN 1: HISTORIA — De los píxeles a los parámetros
+       ====================================================================== -->
+  <section id="historia" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-2">🕰️ De los píxeles a los parámetros</h2>
+    <p class="text-neutral-600 mb-6">
+      La GPU que tienes en casa ejecuta hoy, en segundos, lo que hace 5 años requería un clúster de cientos de miles de dólares. Así es cómo pasamos de renderizar triángulos a ejecutar conversaciones con inteligencias artificiales.
+    </p>
+
     <LevelTabs>
       <Fragment slot="beginner">
-        <ClockCycleDemo />
+        <!-- Timeline vertical — funciona en móvil -->
+        <div class="space-y-0 mb-6">
+          <!-- hitos de la timeline -->
+          <div class="relative pl-8 pb-0 border-l-4 border-neutral-200 last:border-transparent">
+            <!-- 2007: CUDA -->
+            <div class="relative mb-8">
+              <div class="absolute -left-[2.45rem] top-0 w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-md">07</div>
+              <div class="bg-white border border-indigo-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-start gap-3">
+                  <span class="text-2xl shrink-0">🖥️</span>
+                  <div>
+                    <p class="text-sm font-bold text-indigo-700">2007 — CUDA: la GPU se vuelve programable</p>
+                    <p class="text-xs text-neutral-600 mt-1">NVIDIA lanza G80 (GeForce 8800 GTX): la primera GPU que se puede programar para algo que no sean gráficos. Nace el concepto <strong>GPGPU</strong> (General-Purpose GPU). 128 núcleos sombra → 128 CUDA cores. Nadie imagina aún que estas tarjetas de videojuegos acabarán conversando con humanos.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3 mt-6">2. El mapa físico de la GPU</h3>
-        <p class="text-neutral-700 leading-relaxed mb-4">
-          Una GPU tiene una jerarquía física muy clara. Visualmente:
-        </p>
+            <!-- 2012: AlexNet -->
+            <div class="relative mb-8">
+              <div class="absolute -left-[2.45rem] top-0 w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-bold shadow-md">12</div>
+              <div class="bg-white border border-green-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-start gap-3">
+                  <span class="text-2xl shrink-0">🧠</span>
+                  <div>
+                    <p class="text-sm font-bold text-green-700">2012 — AlexNet: el punto de inflexión</p>
+                    <p class="text-xs text-neutral-600 mt-1">Alex Krizhevsky entrena una red neuronal profunda en <strong>2 GTX 580s</strong> y destroza el campeonato ImageNet. Por primera vez, una GPU demuestra que puede hacer algo que una CPU no puede: ML a escala. Las GPUs pasan de «cosas para gamers» a «el motor de la inteligencia artificial».</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <div class="p-4 bg-neutral-50 border border-neutral-200 rounded-xl font-mono text-xs mb-6">
-          <p class="mb-2">🔲 <span class="text-blue-600 font-semibold">Chip GPU (3×3 cm)</span> — aquí están los núcleos que multiplican</p>
-          <p class="ml-4 mb-1">├─ 128 SM (Streaming Multiprocessors)</p>
-          <p class="ml-6 mb-1">├─ 16,384 CUDA Cores (matemáticas generales)</p>
-          <p class="ml-6 mb-1">├─ 512 Tensor Cores (matemáticas matriciales → las que usa el LLM)</p>
-          <p class="ml-4 mb-1">├─ L1 Cache: 16 MB (SRAM, dentro del chip)</p>
-          <p class="ml-4 mb-2">├─ L2 Cache: 72 MB (SRAM, también en el chip)</p>
-          <p class="mb-2">🔌 <span class="text-amber-600 font-semibold">Bus de memoria (384 bits)</span> — cables que conectan chip con VRAM</p>
-          <p class="ml-4 mb-1">├─ 12 pares de cables de 32 bits cada uno</p>
-          <p class="ml-4 mb-2">├─ ~2 cm de longitud por cable</p>
-          <p class="mb-2">💾 <span class="text-purple-600 font-semibold">VRAM (24 GB)</span> — 12 chips GDDR6X alrededor del chip</p>
-          <p class="ml-4 mb-1">├─ Cada chip: 2 GB, ~5×5 mm</p>
-          <p class="ml-4 mb-1">├─ Colocados en anillo alrededor del chip GPU</p>
-          <p class="ml-4">├─ Comunicación a través del bus de 384 bits</p>
+            <!-- 2017: Transformer + Tensor Cores -->
+            <div class="relative mb-8">
+              <div class="absolute -left-[2.45rem] top-0 w-8 h-8 rounded-full bg-amber-600 flex items-center justify-center text-white text-xs font-bold shadow-md">17</div>
+              <div class="bg-white border border-amber-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-start gap-3">
+                  <span class="text-2xl shrink-0">⚡</span>
+                  <div>
+                    <p class="text-sm font-bold text-amber-700">2017 — El año que cambió todo: Transformer + Tensor Cores</p>
+                    <p class="text-xs text-neutral-600 mt-1">Dos revoluciones en paralelo. Google publica <strong>«Attention Is All You Need»</strong> (Transformer). NVIDIA lanza la <strong>V100</strong> con <strong>Tensor Cores</strong>: hardware específico para multiplicar matrices en 1 ciclo (antes: 16 ciclos en CUDA Cores). La arquitectura Transformer resulta ser increíblemente paralelizable en GPUs. Es el Big Bang de los LLMs.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2020: GPT-3 y la brecha -->
+            <div class="relative mb-8">
+              <div class="absolute -left-[2.45rem] top-0 w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold shadow-md">20</div>
+              <div class="bg-white border border-red-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-start gap-3">
+                  <span class="text-2xl shrink-0">🏢</span>
+                  <div>
+                    <p class="text-sm font-bold text-red-700">2020 — GPT-3: la era del clúster</p>
+                    <p class="text-xs text-neutral-600 mt-1">GPT-3 (175B parámetros) solo es ejecutable en <strong>clústers empresariales</strong> de cientos de GPUs. La brecha entre lo que la investigación descubre y lo que una persona puede ejecutar en casa es máxima. Si no trabajas en OpenAI/Google/Meta, los LLMs son algo que <em>usas por API</em>, no algo que <em>ejecutas</em>.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2023: Llama + cuantización -->
+            <div class="relative mb-8">
+              <div class="absolute -left-[2.45rem] top-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shadow-md">23</div>
+              <div class="bg-white border border-blue-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-start gap-3">
+                  <span class="text-2xl shrink-0">🔓</span>
+                  <div>
+                    <p class="text-sm font-bold text-blue-700">2023 — Llama + cuantización: la democratización</p>
+                    <p class="text-xs text-neutral-600 mt-1">Meta lanza <strong>Llama</strong> (7B, 13B, 65B): modelos abiertos que cualquiera puede descargar. Aparece <strong>llama.cpp</strong> (cuantización en CPU), <strong>GPTQ</strong>, <strong>AWQ</strong>. Por primera vez, un modelo de capacidad real (7B) cabe en <strong>una GPU de consumo con cuantización</strong>. El AI local deja de ser un sueño.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2024-2026: AI local -->
+            <div class="relative">
+              <div class="absolute -left-[2.45rem] top-0 w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-md">26</div>
+              <div class="bg-white border border-purple-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-start gap-3">
+                  <span class="text-2xl shrink-0">🚀</span>
+                  <div>
+                    <p class="text-sm font-bold text-purple-700">2024-2026 — La era del AI local</p>
+                    <p class="text-xs text-neutral-600 mt-1">RTX 5090 con 48+ GB VRAM. Apple M3 Ultra con <strong>192 GB de memoria unificada</strong>. Modelos 100B+ que caben en una GPU gracias a FP4/NF4. El hardware de consumo alcanza lo que en 2020 requería un datacenter de $100k. La inferencia local es mainstream: <strong>tu GPU de $1600 ejecuta lo que hace 5 años necesitaba un clúster de $100,000</strong>.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <h3 class="text-lg font-semibold text-neutral-900 mb-3">3. ¿Por qué 200 ciclos para leer de VRAM?</h3>
-        <p class="text-neutral-700 leading-relaxed mb-4">
-          Cuando un núcleo necesita un peso que está en VRAM, pasa esto:
-        </p>
-        <ol class="list-decimal list-inside space-y-3 text-neutral-700 mb-4">
-          <li><strong>~10 ciclos:</strong> la dirección de memoria viaja desde el núcleo hasta la VRAM por el bus de direcciones (~2 cm de ida, señal a 9 cm/ciclo)</li>
-          <li><strong>~80 ciclos:</strong> la VRAM busca el dato en su interior (CAS latency — es el tiempo que tarda en encontrar la fila y columna correcta dentro del chip de memoria, como buscar un libro en una estantería)</li>
-          <li><strong>~50 ciclos:</strong> el dato (4 bytes) viaja de vuelta por el bus de datos (~2 cm de vuelta, más el tiempo de sincronización entre relojes distintos)</li>
-          <li><strong>~60 ciclos:</strong> el dato pasa por L2 Cache, L1 Cache, y llega a los registros del núcleo (atravesando el chip)</li>
-        </ol>
-
-        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-          <p class="text-sm text-yellow-800">
-            ⚠️ <strong>¿Por qué 200 ciclos para 2 cm?</strong> Porque no es solo la distancia. La VRAM es un chip separado con su propio reloj, más lento que el de la GPU (la GDDR6X corre a ~2.6 GHz, la GPU a 2.23 GHz — pero no están sincronizados). Además, la VRAM está optimizada para <strong>capacidad</strong> (24 GB) y <strong>ancho de banda</strong>, no para velocidad de acceso individual. Cada petición tiene que negociar el bus, esperar su turno, y luego buscar físicamente los datos dentro del chip de memoria.
-            <br><br>
-            Es como pedir un libro en una biblioteca enorme: aunque estés a 2 metros de la estantería, el bibliotecario tiene que mirar el catálogo, ir a la estantería, encontrar la sección, buscar el libro, y traerlo.
+        <!-- Caja de contexto destacada -->
+        <div class="p-5 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl mb-4">
+          <p class="text-sm text-indigo-900 font-semibold mb-2">🎯 Por qué esto importa para lo que viene</p>
+          <p class="text-sm text-indigo-800 leading-relaxed">
+            Cada uno de estos hitos ha sido un <strong>salto en lo que una persona puede ejecutar en su propio hardware</strong>. 
+            La razón por la que hoy puedes descargar un modelo, abrir una terminal y <em>hablar</em> con una inteligencia artificial 
+            en tu propia máquina no es solo la investigación en algoritmos. Es también —y sobre todo— que el hardware ha corrido 
+            para alcanzar a los modelos. <strong>Sin la evolución de las GPUs, los LLMs serían solo cosa de datacenters.</strong>
           </p>
         </div>
       </Fragment>
 
       <Fragment slot="deep">
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">La evolución en números</h3>
+        <div class="overflow-x-auto mb-4 -mx-4 sm:mx-0">
+          <table class="w-full text-sm min-w-[640px]">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Hito</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">GPU</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">TFLOPS (FP16)</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">VRAM</th>
+                <th class="px-3 py-2 text-right font-medium text-neutral-700">BW (GB/s)</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Consumo</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200 text-xs">
+              <tr><td class="px-3 py-2 font-medium">2007 — CUDA</td><td class="px-3 py-2 text-right">G80</td><td class="px-3 py-2 text-right">~0.3</td><td class="px-3 py-2 text-right">768 MB</td><td class="px-3 py-2 text-right">86</td><td class="px-3 py-2">177 W</td></tr>
+              <tr><td class="px-3 py-2 font-medium">2012 — AlexNet</td><td class="px-3 py-2 text-right">GTX 580</td><td class="px-3 py-2 text-right">~1.5</td><td class="px-3 py-2 text-right">1.5 GB</td><td class="px-3 py-2 text-right">192</td><td class="px-3 py-2">244 W</td></tr>
+              <tr><td class="px-3 py-2 font-medium">2017 — Transformer</td><td class="px-3 py-2 text-right">V100</td><td class="px-3 py-2 text-right">125</td><td class="px-3 py-2 text-right">16/32 GB</td><td class="px-3 py-2 text-right">900</td><td class="px-3 py-2">300 W</td></tr>
+              <tr><td class="px-3 py-2 font-medium">2020 — GPT-3</td><td class="px-3 py-2 text-right">A100</td><td class="px-3 py-2 text-right">312</td><td class="px-3 py-2 text-right">40/80 GB</td><td class="px-3 py-2 text-right">2,039</td><td class="px-3 py-2">400 W</td></tr>
+              <tr><td class="px-3 py-2 font-medium">2023 — Llama 2</td><td class="px-3 py-2 text-right">RTX 4090</td><td class="px-3 py-2 text-right">82</td><td class="px-3 py-2 text-right">24 GB</td><td class="px-3 py-2 text-right">1,008</td><td class="px-3 py-2">450 W</td></tr>
+              <tr class="bg-purple-50"><td class="px-3 py-2 font-medium text-purple-800">2026 — Era local</td><td class="px-3 py-2 text-right text-purple-800">RTX 5090</td><td class="px-3 py-2 text-right text-purple-800">~200</td><td class="px-3 py-2 text-right text-purple-800">48 GB</td><td class="px-3 py-2 text-right text-purple-800">~1,792</td><td class="px-3 py-2 text-purple-800">~600 W</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4">
+          <p class="text-sm text-blue-800">
+            💡 <strong>Crecimiento 2007 → 2026:</strong>
+            <br><br>
+            • <strong>TFLOPS:</strong> 0.3 → ~200 → <strong>~670× más</strong><br>
+            • <strong>VRAM:</strong> 0.75 GB → 48 GB → <strong>~64× más</strong><br>
+            • <strong>Ancho de banda:</strong> 86 → ~1,792 GB/s → <strong>~21× más</strong><br>
+            <br>
+            La capacidad de cómputo ha crecido <strong>10× más rápido</strong> que el ancho de banda de memoria. Esa divergencia es el <strong>Memory Wall</strong>, y es la razón por la que la inferencia de LLMs es memory-bound (lo veremos en detalle más abajo).
+          </p>
+        </div>
+      </Fragment>
+
+      <Fragment slot="advanced">
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">El Memory Wall: la ley que define el hardware de IA</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Desde ~2005, los chips han duplicado su capacidad de cómputo cada ~2 años (Ley de Moore para transistores + 
+          arquitecturas paralelas). Pero el ancho de banda de memoria solo crece ~15% anual. El resultado es que 
+          <strong>cada año la brecha entre lo que la GPU puede calcular y lo que puede alimentar de datos es mayor</strong>.
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Evolución del gap compute vs. memory bandwidth:
+                          TFLOPS     BW (GB/s)    FLOP/byte
+  2007 (G80):              0.3           86          3.5    ← compute-bound
+  2012 (GTX 580):          1.5          192          7.8    ← compute-bound
+  2017 (V100):             125          900        139      ← empieza a ser MB
+  2020 (A100):             312        2,039        153      ← memory-bound
+  2023 (RTX 4090):          82        1,008         81      ← memory-bound
+  2026 (RTX 5090 est.):    200        1,792        112      ← memory-bound
+
+  La inferencia de un LLM típico tiene intensidad aritmética ~1-2 FLOP/byte.
+  Por debajo de ~50 FLOP/byte, eres memory-bound.
+  Todas las GPUs modernas están muy por debajo de ese umbral.</code></pre>
+
+        <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+          <p class="text-sm text-red-800">
+            🔴 <strong>La consecuencia inevitable:</strong> La evolución del hardware de IA no es una historia de <em>«cada año chips más rápidos»</em>. 
+            Es la historia de cómo la industria ha intentado —con éxito limitado— <strong>alimentar de datos a unos chips que cada vez calculan más rápido</strong>.
+            HBM (High Bandwidth Memory), GDDR7, memoria unificada (Apple), interposers de silicio… todas son soluciones al mismo problema: <strong>el Memory Wall</strong>.
+            <br><br>
+            Y la solución más efectiva para sortearlo hoy no es un chip más rápido: es <strong>mover menos datos</strong>. 
+            Por eso la cuantización (FP16 → FP8 → FP4) es la herramienta más poderosa para acelerar LLMs.
+          </p>
+        </div>
+      </Fragment>
+    </LevelTabs>
+  </section>
+
+  <!-- ======================================================================
+       SECCIÓN 2: MAPA FÍSICO DE LA GPU
+       ====================================================================== -->
+  <section id="mapa-gpu" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-2">🔌 El mapa físico de la GPU</h2>
+    <p class="text-neutral-600 mb-6">
+      Antes de entender los ciclos y los tiempos, necesitas saber <strong>qué hay físicamente</strong> dentro de una GPU. 
+      Esta es la jerarquía completa, desde el chip hasta el bus.
+    </p>
+
+    <HardwareDiagram />
+  </section>
+
+  <!-- ======================================================================
+       SECCIÓN 3: CICLOS, DISTANCIAS Y LATENCIAS
+       ====================================================================== -->
+  <section id="ciclos-distancias" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">⏱️ Ciclos, distancias y latencias</h2>
+    <p class="text-neutral-600 mb-6">
+      Ahora que sabes qué hay dentro, vamos a ver <strong>cuánto tarda cada cosa</strong> y <strong>por qué</strong>. 
+      El concepto clave: un ciclo de reloj es el latido de la GPU, y cada operación cuesta una cantidad de latidos distinta.
+    </p>
+
+    <LevelTabs>
+      <Fragment slot="beginner">
+        <ClockCycleDemo />
+      </Fragment>
+
+      <Fragment slot="deep">
         <h3 class="text-lg font-semibold text-neutral-900 mb-3">Tiempos de acceso en detalle</h3>
-        <div class="overflow-x-auto mb-4">
-          <table class="w-full text-sm">
+        <div class="overflow-x-auto mb-4 -mx-4 sm:mx-0">
+          <table class="w-full text-sm min-w-[600px]">
             <thead>
               <tr class="bg-neutral-100">
                 <th class="px-3 py-2 text-left font-medium text-neutral-700">Operación</th>
@@ -95,9 +261,26 @@ import InfoBox from '../components/content/InfoBox.vue'
             </tbody>
           </table>
         </div>
-        <p class="text-xs text-neutral-500">
+        <p class="text-xs text-neutral-500 mb-4">
           Leer de VRAM cuesta ~200× más que una multiplicación. Por eso mover datos es el cuello de botella.
         </p>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Los pesos no caben en la caché</h3>
+        <div class="p-4 bg-green-50 border border-green-200 rounded-xl mb-4">
+          <p class="text-sm text-green-800">
+            🟢 <strong>Resumen visual de la jerarquía:</strong>
+            <br><br>
+            <strong>Registros (32 MB)</strong> → están DENTRO de cada SM, son la memoria más rápida (~1 ciclo). Aquí se ponen los números justo antes de multiplicarse.
+            <br><br>
+            <strong>L1 Cache (16 MB)</strong> → está DENTRO del chip, compartida entre unos pocos SM. Si los datos están aquí, se leen en ~10 ciclos.
+            <br><br>
+            <strong>L2 Cache (72 MB)</strong> → está DENTRO del chip, compartida globalmente. Trampolín antes de ir a VRAM. ~50 ciclos.
+            <br><br>
+            <strong>VRAM (24 GB)</strong> → está FUERA del chip, conectada por el bus. Aquí viven los pesos. ~200 ciclos.
+            <br><br>
+            <strong>Los pesos del modelo NO CABEN ni en registros, ni en L1, ni en L2.</strong> Solo caben en VRAM. Por eso cada multiplicación requiere leer de VRAM, y eso cuesta ~200 ciclos.
+          </p>
+        </div>
       </Fragment>
 
       <Fragment slot="advanced">
@@ -122,41 +305,17 @@ Esto significa:
 
         <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
           <p class="text-sm text-blue-800">
-            💡 <strong>Mito: "la velocidad de la luz es el límite"</strong> — Es cierto, pero en una GPU el límite no es la distancia física (2 cm) sino la <strong>latencia de los chips de memoria</strong>. Cada chip GDDR6X tiene su propia lógica interna: decodificar direcciones, activar filas en la matriz de celdas, leer los condensadores, amplificar la señal, y enviarla de vuelta. Eso lleva ~80 ciclos. Es como un camión que tarda 10 minutos en cargarse aunque el viaje sean 2 minutos.
+            💡 <strong>Mito: «la velocidad de la luz es el límite»</strong> — Es cierto, pero en una GPU el límite no es la distancia física (2 cm) sino la <strong>latencia de los chips de memoria</strong>. Cada chip GDDR6X tiene su propia lógica interna: decodificar direcciones, activar filas en la matriz de celdas, leer los condensadores, amplificar la señal, y enviarla de vuelta. Eso lleva ~80 ciclos. Es como un camión que tarda 10 minutos en cargarse aunque el viaje sean 2 minutos.
           </p>
         </div>
       </Fragment>
     </LevelTabs>
   </section>
 
-  <!-- ====== COMPONENTES DE LA GPU ====== -->
-  <section id="componentes-gpu" class="content-section">
-    <h2 class="text-2xl font-bold text-neutral-900 mb-4">🔧 Componentes de la GPU (diagrama interactivo)</h2>
-    <p class="text-neutral-700 leading-relaxed mb-6">
-      Aquí tienes todos los componentes físicos explicados: el chip, los núcleos, la VRAM, el bus. <strong>Haz clic en cada tarjeta</strong> para ver los detalles.
-    </p>
-
-    <HardwareDiagram />
-
-    <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
-      <p class="text-sm text-green-800">
-        🟢 <strong>Resumen visual de la jerarquía:</strong>
-        <br><br>
-        <strong>Registros (32 MB)</strong> → están DENTRO de cada SM, son la memoria más rápida (~1 ciclo). Aquí se ponen los números justo antes de multiplicarse.
-        <br><br>
-        <strong>L1 Cache (16 MB)</strong> → está DENTRO del chip, compartida entre unos pocos SM. Si los datos están aquí, se leen en ~10 ciclos.
-        <br><br>
-        <strong>L2 Cache (72 MB)</strong> → está DENTRO del chip, compartida globalmente. Trampolín antes de ir a VRAM. ~50 ciclos.
-        <br><br>
-        <strong>VRAM (24 GB)</strong> → está FUERA del chip, conectada por el bus. Aquí viven los pesos. ~200 ciclos.
-        <br><br>
-        <strong>Los pesos del modelo NO CABEN ni en registros, ni en L1, ni en L2.</strong> Solo caben en VRAM. Por eso cada multiplicación requiere leer de VRAM, y eso cuesta ~200 ciclos.
-      </p>
-    </div>
-  </section>
-
-  <!-- ====== EL VIAJE DE LOS PESOS ====== -->
-  <section id="flujo-datos" class="content-section">
+  <!-- ======================================================================
+       SECCIÓN 4: EL VIAJE DE LOS PESOS POR EL BUS
+       ====================================================================== -->
+  <section id="viaje-pesos" class="content-section">
     <h2 class="text-2xl font-bold text-neutral-900 mb-4">🚛 El viaje: de VRAM a los núcleos</h2>
     <LevelTabs>
       <Fragment slot="beginner">
@@ -167,25 +326,25 @@ Esto significa:
 
         <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-6">
           <p class="text-sm text-amber-800">
-            ❓ <strong>Pregunta clave:</strong> "¿Por qué los pesos tienen que viajar si solo se van a multiplicar?"
+            ❓ <strong>Pregunta clave:</strong> «¿Por qué los pesos tienen que viajar si solo se van a multiplicar?»
             <br><br>
             ✅ <strong>Respuesta:</strong> Porque la multiplicación no ocurre donde están guardados los pesos. El Tensor Core que hace la multiplicación está dentro del chip GPU. El peso está en VRAM, fuera del chip. 
             <br><br>
             Es como tener los números en una libreta y la calculadora en la mesa. No puedes multiplicar dentro de la libreta. Tienes que leer el número de la libreta, teclearlo en la calculadora, y entonces obtienes el resultado.
             <br><br>
-            <strong>La "libreta" es la VRAM. La "calculadora" es el Tensor Core. El "movimiento de tus ojos y manos" es el bus de memoria.</strong>
+            <strong>La «libreta» es la VRAM. La «calculadora» es el Tensor Core. El «movimiento de tus ojos y manos» es el bus de memoria.</strong>
           </p>
         </div>
 
         <h3 class="text-lg font-semibold text-neutral-900 mb-3">El flujo, paso a paso</h3>
         
-        <div class="space-y-4 mb-6">
+        <div class="space-y-3 mb-6">
           <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
             <div class="flex items-start gap-3">
               <span class="text-lg shrink-0">1️⃣</span>
               <div>
                 <p class="text-sm font-semibold text-neutral-900">El prompt se tokeniza y se carga en VRAM</p>
-                <p class="text-xs text-neutral-600">"La capital de Francia es" → [123, 456, 789, 101] → 4 vectores de 4096 números</p>
+                <p class="text-xs text-neutral-600">«La capital de Francia es» → [123, 456, 789, 101] → 4 vectores de 4096 números</p>
               </div>
             </div>
           </div>
@@ -246,8 +405,8 @@ Esto significa:
 
       <Fragment slot="deep">
         <h3 class="text-lg font-semibold text-neutral-900 mb-3">Cálculo detallado: datos por capa</h3>
-        <div class="overflow-x-auto mb-4">
-          <table class="w-full text-sm">
+        <div class="overflow-x-auto mb-4 -mx-4 sm:mx-0">
+          <table class="w-full text-sm min-w-[600px]">
             <thead>
               <tr class="bg-neutral-100">
                 <th class="px-3 py-2 text-left font-medium text-neutral-700">Operación</th>
@@ -306,8 +465,10 @@ Esto significa:
     </LevelTabs>
   </section>
 
-  <!-- ====== EL CUELLO DE BOTELLA ====== -->
-  <section id="memory-bound" class="content-section">
+  <!-- ======================================================================
+       SECCIÓN 5: EL CUELLO DE BOTELLA
+       ====================================================================== -->
+  <section id="cuello-botella" class="content-section">
     <h2 class="text-2xl font-bold text-neutral-900 mb-4">🐢 El cuello de botella: memory-bound</h2>
     <LevelTabs>
       <Fragment slot="beginner">
@@ -415,30 +576,36 @@ La GPU solo usa el 1.2% de su capacidad de cómputo.</code></pre>
     </LevelTabs>
   </section>
 
-  <!-- ====== RESUMEN FINAL ====== -->
-  <section class="content-section mt-8">
+  <!-- ======================================================================
+       SECCIÓN 6: RESUMEN
+       ====================================================================== -->
+  <section id="resumen" class="content-section mt-8">
     <div class="p-6 bg-gradient-to-br from-neutral-50 to-neutral-100 border border-neutral-200 rounded-2xl">
       <h2 class="text-xl font-bold text-neutral-900 mb-4">📋 Resumen: respuestas a tus preguntas</h2>
       <div class="space-y-4 text-sm text-neutral-700">
         <div class="p-3 bg-white rounded-xl border border-neutral-200">
-          <p class="font-semibold text-neutral-900 mb-1">❓ "¿Los pesos caben en los núcleos de cálculo?"</p>
+          <p class="font-semibold text-neutral-900 mb-1">❓ «¿Los pesos caben en los núcleos de cálculo?»</p>
           <p class="text-neutral-600">No. Los núcleos tienen registros (32 MB en total). Los pesos de una capa son ~400 MB. Los pesos viven en VRAM (24 GB).</p>
         </div>
         <div class="p-3 bg-white rounded-xl border border-neutral-200">
-          <p class="font-semibold text-neutral-900 mb-1">❓ "¿Si el modelo pesa 24 GB, esos 24 GB se mueven por el bus?"</p>
+          <p class="font-semibold text-neutral-900 mb-1">❓ «¿Si el modelo pesa 24 GB, esos 24 GB se mueven por el bus?»</p>
           <p class="text-neutral-600">No se mueven de golpe. Viajan por el bus en fragmentos, capa por capa, matriz por matriz. Por cada token se mueven ~13 GB (el modelo completo), pero en 224 viajes individuales a lo largo de ~13 ms.</p>
         </div>
         <div class="p-3 bg-white rounded-xl border border-neutral-200">
-          <p class="font-semibold text-neutral-900 mb-1">❓ "¿Por qué 200 ciclos si la distancia son 2 cm?"</p>
+          <p class="font-semibold text-neutral-900 mb-1">❓ «¿Por qué 200 ciclos si la distancia son 2 cm?»</p>
           <p class="text-neutral-600">Porque la VRAM tiene su propia latencia interna (~80 ciclos para buscar el dato dentro del chip). La distancia física solo explica ~10-20 ciclos. El resto es burocracia del protocolo de memoria.</p>
         </div>
         <div class="p-3 bg-white rounded-xl border border-neutral-200">
-          <p class="font-semibold text-neutral-900 mb-1">❓ "¿Qué es lo que se mueve por la autopista?"</p>
+          <p class="font-semibold text-neutral-900 mb-1">❓ «¿Qué es lo que se mueve por la autopista?»</p>
           <p class="text-neutral-600">Los pesos (parámetros del modelo). Son números que viajan desde VRAM a los Tensor Cores para ser multiplicados. ~13 GB por token en FP16, ~3.5 GB por token en Q4.</p>
         </div>
         <div class="p-3 bg-white rounded-xl border border-neutral-200">
-          <p class="font-semibold text-neutral-900 mb-1">🚀 Conclusión final</p>
-          <p class="text-neutral-600">La inferencia de LLMs no es un problema de <strong>potencia de cálculo</strong> (tenemos de sobra). Es un problema de <strong>transporte de datos</strong>. La GPU pasa el 99% del tiempo esperando a que los pesos lleguen desde la VRAM. <strong>Cuantizar = reducir la carga a transportar = 4× más rápido.</strong></p>
+          <p class="font-semibold text-neutral-900 mb-1">❓ «¿Cómo hemos llegado hasta aquí?»</p>
+          <p class="text-neutral-600">Desde CUDA en 2007 hasta hoy: los TFLOPS se han multiplicado por ~670, la VRAM por ~64, el ancho de banda por ~21. Pero el cómputo ha crecido 10× más rápido que la memoria — por eso hoy la inferencia está limitada por el bus, no por los núcleos.</p>
+        </div>
+        <div class="p-3 bg-green-50 rounded-xl border border-green-200">
+          <p class="font-semibold text-green-900 mb-1">🚀 Conclusión final</p>
+          <p class="text-green-800">La inferencia de LLMs no es un problema de <strong>potencia de cálculo</strong> (tenemos de sobra). Es un problema de <strong>transporte de datos</strong>. La GPU pasa el 99% del tiempo esperando a que los pesos lleguen desde la VRAM. <strong>Cuantizar = reducir la carga a transportar = 4× más rápido.</strong></p>
         </div>
       </div>
     </div>
