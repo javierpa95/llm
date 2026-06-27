@@ -1,5 +1,6 @@
 ---
 import DocLayout from '../../layouts/DocLayout.astro'
+import ShareButtons from '../../components/ShareButtons.astro'
 import { getNewsBySlug, CATEGORY_EMOJIS, resolveWikilinks } from '../../data/news'
 import type { NewsItem } from '../../data/news'
 import { marked } from 'marked'
@@ -83,8 +84,13 @@ const { news } = Astro.props as { news: NewsItem }
     <!-- Cuerpo de la noticia (markdown + wikilinks renderizados) -->
     <div class="prose prose-neutral max-w-none markdown-content" set:html={marked.parse(resolveWikilinks(news.content))} />
 
+    <!-- Compartir -->
+    <div class="mt-10 pt-6 border-t border-neutral-200">
+      <ShareButtons title={news.title} description={news.summary} />
+    </div>
+
     <!-- Footer de navegación -->
-    <div class="mt-12 pt-6 border-t border-neutral-200">
+    <div class="mt-6 pt-6 border-t border-neutral-200">
       <a href="/noticias" class="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium">
         ← Volver al archivo de noticias
       </a>

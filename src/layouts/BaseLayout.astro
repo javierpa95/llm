@@ -1,33 +1,53 @@
 ---
-import '../styles/global.css'
-import { SITE } from '../consts'
-
 export interface Props {
   title?: string
   description?: string
+  image?: string
 }
 
-const { title, description } = Astro.props
-const pageTitle = title ? `${title} — ${SITE.title}` : SITE.title
-const pageDesc = description ?? SITE.description
+const { title, description, image } = Astro.props
+
+const siteTitle = title 
+  ? `${title} — LLM — Anatomía de un Modelo de Lenguaje Grande`
+  : 'LLM — Anatomía de un Modelo de Lenguaje Grande'
+
+const siteDescription = description || 'Aprende cómo funcionan los grandes modelos de lenguaje desde el silicio hasta la implementación práctica. Guías técnicas, hardware, arquitectura, inferencia y entrenamiento de LLMs.'
+const siteUrl = Astro.url
+const defaultImage = image || 'https://llm.javierpenate.com/og-default.svg'
 ---
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{pageTitle}</title>
-    <meta name="description" content={pageDesc} />
-    <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={pageDesc} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={SITE.url} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
-  </head>
-  <body>
-    <slot />
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- HTML Title -->
+  <title>{siteTitle}</title>
+  <meta name="description" content={siteDescription} />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={siteTitle} />
+  <meta property="og:description" content={siteDescription} />
+  <meta property="og:image" content={defaultImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={siteUrl} />
+  <meta property="og:locale" content="es_ES" />
+  <meta property="og:site_name" content="Anatomía de un LLM" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={siteTitle} />
+  <meta name="twitter:description" content={siteDescription} />
+  <meta name="twitter:image" content={defaultImage} />
+
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  <link rel="stylesheet" href="/src/styles/global.css" />
+</head>
+<body>
+  <slot />
+</body>
 </html>

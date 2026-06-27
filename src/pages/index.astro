@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro'
 import Header from '../components/layout/Header.astro'
 import Footer from '../components/layout/Footer.astro'
+import ShareButtons from '../components/ShareButtons.astro'
 import { NAV_ITEMS } from '../consts'
 ---
 
@@ -229,6 +230,16 @@ import { NAV_ITEMS } from '../consts'
         a velocidades finitas. Todo se puede medir, todo se puede explicar."
       </blockquote>
       <p class="mt-4 text-sm text-neutral-400">— Filosofía del proyecto</p>
+    </div>
+  </section>
+
+  <!-- Compartir -->
+  <section class="border-t border-neutral-200 bg-white">
+    <div class="max-w-page mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="flex flex-col items-center gap-3">
+        <p class="text-sm text-neutral-500">¿Te parece útil? Compártelo</p>
+        <ShareButtons title="Anatomía de un LLM" description="Guía interactiva sobre cómo funcionan los grandes modelos de lenguaje desde el silicio hasta la implementación." compact />
+      </div>
     </div>
   </section>
 
