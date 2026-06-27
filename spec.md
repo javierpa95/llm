@@ -1115,24 +1115,19 @@ Un sistema de noticias curadas que convierte el sitio en un destino recurrente. 
 - Llama / DeepSeek / Mistral release notes
 - ArXiv — papers trending en ML (cs.CL, cs.LG)
 
-### 12.2 Flujo de trabajo
+### 12.2 Flujo de trabajo (auto-publicación diaria)
 
 ```
 Cron diario (08:00 UTC)
   ─► 1. Walker: visita fuentes, extrae titulares y enlaces
   ─► 2. Filter: evalúa relevancia para LLM site
-  ─► 3. Draft: escribe 1-3 noticias en noticias/pending/
-  ─► 4. Notify: envía resumen a Telegram "📰 N noticias pendientes"
-  
-Editor (Javier)
-  ─► 5. Revisa los drafts en Telegram
-  ─► 6. Responde "publica X" o "borra Y"
-  ─► 7. Si publica:
-       a. Mueve de pending/ a published/
-       b. Actualiza noticias/published/index.md
-       c. La home muestra las 3 últimas
-       d. /noticias tiene el archivo completo
+  ─► 3. Publish: si hay noticia relevante, escribe directamente en published/
+  ─► 4. Overflow: si hay varias, las mejores van a pending/
+  ─► 5. Skip: si nada es relevante, no publica nada
+  ─► 6. Notify: envía resumen a Telegram "📰 Publicada: ..." o "📭 Nada relevante"
 ```
+
+**Regla de oro:** Una noticia por día, solo si es relevante. Mejor ninguna que una inventada o de relleno.
 
 ### 12.3 Estructura de archivos
 
@@ -1209,27 +1204,37 @@ En `src/pages/index.astro`, añadir después de las cards:
 
 ```bash
 # Se ejecuta diariamente a las 08:00 UTC
-# Skills: web (búsqueda), file (escritura)
+# Busca en las 6 fuentes principales + secundarias
+# Si encuentra noticia relevante → publica directo en published/
+# Skills: web (búsqueda), file (escritura), terminal
 # Workdir: /opt/data/LLM
 
 hermes cron create \
   --schedule "0 8 * * *" \
-  --prompt "Ejecuta el script de noticias: busca en las fuentes principales (Import AI, The Decoder, Simon Willison, Interconnects, Sebastian Raschka, Ars Technica AI) noticias sobre LLMs. Filtra por relevancia. Escribe drafts en noticias/pending/. Envía resumen al editor." \
-  --workdir /opt/data/LLM
+  --prompt "Busca en las fuentes principales (Import AI, The Decoder, Simon Willison, Interconnects, Sebastian Raschka, Ars Technica AI) noticias sobre LLMs. Filtra por relevancia. Si hay una noticia relevante, publícala directamente en noticias/published/. Si no hay nada relevante, no publiques nada." \
+  --workdir /opt/data/LLM \
+  --skills web \
+  --enabled-toolsets web,file,terminal
 ```
 
 ### 12.9 Comandos de gestión
 
 ```bash
-# Publicar una noticia (mover de pending a published)
-mv noticias/pending/2026-06-28-slug.md noticias/published/
-# Actualizar índice
-# Lanzar build y deploy
+# El cron publica automáticamente. pending/ solo se usa para desbordamiento.
 
-# Revisar pendientes
+# Revisar si hay desbordamiento (noticias extra que no se publicaron)
 ls noticias/pending/
 
+# Publicar un desbordamiento manualmente
+mv noticias/pending/YYYY-MM-DD-slug.md noticias/published/
+
+# Forzar un rebuild y deploy tras publicar manualmente
+cd /opt/data/LLM && npm run build && docker cp dist/. $(docker ps --filter "name=llm" --format '{{.Names}}'):/usr/share/nginx/html/
+
+# Ver las últimas publicadas
+ls -t noticias/published/*.md | head -5
+
 # Borrar pendiente (no relevante)
-rm noticias/pending/2026-06-28-slug.md
+rm noticias/pending/YYYY-MM-DD-slug.md
 ```
 
