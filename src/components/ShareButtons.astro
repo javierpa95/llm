@@ -9,7 +9,8 @@ export interface Props {
 const { title, description = '', url = Astro.url.toString(), compact = false } = Astro.props
 const encodedUrl = encodeURIComponent(url)
 const encodedTitle = encodeURIComponent(title)
-const shareText = `${title}\n${url}`
+const shareText = `Me ha encantado este artículo: ${title}
+${url}`
 ---
 
 <div class:list={['share-buttons', compact && 'share-compact']}>
@@ -108,8 +109,8 @@ const shareText = `${title}\n${url}`
       e.preventDefault()
 
       // Intentar abrir la app vía URL scheme nativo
-      // twitter://post?message= funciona en iOS y Android para abrir compose precargado
-      const nativeUrl = 'twitter://post?message=' + encodeURIComponent(text)
+      // twitter://post?text= abre compose precargado en iOS y Android
+      const nativeUrl = 'twitter://post?text=' + encodeURIComponent(text)
       
       // Intentar app nativa
       window.location.href = nativeUrl
