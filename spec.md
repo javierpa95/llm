@@ -124,8 +124,8 @@ llm/
 │   │
 │   ├── pages/
 │   │   ├── index.astro               ← Landing + hero + secciones principales
-│   │   ├── fundamentos.astro         ← Parámetros + Memoria + Quantización
 │   │   ├── hardware.astro            ← Hardware + bus + jerarquía
+│   │   ├── fundamentos.astro         ← Parámetros + Memoria + Quantización
 │   │   ├── arquitectura.mdx          ← Transformer + Atención + FFN
 │   │   ├── inferencia.astro          ← Bucle autoregresivo + KV Cache + Velocidad
 │   │   ├── tokenizacion.astro        ← Tokenización + Embeddings
@@ -178,8 +178,8 @@ llm/
 
 ```
 /                     → Landing + hero + resumen de todo
-/fundamentos          → Parámetros, memoria, cuantización, calculadora VRAM
 /hardware             → Bus, BW, GPU architecture, jerarquía memoria
+/fundamentos          → Parámetros, memoria, cuantización, calculadora VRAM
 /arquitectura         → Transformer, Atención, FFN, capa completa
 /inferencia           → Bucle autoregresivo, KV Cache, calculadora velocidad
 /tokenizacion         → BPE, embeddings, word arithmetic

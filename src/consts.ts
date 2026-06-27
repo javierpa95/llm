@@ -8,8 +8,8 @@ export const SITE = {
 
 export const NAV_ITEMS = [
   { label: 'Inicio', href: '/' },
-  { label: 'Fundamentos', href: '/fundamentos' },
   { label: 'Hardware', href: '/hardware' },
+  { label: 'Fundamentos', href: '/fundamentos' },
   { label: 'Arquitectura', href: '/arquitectura' },
   { label: 'Inferencia', href: '/inferencia' },
   { label: 'Tokenización', href: '/tokenizacion' },

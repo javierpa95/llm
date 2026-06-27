@@ -12,9 +12,9 @@
 ## 📋 Índice
 
 1. [¿Qué es un LLM? — Next Token Prediction](#1-qué-es-un-llm--next-token-prediction)
-2. [Parámetros: el esqueleto](#2-parámetros-el-esqueleto)
-3. [Memoria: dónde vive el modelo](#3-memoria-dónde-vive-el-modelo)
-4. [🔌 Hardware: la realidad física](#4-hardware-la-realidad-física)
+2. [🔌 Hardware: la realidad física](#2-hardware-la-realidad-física)
+3. [Parámetros: el esqueleto](#3-parámetros-el-esqueleto)
+4. [Memoria: dónde vive el modelo](#4-memoria-dónde-vive-el-modelo)
 5. [Arquitectura Transformer — visión global](#5-arquitectura-transformer--visión-global)
 6. [Tokenización: de texto a números](#6-tokenización-de-texto-a-números)
 7. [Embeddings: el espacio semántico](#7-embeddings-el-espacio-semántico)
@@ -105,7 +105,7 @@ perplejidad 10 necesita ~3.32 bits/token (log₂ 10).
 
 ---
 
-## 2. Parámetros: el esqueleto
+## 3. Parámetros: el esqueleto
 
 ### 🟢 Para empezar
 
@@ -171,7 +171,7 @@ solo el de los expertos activos.
 
 ---
 
-## 3. Memoria: dónde vive el modelo
+## 4. Memoria: dónde vive el modelo
 
 ### 🟢 Para empezar
 
@@ -256,7 +256,7 @@ INT4:
 
 ---
 
-## 4. Hardware: la realidad física
+## 2. Hardware: la realidad física
 
 Esta es la sección más importante para **quitarle la magia**. Un LLM no es
 más que un archivo de números que se mueven físicamente por cables de
