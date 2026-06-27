@@ -15,9 +15,9 @@ const encodedDesc = encodeURIComponent(description)
 <div class="share-buttons {compact ? 'share-compact' : ''}">
   {!compact && <span class="share-label">Compartir</span>}
   <div class="share-grid">
-    <!-- X / Twitter -->
+    <!-- X (Twitter) -->
     <a
-      href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+      href={`https://x.com/intent/post?text=${encodedTitle}&url=${encodedUrl}`}
       target="_blank"
       rel="noopener noreferrer"
       class="share-btn share-x"

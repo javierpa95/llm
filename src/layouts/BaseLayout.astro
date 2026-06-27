@@ -5,6 +5,8 @@ export interface Props {
   image?: string
 }
 
+import '../styles/global.css'
+
 const { title, description, image } = Astro.props
 
 const siteTitle = title 
@@ -13,7 +15,7 @@ const siteTitle = title
 
 const siteDescription = description || 'Aprende cómo funcionan los grandes modelos de lenguaje desde el silicio hasta la implementación práctica. Guías técnicas, hardware, arquitectura, inferencia y entrenamiento de LLMs.'
 const siteUrl = Astro.url
-const defaultImage = image || 'https://llm.javierpenate.com/og-default.svg'
+const defaultImage = image || 'https://llm.javierpenate.com/og-default.png'
 ---
 
 <!DOCTYPE html>
@@ -45,7 +47,6 @@ const defaultImage = image || 'https://llm.javierpenate.com/og-default.svg'
   <meta name="twitter:image" content={defaultImage} />
 
   <link rel="sitemap" href="/sitemap-index.xml" />
-  <link rel="stylesheet" href="/src/styles/global.css" />
 </head>
 <body>
   <slot />
