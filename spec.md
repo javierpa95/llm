@@ -178,12 +178,12 @@ llm/
 
 ```
 /                     → Landing + hero + resumen de todo
-/hardware             → Bus, BW, GPU architecture, jerarquía memoria
+/hardware             → Historia GPU, mapa físico, ciclos, viaje, demo, cuello de botella
 /fundamentos          → Parámetros, memoria, cuantización, calculadora VRAM
 /arquitectura         → Transformer, Atención, FFN, capa completa
 /inferencia           → Bucle autoregresivo, KV Cache, calculadora velocidad
 /tokenizacion         → BPE, embeddings, word arithmetic
-/entrenamiento        → Training, SFT, RLHF, alucinaciones
+/entrenamiento        → Training (3 fases), paralelismo, alucinaciones
 /glosario             → Búsqueda + fichas de todos los términos
 ```
 
