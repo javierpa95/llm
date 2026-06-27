@@ -17,7 +17,7 @@ const shareText = `${title}\n${url}`
   <div class="share-grid">
     <!-- X (Twitter) -->
     <a
-      href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+      href={`https://x.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
       target="_blank"
       rel="noopener noreferrer"
       class="share-btn share-x"
@@ -73,7 +73,7 @@ const shareText = `${title}\n${url}`
 </div>
 
 <script>
-  // Manejador de copiar enlace (separado del HTML, sin escapes rotos)
+  // Botón Copiar
   document.querySelectorAll('.share-copy').forEach(btn => {
     btn.addEventListener('click', async () => {
       const url = btn.getAttribute('data-copy-url')
@@ -87,7 +87,6 @@ const shareText = `${title}\n${url}`
           setTimeout(() => { label.textContent = original }, 2000)
         }
       } catch (e) {
-        // fallback para móviles sin clipboard API
         const textarea = document.createElement('textarea')
         textarea.value = url
         document.body.appendChild(textarea)
@@ -97,6 +96,26 @@ const shareText = `${title}\n${url}`
       }
     })
   })
+
+  // En móvil, usar Web Share API si está disponible
+  if ('share' in navigator && window.matchMedia('(pointer: coarse)').matches) {
+    document.querySelectorAll('.share-btn.share-x, .share-btn.share-linkedin')
+      .forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault()
+          const url = btn.getAttribute('href')
+          const text = btn.classList.contains('share-x')
+            ? 'Mira esto:' : ''
+          try {
+            await navigator.share({
+              title: document.title,
+              text: document.title,
+              url: window.location.href,
+            })
+          } catch { /* user cancelled */ }
+        })
+      })
+  }
 </script>
 
 <style>
