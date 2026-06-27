@@ -96,26 +96,6 @@ const shareText = `${title}\n${url}`
       }
     })
   })
-
-  // En móvil, usar Web Share API si está disponible
-  if ('share' in navigator && window.matchMedia('(pointer: coarse)').matches) {
-    document.querySelectorAll('.share-btn.share-x, .share-btn.share-linkedin')
-      .forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          e.preventDefault()
-          const url = btn.getAttribute('href')
-          const text = btn.classList.contains('share-x')
-            ? 'Mira esto:' : ''
-          try {
-            await navigator.share({
-              title: document.title,
-              text: document.title,
-              url: window.location.href,
-            })
-          } catch { /* user cancelled */ }
-        })
-      })
-  }
 </script>
 
 <style>
