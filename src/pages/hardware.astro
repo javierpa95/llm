@@ -3,6 +3,7 @@ import DocLayout from '../layouts/DocLayout.astro'
 import LevelTabs from '../components/content/LevelTabs.astro'
 import HardwareDiagram from '../components/content/HardwareDiagram.astro'
 import ClockCycleDemo from '../components/content/ClockCycleDemo.astro'
+import ModelJourney from '../components/content/ModelJourney.astro'
 ---
 
 <DocLayout
@@ -14,6 +15,7 @@ import ClockCycleDemo from '../components/content/ClockCycleDemo.astro'
     { id: 'mapa-gpu', label: 'El mapa físico de la GPU', level: 'beginner' },
     { id: 'ciclos-distancias', label: 'Ciclos, distancias y latencias', level: 'deep' },
     { id: 'viaje-pesos', label: 'El viaje de los pesos por el bus', level: 'deep' },
+    { id: 'demo-animada', label: '🚀 Demo: el viaje completo', level: 'beginner' },
     { id: 'cuello-botella', label: 'El cuello de botella', level: 'advanced' },
     { id: 'resumen', label: 'Resumen y conclusiones', level: 'beginner' },
   ]}
@@ -463,6 +465,18 @@ Esto significa:
         </p>
       </Fragment>
     </LevelTabs>
+  </section>
+
+  <!-- ======================================================================
+       SECCIÓN 4.5: DEMO ANIMADA — El viaje completo del modelo
+       ====================================================================== -->
+  <section id="demo-animada" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-2">🚀 Demo: el viaje completo del modelo</h2>
+    <p class="text-neutral-600 mb-6">
+      Una animación interactiva que muestra todo lo que has aprendido: cómo los pesos se cargan en VRAM,
+      cómo viajan a los núcleos para procesar el texto, y por qué <strong>cada nueva palabra requiere repetir el proceso desde cero</strong>.
+    </p>
+    <ModelJourney />
   </section>
 
   <!-- ======================================================================
