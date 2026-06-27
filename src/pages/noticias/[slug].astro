@@ -2,6 +2,12 @@
 import DocLayout from '../../layouts/DocLayout.astro'
 import { getNewsBySlug, CATEGORY_EMOJIS } from '../../data/news'
 import type { NewsItem } from '../../data/news'
+import { marked } from 'marked'
+
+// Configurar marked para que las tablas tengan clases Tailwind
+marked.use({
+  gfm: true, // GitHub Flavored Markdown para tablas
+})
 
 export async function getStaticPaths() {
   const { getAllNews } = await import('../../data/news')
@@ -76,20 +82,8 @@ const { news } = Astro.props as { news: NewsItem }
       )}
     </div>
 
-    <!-- Cuerpo de la noticia -->
-    <div class="prose prose-neutral max-w-none">
-      {news.content.split('\n').map((paragraph, i) => {
-        if (!paragraph.trim()) return null
-        // Detect lists
-        if (paragraph.trim().startsWith('- ') || paragraph.trim().startsWith('* ')) {
-          return <li class="text-neutral-700 ml-4 mb-1">{paragraph.trim().substring(2)}</li>
-        }
-        if (paragraph.trim().match(/^\d+\.\s/)) {
-          return <li class="text-neutral-700 ml-4 mb-1">{paragraph.trim().replace(/^\d+\.\s/, '')}</li>
-        }
-        return <p class="text-neutral-700 leading-relaxed mb-4">{paragraph}</p>
-      })}
-    </div>
+    <!-- Cuerpo de la noticia (markdown renderizado) -->
+    <div class="prose prose-neutral max-w-none markdown-content" set:html={marked.parse(news.content)} />
 
     <!-- Footer de navegación -->
     <div class="mt-12 pt-6 border-t border-neutral-200">
