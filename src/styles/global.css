@@ -5,146 +5,197 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ══════════════════════════════════════════════════════════════
-   DESIGN SYSTEM TOKENS
+   DESIGN SYSTEM — CSS plano (sin @apply) 
+   Todo lo que va aquí se incluye SIN depender de chunking de Vite
    Ver design.md para documentación completa
    ══════════════════════════════════════════════════════════════ */
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
-  }
-
-  body {
-    @apply bg-white text-neutral-900 font-sans antialiased;
-  }
-
-  ::selection {
-    @apply bg-primary-200 text-primary-900;
-  }
+/* ───── Base ───── */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
-@layer components {
-  /* ───── Secciones ───── */
-  .content-section {
-    @apply mb-10 last:mb-0;
-  }
+body {
+  background-color: #fff;
+  color: #171717;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  /* ───── Cards ───── */
-  .card {
-    @apply bg-white border border-neutral-200 rounded-xl shadow-sm transition-shadow;
-  }
-  .card-hover {
-    @apply card hover:shadow-md;
-  }
+::selection {
+  background-color: #c7d2fe;
+  color: #312e81;
+}
 
-  /* ───── Info boxes (semánticos) ───── */
-  .info-box {
-    @apply p-4 rounded-xl;
-  }
-  .info-box-blue {
-    @apply info-box bg-blue-50 border border-blue-200;
-  }
-  .info-box-blue p { @apply text-blue-800; }
+/* ───── Secciones ───── */
+.content-section {
+  margin-bottom: 2.5rem;
+}
+.content-section:last-child {
+  margin-bottom: 0;
+}
 
-  .info-box-yellow {
-    @apply info-box bg-yellow-50 border border-yellow-200;
-  }
-  .info-box-yellow p { @apply text-yellow-800; }
+/* ───── Cards ───── */
+.card,
+.card-hover {
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: box-shadow 0.15s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
 
-  .info-box-green {
-    @apply info-box bg-green-50 border border-green-200;
-  }
-  .info-box-green p { @apply text-green-800; }
+/* ───── Info boxes ───── */
+.info-box {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid;
+}
+.info-box-blue { background: #eff6ff; border-color: #bfdbfe; }
+.info-box-blue :is(h1,h2,h3,h4,h5,h6,p,span,div) { color: #1e40af; }
+.info-box-yellow { background: #fefce8; border-color: #fef08a; }
+.info-box-yellow :is(h1,h2,h3,h4,h5,h6,p,span,div) { color: #854d0e; }
+.info-box-green { background: #f0fdf4; border-color: #bbf7d0; }
+.info-box-green :is(h1,h2,h3,h4,h5,h6,p,span,div) { color: #166534; }
+.info-box-red { background: #fef2f2; border-color: #fecaca; }
+.info-box-red :is(h1,h2,h3,h4,h5,h6,p,span,div) { color: #991b1b; }
+.info-box-indigo { background: #eef2ff; border-color: #c7d2fe; }
+.info-box-indigo :is(h1,h2,h3,h4,h5,h6,p,span,div) { color: #3730a3; }
+.info-box-amber { background: #fffbeb; border-color: #fde68a; }
+.info-box-amber :is(h1,h2,h3,h4,h5,h6,p,span,div) { color: #92400e; }
+.info-box-purple { background: #faf5ff; border-color: #e9d5ff; }
+.info-box-purple :is(h1,h2,h3,h4,h5,h6,p,span,div) { color: #6b21a8; }
 
-  .info-box-red {
-    @apply info-box bg-red-50 border border-red-200;
-  }
-  .info-box-red p { @apply text-red-800; }
-
-  .info-box-indigo {
-    @apply info-box bg-indigo-50 border border-indigo-200;
-  }
-  .info-box-indigo p { @apply text-indigo-800; }
-
-  .info-box-amber {
-    @apply info-box bg-amber-50 border border-amber-200;
-  }
-  .info-box-amber p { @apply text-amber-800; }
-
-  .info-box-purple {
-    @apply info-box bg-purple-50 border border-purple-200;
-  }
-  .info-box-purple p { @apply text-purple-800; }
-
-  /* ───── Tablas ───── */
+/* ───── Tablas en contenido ───── */
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  margin-left: -1rem;
+  margin-right: -1rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.75rem;
+}
+@media (min-width: 640px) {
   .table-wrap {
-    @apply overflow-x-auto mb-4 -mx-4 sm:mx-0;
-  }
-  .table-wrap table {
-    @apply w-full text-sm min-w-[600px];
-  }
-  .table-wrap thead tr {
-    @apply bg-neutral-100;
-  }
-  .table-wrap th {
-    @apply px-3 py-2 text-left font-medium text-neutral-700;
-  }
-  .table-wrap tbody {
-    @apply divide-y divide-neutral-200;
-  }
-  .table-wrap tbody tr {
-    @apply even:bg-neutral-50 hover:bg-neutral-100 transition-colors;
-  }
-  .table-wrap td {
-    @apply px-3 py-2;
-  }
-
-  /* ───── Bloques de código ───── */
-  .code-block {
-    @apply p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto shadow-sm mb-4;
-  }
-
-  /* ───── Botones ───── */
-  .btn-primary {
-    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors;
-  }
-  .btn-secondary {
-    @apply inline-flex items-center gap-2 px-4 py-2 bg-white text-neutral-700 text-sm font-semibold rounded-xl border border-neutral-300 hover:border-primary-300 hover:text-primary-600 transition-colors;
-  }
-  .btn-ghost {
-    @apply inline-flex items-center gap-2 px-3 py-2 text-neutral-500 text-sm font-medium rounded-lg hover:bg-neutral-100 transition-colors;
-  }
-
-  /* ───── Badges / Tags ───── */
-  .badge {
-    @apply inline-flex px-2 py-0.5 rounded-lg text-xs font-medium;
-  }
-  .badge-modelos { @apply badge bg-purple-100 text-purple-700; }
-  .badge-hardware { @apply badge bg-amber-100 text-amber-700; }
-  .badge-investigacion { @apply badge bg-blue-100 text-blue-700; }
-  .badge-industria { @apply badge bg-green-100 text-green-700; }
-  .badge-herramientas { @apply badge bg-neutral-100 text-neutral-700; }
-
-  /* ───── Niveles de LevelTabs ───── */
-  .level-tab {
-    @apply px-4 py-2 text-sm font-medium transition-colors rounded-t-lg border-b-2 -mb-px;
-  }
-  .level-tab[data-active="true"] {
-    @apply border-current bg-neutral-50;
-  }
-  .level-tab[data-active="false"] {
-    @apply text-neutral-500 hover:text-neutral-700 border-transparent;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.table-wrap table {
+  width: 100%;
+  font-size: 0.875rem;
+  min-width: 600px;
+}
+.table-wrap thead tr {
+  background-color: #f5f5f5;
+}
+.table-wrap th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 500;
+  color: #404040;
+}
+.table-wrap tbody {
+  border-top: 1px solid #e5e5e5;
+}
+.table-wrap tbody tr {
+  border-bottom: 1px solid #e5e5e5;
+}
+.table-wrap tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+.table-wrap tbody tr:hover {
+  background-color: #f5f5f5;
+}
+.table-wrap td {
+  padding: 0.5rem 0.75rem;
 }
 
-/* ───── Tablas en contenido: filas alternas globales ───── */
-.content-section tbody tr {
-  @apply even:bg-neutral-50 hover:bg-neutral-100 transition-colors;
+/* Tablas dentro de sections (inline) */
+.content-section table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+.content-section table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* ───── Bloques de código ───── */
+.code-block {
+  padding: 1rem;
+  background-color: #171717;
+  color: #f5f5f5;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  overflow-x: auto;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  margin-bottom: 1rem;
+}
+
+/* ───── Botones ───── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: #4f46e5;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: background-color 0.15s ease;
+}
+.btn-primary:hover {
+  background-color: #4338ca;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  color: #404040;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  border: 1px solid #d4d4d4;
+  transition: all 0.15s ease;
+}
+.btn-secondary:hover {
+  border-color: #a5b4fc;
+  color: #4f46e5;
+}
+
+/* ───── Badges / Tags ───── */
+.badge {
+  display: inline-flex;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.badge-modelos { background: #f3e8ff; color: #7e22ce; }
+.badge-hardware { background: #fef3c7; color: #b45309; }
+.badge-investigacion { background: #dbeafe; color: #1d4ed8; }
+.badge-industria { background: #dcfce7; color: #15803d; }
+.badge-herramientas { background: #f5f5f5; color: #737373; }
+
+/* ───── Animación de entrada para secciones ───── */
+@keyframes sectionFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.content-section {
+  animation: sectionFadeIn 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content-section {
+    animation: none;
+  }
 }
