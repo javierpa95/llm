@@ -101,3 +101,59 @@ export const CATEGORY_EMOJIS: Record<string, string> = {
   industria: '🏢',
   herramientas: '🛠️',
 }
+
+// ─── Wikilinks entre noticias ───
+// Formato en markdown:
+//   [[slug]]              → enlace con el título de la noticia destino
+//   [[texto visible|slug]] → enlace con texto personalizado
+//
+// El slug es el nombre del fichero .md sin extensión.
+// Ejemplo: [[2026-06-27-openai-broadcom-jalapeno-chip-llm-inference]]
+
+let _slugCache: Record<string, string> | null = null
+
+function _buildSlugCache(): Record<string, string> {
+  if (!_slugCache) {
+    _slugCache = {}
+    try {
+      const all = getAllNews()
+      for (const n of all) {
+        _slugCache[n.slug] = n.title
+      }
+    } catch {
+      // Fallback vacío si no se puede leer el FS (e.g. contexto cliente)
+    }
+  }
+  return _slugCache
+}
+
+/** Resuelve [[wikilinks]] en contenido markdown a enlaces reales */
+export function resolveWikilinks(content: string): string {
+  const slugs = _buildSlugCache()
+
+  // [[texto visible|slug]] — más específico, procesar primero
+  // Formato: [[slug|texto visible]]
+  content = content.replace(
+    /\[\[([^\[\]]+?)\|([^\[\]]+?)\]\]/g,
+    (_match, slug, text) => {
+      slug = slug.trim()
+      const title = slugs[slug]
+      if (!title) return _match // dejar intacto si no existe
+      return `[${text.trim()}](${makeUrl(slug)})`
+    }
+  )
+
+  // [[slug]] — simple
+  content = content.replace(/\[\[([^\[\]]+?)\]\]/g, (_match, slug) => {
+    slug = slug.trim()
+    const title = slugs[slug]
+    if (!title) return _match
+    return `[${title}](${makeUrl(slug)})`
+  })
+
+  return content
+}
+
+function makeUrl(slug: string): string {
+  return `/noticias/${slug}`
+}

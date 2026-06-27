@@ -1,10 +1,35 @@
 ---
 import DocLayout from '../layouts/DocLayout.astro'
-import { getAllNews, CATEGORY_EMOJIS } from '../data/news'
+import { getAllNews, CATEGORY_EMOJIS, resolveWikilinks } from '../data/news'
 import { SITE } from '../consts'
+import fs from 'fs'
+import path from 'path'
 
 const allNews = getAllNews()
 const categories = [...new Set(allNews.map(n => n.category).filter(Boolean))]
+
+// Leer borradores pendientes
+const pendingDir = path.resolve(process.cwd(), 'noticias/pending')
+let pendingDrafts: { slug: string; title: string; date: string; category: string }[] = []
+try {
+  if (fs.existsSync(pendingDir)) {
+    pendingDrafts = fs.readdirSync(pendingDir)
+      .filter(f => f.endsWith('.md'))
+      .map(f => {
+        const content = fs.readFileSync(path.join(pendingDir, f), 'utf-8')
+        const titleMatch = content.match(/^title:\s*"(.+)"\s*$/m)
+        const dateMatch = content.match(/^date:\s*(.+)\s*$/m)
+        const catMatch = content.match(/^category:\s*(.+)\s*$/m)
+        return {
+          slug: f.replace('.md', ''),
+          title: titleMatch ? titleMatch[1] : f,
+          date: dateMatch ? dateMatch[1] : '',
+          category: catMatch ? catMatch[1] : '',
+        }
+      })
+      .sort((a, b) => b.date.localeCompare(a.date))
+  }
+} catch { /* no pending dir */ }
 ---
 
 <DocLayout
@@ -14,14 +39,31 @@ const categories = [...new Set(allNews.map(n => n.category).filter(Boolean))]
   :sections={[
     { id: 'archivo', label: '📰 Archivo de noticias', level: 'beginner' },
     ...categories.map(c => ({ id: `cat-${c}`, label: `${CATEGORY_EMOJIS[c] || '📄'} ${c}`, level: 'beginner' as const })),
+    ...(pendingDrafts.length > 0 ? [{ id: 'borradores', label: '📝 Borradores', level: 'beginner' as const }] : []),
   ]}
 >
-  <h1 class="text-3xl font-bold text-neutral-900 mb-2">📰 Noticias LLM</h1>
-  <p class="text-lg text-neutral-600 mb-8">
-    Noticias curadas sobre el mundo de los modelos de lenguaje: nuevos modelos, hardware, investigación aplicada y herramientas.
-    Seleccionadas por <strong>{SITE.author}</strong> para mantenerte al día sin ruido.
-  </p>
+  <!-- Header con estadísticas -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-neutral-900 mb-2">📰 Noticias LLM</h1>
+    <p class="text-lg text-neutral-600 mb-4">
+      Noticias curadas sobre el mundo de los modelos de lenguaje. Seleccionadas por <strong>{SITE.author}</strong> para mantenerte al día sin ruido.
+    </p>
+    <div class="flex flex-wrap gap-4 text-sm">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 rounded-lg text-neutral-600">
+        <span class="font-semibold text-neutral-800">{allNews.length}</span> publicadas
+      </span>
+      {pendingDrafts.length > 0 && (
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-700">
+          <span class="font-semibold">{pendingDrafts.length}</span> borrador{pendingDrafts.length > 1 ? 'es' : ''} pendiente{pendingDrafts.length > 1 ? 's' : ''}
+        </span>
+      )}
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 rounded-lg text-neutral-600">
+        <span class="font-semibold text-neutral-800">{categories.length}</span> categorías
+      </span>
+    </div>
+  </div>
 
+  <!-- Timeline de noticias publicadas -->
   <section id="archivo" class="content-section">
     {allNews.length === 0 ? (
       <div class="p-8 text-center text-neutral-400 border-2 border-dashed border-neutral-200 rounded-2xl">
@@ -30,13 +72,23 @@ const categories = [...new Set(allNews.map(n => n.category).filter(Boolean))]
         <p class="text-xs mt-1">El sistema de noticias está configurado. Pronto llegarán las primeras.</p>
       </div>
     ) : (
-      <div class="space-y-4">
-        {allNews.map((news) => (
+      <div class="space-y-3">
+        {allNews.map((news, i) => (
           <a
             href={`/noticias/${news.slug}`}
-            class="block group p-5 bg-white border border-neutral-200 rounded-xl hover:border-primary-200 hover:shadow-md transition-all"
+            class="block group p-4 sm:p-5 bg-white border border-neutral-200 rounded-xl hover:border-primary-200 hover:shadow-md transition-all"
           >
-            <div class="flex items-start gap-3">
+            <div class="flex items-start gap-4">
+              {/* Fecha vertical */}
+              <div class="hidden sm:flex flex-col items-center w-12 pt-0.5 shrink-0">
+                <span class="text-xs font-semibold text-neutral-400 uppercase">{news.date ? new Date(news.date + 'T00:00:00').toLocaleDateString('es', { month: 'short' }) : ''}</span>
+                <span class="text-lg font-bold text-neutral-600 -mt-0.5">{news.date ? new Date(news.date + 'T00:00:00').getDate() : ''}</span>
+                {/* Línea conectora si no es la última */}
+                {i < allNews.length - 1 && (
+                  <div class="w-px flex-1 bg-neutral-200 mt-2 min-h-[24px]"></div>
+                )}
+              </div>
+
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1.5 flex-wrap">
                   <span class="text-xs px-2 py-0.5 rounded-full font-medium" 
@@ -50,8 +102,7 @@ const categories = [...new Set(allNews.map(n => n.category).filter(Boolean))]
                   >
                     {CATEGORY_EMOJIS[news.category] || '📄'} {news.category}
                   </span>
-                  <span class="text-xs text-neutral-400">{news.date}</span>
-                  {news.reading_time && <span class="text-xs text-neutral-300">·</span>}
+                  <span class="text-xs text-neutral-400 sm:hidden">{news.date}</span>
                   {news.reading_time && <span class="text-xs text-neutral-400">{news.reading_time}</span>}
                 </div>
                 <h3 class="text-base font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
@@ -64,11 +115,17 @@ const categories = [...new Set(allNews.map(n => n.category).filter(Boolean))]
                 )}
                 <div class="flex items-center gap-2 mt-2">
                   <span class="text-xs text-neutral-400">Fuente: {news.source}</span>
-                  <span class="text-xs text-neutral-300">·</span>
-                  <span class="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
                     Leer →
                   </span>
                 </div>
+                {news.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-1 mt-2">
+                    {news.tags.map(tag => (
+                      <span class="px-1.5 py-0.5 bg-neutral-50 text-neutral-400 rounded text-[11px]">#{tag}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </a>
@@ -77,20 +134,67 @@ const categories = [...new Set(allNews.map(n => n.category).filter(Boolean))]
     )}
   </section>
 
-  <!-- Categorías como secciones de anclaje -->
+  <!-- Borradores pendientes -->
+  {pendingDrafts.length > 0 && (
+    <section id="borradores" class="content-section">
+      <h2 class="text-xl font-bold text-neutral-900 mb-3">📝 Borradores pendientes</h2>
+      <div class="space-y-2">
+        {pendingDrafts.map(draft => (
+          <div class="p-4 bg-amber-50/50 border border-amber-200 border-dashed rounded-xl">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-neutral-100 text-neutral-600">
+                {CATEGORY_EMOJIS[draft.category] || '📄'} {draft.category || 'sin categoría'}
+              </span>
+              <span class="text-xs text-neutral-400">{draft.date}</span>
+            </div>
+            <p class="text-sm font-medium text-neutral-700">{draft.title}</p>
+            <p class="text-xs text-amber-600 mt-1">⏳ Pendiente de revisión</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Por categorías -->
+  {categories.length > 0 && (
+    <section class="content-section">
+      <h2 class="text-xl font-bold text-neutral-900 mb-4">📂 Por categorías</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {categories.map(cat => {
+          const count = allNews.filter(n => n.category === cat).length
+          return (
+            <a
+              href={`#cat-${cat}`}
+              class="p-4 bg-white border border-neutral-200 rounded-xl hover:border-primary-200 hover:shadow-sm transition-all"
+            >
+              <div class="flex items-center gap-2">
+                <span class="text-xl">{CATEGORY_EMOJIS[cat] || '📄'}</span>
+                <div>
+                  <p class="text-sm font-medium text-neutral-900 capitalize">{cat}</p>
+                  <p class="text-xs text-neutral-400">{count} noticia{count !== 1 ? 's' : ''}</p>
+                </div>
+              </div>
+            </a>
+          )
+        })}
+      </div>
+    </section>
+  )}
+
+  <!-- Desglose por categoría -->
   {categories.map(cat => {
     const catNews = allNews.filter(n => n.category === cat)
     if (catNews.length === 0) return null
     return (
       <section id={`cat-${cat}`} class="content-section">
         <h2 class="text-xl font-bold text-neutral-900 mb-4">{CATEGORY_EMOJIS[cat] || '📄'} {cat}</h2>
-        <div class="space-y-3">
+        <div class="space-y-2">
           {catNews.map(news => (
-            <a href={`/noticias/${news.slug}`} class="block p-4 bg-white border border-neutral-200 rounded-xl hover:border-primary-200 transition-all">
-              <div class="flex items-center gap-2 mb-1">
-                <span class="text-xs text-neutral-400">{news.date}</span>
-                <span class="text-xs text-neutral-300">·</span>
-                <span class="text-xs text-neutral-400">{news.source}</span>
+            <a href={`/noticias/${news.slug}`} class="block p-3 px-4 bg-white border border-neutral-200 rounded-xl hover:border-primary-200 transition-all">
+              <div class="flex items-center gap-2 text-xs text-neutral-400 mb-0.5">
+                <span>{news.date}</span>
+                <span>·</span>
+                <span>{news.source}</span>
               </div>
               <p class="text-sm font-medium text-neutral-900 hover:text-primary-600 transition-colors">{news.title}</p>
             </a>

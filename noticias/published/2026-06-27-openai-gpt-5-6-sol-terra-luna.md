@@ -27,6 +27,8 @@ Terra ofrece rendimiento competitivo con GPT-5.5 siendo 2× más barato, mientra
 
 GPT-5.6 introduce además un sistema de **prompt caching más predecible**: incluye *cache breakpoints* explícitos y una vida mínima de caché de 30 minutos. Las escrituras en caché se facturan a 1.25× la tasa de input sin caché, mientras que las lecturas mantienen el 90% de descuento sobre input cacheado.
 
+Este avance en eficiencia de inferencia va de la mano con los nuevos chips especializados que [[2026-06-27-openai-broadcom-jalapeno-chip-llm-inference|Openlayers y Broadcom están desarrollando]].
+
 La *system card* de GPT-5.6 también documenta mejoras en **resistencia a prompt injection**, un área donde los frontier models han avanzado significativamente — como refleja el experimento de OpenClaw donde Opus 4.6 resistió 6,000 intentos de ataque.
 
 ## Contexto

@@ -1,13 +1,11 @@
 ---
 import DocLayout from '../../layouts/DocLayout.astro'
-import { getNewsBySlug, CATEGORY_EMOJIS } from '../../data/news'
+import { getNewsBySlug, CATEGORY_EMOJIS, resolveWikilinks } from '../../data/news'
 import type { NewsItem } from '../../data/news'
 import { marked } from 'marked'
 
-// Configurar marked para que las tablas tengan clases Tailwind
-marked.use({
-  gfm: true, // GitHub Flavored Markdown para tablas
-})
+// Configurar marked
+marked.use({ gfm: true })
 
 export async function getStaticPaths() {
   const { getAllNews } = await import('../../data/news')
@@ -82,8 +80,8 @@ const { news } = Astro.props as { news: NewsItem }
       )}
     </div>
 
-    <!-- Cuerpo de la noticia (markdown renderizado) -->
-    <div class="prose prose-neutral max-w-none markdown-content" set:html={marked.parse(news.content)} />
+    <!-- Cuerpo de la noticia (markdown + wikilinks renderizados) -->
+    <div class="prose prose-neutral max-w-none markdown-content" set:html={marked.parse(resolveWikilinks(news.content))} />
 
     <!-- Footer de navegación -->
     <div class="mt-12 pt-6 border-t border-neutral-200">
