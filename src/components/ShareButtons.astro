@@ -22,6 +22,7 @@ const shareText = `${title}\n${url}`
       rel="noopener noreferrer"
       class="share-btn share-x"
       aria-label="Compartir en X"
+      data-share-text={`${title}\n${url}`}
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -96,6 +97,40 @@ const shareText = `${title}\n${url}`
       }
     })
   })
+
+  // X: en móvil, intentar URL scheme nativo primero
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    document.querySelector('.share-x')?.addEventListener('click', function(e) {
+      const text = this.getAttribute('data-share-text') || ''
+      const webUrl = this.getAttribute('href')
+      if (!text) return
+
+      e.preventDefault()
+
+      // Intentar abrir la app vía URL scheme nativo
+      // twitter://post?message= funciona en iOS y Android para abrir compose precargado
+      const nativeUrl = 'twitter://post?message=' + encodeURIComponent(text)
+      
+      // Intentar app nativa
+      window.location.href = nativeUrl
+
+      // Fallback a web si no abre la app (tras 1.5s)
+      setTimeout(() => {
+        window.location.href = webUrl
+      }, 1500)
+
+      // Si la app se abre (la página se oculta), cancelar fallback
+      const onVisibility = () => {
+        if (document.hidden) {
+          // La app se abrió, cancelar timeout
+          const timerId = setTimeout(() => {}, 0)
+          for (let i = 0; i <= timerId; i++) clearTimeout(i)
+          document.removeEventListener('visibilitychange', onVisibility)
+        }
+      }
+      document.addEventListener('visibilitychange', onVisibility)
+    })
+  }
 </script>
 
 <style>
