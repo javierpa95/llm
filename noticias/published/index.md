@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-06-30
+updated: 2026-07-01
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-07-01 | [Anthropic lanza Claude Sonnet 5: rendimiento frontier a menor costo](/noticias/2026-07-01-anthropic-claude-sonnet-5) | Anthropic Blog | modelos |
 | 2026-06-30 | [Amazon ingenia sus modelos de Anthropic para sortear el pago por tokens](/noticias/2026-06-30-amazon-distilling-anthropic-models) | The Decoder | industria |
 | 2026-06-29 | [CEO-Bench: solo tres modelos sobreviven 500 días dirigiendo una startup](/noticias/2026-06-29-ceo-bench-llm-startup-survival) | The Decoder | investigación |
 | 2026-06-28 | [VibeThinker-3B: razonamiento comprimido, conocimiento que no](/noticias/2026-06-28-vibethinker-3b-reasoning-compression) | The Decoder | modelos |
