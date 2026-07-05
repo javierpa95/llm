@@ -10,6 +10,7 @@ import InfoBox from '../components/content/InfoBox.vue'
   currentPath="/entrenamiento"
   :sections={[
     { id: 'como-se-entrenan', label: '¿Cómo se entrenan? (3 fases)', level: 'beginner' },
+    { id: 'coste', label: '💰 ¿Por qué es tan caro?', level: 'beginner' },
     { id: 'paralelismo', label: 'Paralelismo', level: 'advanced' },
     { id: 'alucinaciones', label: 'Alucinaciones', level: 'deep' },
   ]}
@@ -104,6 +105,256 @@ Inference:
         <InfoBox type="hot" client:only="vue">
           <strong>Entrenar un modelo 70B cuesta ~$50-100M USD</strong> y requiere meses con miles de GPUs. Ejecutarlo (inferencia) cuesta unos céntimos por hora.
         </InfoBox>
+      </Fragment>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== COSTE ====== -->
+  <section id="coste" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">💰 ¿Por qué es tan caro entrenar?</h2>
+
+    <LevelTabs>
+      <Fragment slot="beginner">
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Que un modelo como LLaMA 3 70B cueste <strong>~$50-100 millones</strong> entrenarlo no es porque las GPUs sean caras (que también). Es por tres razones que se multiplican entre sí:
+        </p>
+
+        <div class="space-y-4 mb-4">
+          <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+            <h4 class="font-bold text-red-800 mb-1">1️⃣ Cada paso hace forward + backward</h4>
+            <p class="text-sm text-red-700">
+              En inferencia el modelo solo hace <strong>forward</strong> (calcular la siguiente palabra). En entrenamiento hace forward + backward (calcular el error y ajustar pesos). <strong>Eso duplica el coste computacional</strong> por paso, y además hay que guardar en memoria los valores intermedios del forward para usarlos en el backward.
+            </p>
+            <div class="flex items-center gap-1 mt-2 text-xs font-mono text-red-600">
+              <span class="px-2 py-0.5 bg-red-100 rounded">Inferencia: F</span>
+              <span>→</span>
+              <span class="px-2 py-0.5 bg-red-200 rounded font-bold">Entrenamiento: F + B + Opt</span>
+            </div>
+          </div>
+
+          <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <h4 class="font-bold text-amber-800 mb-1">2️⃣ No caben en una GPU</h4>
+            <p class="text-sm text-amber-700">
+              Un modelo 70B en FP16 ocupa 140 GB solo en pesos. La H100 más cara tiene 80 GB. Necesitas <strong>múltiples GPUs</strong> y estas tienen que comunicarse entre sí constantemente (cada paso, todos los pesos se sincronizan). Esa comunicación tiene un coste en tiempo y energía.
+            </p>
+            <div class="flex items-center gap-1 mt-2 text-xs text-amber-600">
+              <span class="px-2 py-0.5 bg-amber-100 rounded">Pesos: 140 GB</span>
+              <span>→</span>
+              <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded">2 H100: 160 GB ✅</span>
+              <span>+</span>
+              <span class="px-2 py-0.5 bg-amber-100 rounded">Interconexión NVLink</span>
+            </div>
+          </div>
+
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <h4 class="font-bold text-blue-800 mb-1">3️⃣ Son millones de pasos sobre billones de tokens</h4>
+            <p class="text-sm text-blue-700">
+              No es que entrenes una vez. Entrenas el modelo sobre <strong>~15 billones de tokens</strong>, en lotes de ~4 millones cada uno. Son ~3-4 millones de pasos. Cada paso cuesta ~0.1-0.5 segundos aunque tengas miles de GPUs. <strong>Multiplica: pasos × GPUs × tiempo = factura astronómica</strong>.
+            </p>
+            <div class="flex items-center gap-1 mt-2 text-xs text-blue-600">
+              <span class="px-2 py-0.5 bg-blue-100 rounded">15T tokens</span>
+              <span>÷</span>
+              <span class="px-2 py-0.5 bg-blue-100 rounded">4M batch</span>
+              <span>=</span>
+              <span class="px-2 py-0.5 bg-blue-200 rounded font-bold">~3.75M pasos</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
+          <p class="text-sm text-green-800">
+            💡 <strong>La fórmula mental:</strong> Coste = Parámetros × Tokens × (F+B) / Eficiencia. Si doblas los parámetros, <strong>no doblas el coste: lo multiplicas por ~4</strong> (porque necesitas más GPUs, más comunicación, y más tokens para llenar esos parámetros).
+          </p>
+        </div>
+      </Fragment>
+
+      <Fragment slot="deep">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Desglose de coste por modelo</h2>
+
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Modelo</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Params</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Tokens</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">GPU-hours</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">GPUs</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Coste estimado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr>
+                <td class="px-3 py-2 font-medium">GPT-3 (2020)</td>
+                <td class="px-3 py-2">175B</td>
+                <td class="px-3 py-2">300B</td>
+                <td class="px-3 py-2">~3.6M A100</td>
+                <td class="px-3 py-2">~10,000</td>
+                <td class="px-3 py-2">~$4.6M</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 font-medium">LLaMA 2 70B (2023)</td>
+                <td class="px-3 py-2">70B</td>
+                <td class="px-3 py-2">2T</td>
+                <td class="px-3 py-2">~1.7M A100</td>
+                <td class="px-3 py-2">~2,000</td>
+                <td class="px-3 py-2">~$2-3M</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 font-medium">LLaMA 3 70B (2024)</td>
+                <td class="px-3 py-2">70B</td>
+                <td class="px-3 py-2">15T</td>
+                <td class="px-3 py-2">~6.4M H100</td>
+                <td class="px-3 py-2">~3,000</td>
+                <td class="px-3 py-2">~$50-100M</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 font-medium">LLaMA 3 405B (2024)</td>
+                <td class="px-3 py-2">405B</td>
+                <td class="px-3 py-2">15T</td>
+                <td class="px-3 py-2">~30M H100</td>
+                <td class="px-3 py-2">~16,000</td>
+                <td class="px-3 py-2">~$200-300M</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 font-medium">DeepSeek V3 (2024)</td>
+                <td class="px-3 py-2">671B MoE</td>
+                <td class="px-3 py-2">14.8T</td>
+                <td class="px-3 py-2">~2.8M H800</td>
+                <td class="px-3 py-2">~2,048</td>
+                <td class="px-3 py-2">~$5.6M</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 font-medium">Gemini 1.0 Ultra (2023)</td>
+                <td class="px-3 py-2">? (~1T)</td>
+                <td class="px-3 py-2">? (~15T)</td>
+                <td class="px-3 py-2">~? TPUv4</td>
+                <td class="px-3 py-2">~? (TPU pods)</td>
+                <td class="px-3 py-2">~$200M+ (est.)</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 font-medium">GPT-4 (2023)</td>
+                <td class="px-3 py-2">? (~1.8T MoE)</td>
+                <td class="px-3 py-2">? (~13T)</td>
+                <td class="px-3 py-2">~? (~2-3× GPT-3)</td>
+                <td class="px-3 py-2">~25,000 (est.)</td>
+                <td class="px-3 py-2">~$100-200M</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4">
+          <p class="text-sm text-blue-800">
+            📊 <strong>Dato curioso:</strong> DeepSeek V3 tiene 671B parámetros (más que LLaMA 3 405B) pero costó ~$5.6M frente a los ~$200-300M de LLaMA 3 405B. ¿Cómo? Es <strong>MoE (Mixture of Experts)</strong>: de sus 671B parámetros, solo ~37B están activos por token. Además optimizaron al límite la eficiencia de comunicación y usaron H800 (versión china de H100, más barata).
+          </p>
+        </div>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">¿Por qué LLaMA 3 costó tanto más que LLaMA 2?</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          El modelo 70B pasó de 2T a 15T tokens (<strong>7.5× más datos</strong>). El coste de entrenamiento escala con parámetros × tokens. Si multiplicas los tokens por 7.5, multiplicas el coste por ~7.5. Pero además LLaMA 3 usó H100 (más caras que A100) y entrenaron durante más tiempo para maximizar la calidad. La moraleja: <strong>entrenar con más datos es la forma más simple de mejorar el modelo, pero la factura crece en la misma proporción</strong>.
+        </p>
+      </Fragment>
+
+      <Fragment slot="advanced">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Desglose matemático del coste</h2>
+
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Coste de entrenar un modelo Transformer denso (no MoE):
+
+FLOPs totales ≈ 6 × N × D
+
+Donde:
+  N = número de parámetros del modelo
+  D = número de tokens de entrenamiento
+  6 = factor constante (3 para forward + 3 para backward)
+
+Ejemplo: LLaMA 3 70B con 15T tokens
+  FLOPs = 6 × 70×10⁹ × 15×10¹² = 6.3 × 10²⁴ FLOPs
+
+Para ponerlo en perspectiva:
+  - Una H100 hace ~3.9 × 10¹⁵ FLOP/s en FP16 (3.9 PFLOPS)
+  - Tiempo teórico: 6.3e24 / 3.9e15 = 1.6 × 10⁹ segundos = ~50 años en 1 GPU
+  - Con 3,000 GPUs: 50 años / 3000 = ~6 días... en teoría
+  - En realidad: ~3 meses (eficiencia ~50%)</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">MFU: Model FLOPs Utilization</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Las GPUs nunca alcanzan su rendimiento teórico en la práctica. El <strong>MFU</strong> mide qué porcentaje del rendimiento máximo estás obteniendo realmente:
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>MFU = FLOPs reales / (Rendimiento pico GPU × tiempo)
+
+Valores típicos en entrenamiento de LLMs:
+  - Tensor Parallel sin optimizar: 30-40%
+  - Con Flash Attention + kernel fusion: 45-55%
+  - Con optimización extrema (DeepSeek, NVIDIA): 60-70%
+  - Teórico máximo (solo matmul): ~80%
+
+¿Por qué no se llega al 100%?
+  1. Comunicación entre GPUs (all-reduce, all-gather)
+  2. Operaciones no-matmul (LayerNorm, Softmax, dropout)
+  3. Cuellos de botella de memoria (carga de datos)
+  4. Overhead del framework (PyTorch, JAX)
+
+DeepSeek V3 consiguió ~55% MFU en H800 gracias a:
+  - Kernel fusion (DualPipe)
+  - Comunicación asíncrona (solapa compute con network)
+  - Particionado manual de MoE</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Desglose de VRAM en entrenamiento</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Para un modelo de 70B en FP16 entrenando con AdamW:
+
+| Componente          | Fórmula                | VRAM (70B) |
+|--------------------|------------------------|-----------|
+| Pesos (FP16)       | 2 × N                  | 140 GB    |
+| Gradientes (FP16)  | 2 × N                  | 140 GB    |
+| Optimizer AdamW    | 4 × N (2× estados FP32)| 280 GB    |
+| Activaciones       | variable (batch × seq) | ~50-100 GB|
+| Overhead           | buffers, cuDNN, etc.   | ~10-20 GB |
+| **Total**          |                        | **~620 GB**|
+
+Con ZeRO-3 (sharding de todo entre GPUs):
+  - Con 8 GPUs: ~77 GB / GPU ✅ cabe en H100
+  - Con 4 GPUs: ~155 GB / GPU ❌ no cabe
+  - Por eso LLaMA 3 70B usó 3,000 GPUs: necesitaban ~200 GB/GPU con
+    margen para activaciones y batch grande</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">El coste del carbono</h3>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Modelo</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">MWh</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Toneladas CO₂</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Equivalente</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr>
+                <td class="px-3 py-2">GPT-3 (175B)</td>
+                <td class="px-3 py-2">~1.3 GWh</td>
+                <td class="px-3 py-2">~550 tCO₂</td>
+                <td class="px-3 py-2">120 coches / año</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">LLaMA 3 70B</td>
+                <td class="px-3 py-2">~11 GWh</td>
+                <td class="px-3 py-2">~4,700 tCO₂</td>
+                <td class="px-3 py-2">1,000 coches / año</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">LLaMA 3 405B</td>
+                <td class="px-3 py-2">~50 GWh</td>
+                <td class="px-3 py-2">~21,000 tCO₂</td>
+                <td class="px-3 py-2">4,500 coches / año</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="text-neutral-700 leading-relaxed">
+          Por eso hay un movimiento creciente hacia <strong>entrenamientos más eficientes</strong>: modelos más pequeños con más datos (Chinchilla optimal), cuantización durante entrenamiento, y el auge de arquitecturas MoE que activan solo una fracción de los parámetros.
+        </p>
       </Fragment>
     </LevelTabs>
   </section>
