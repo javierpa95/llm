@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-07-04
+updated: 2026-07-05
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-07-05 | [pxpipe: herramienta open-source que recorta un 70% los costes de tokens convirtiendo texto a PNG](/noticias/2026-07-05-pxpipe-token-compression-png) | The Decoder | 🛠️ herramientas |
 | 2026-07-04 | [Mistral lanza Leanstral 1.5: modelo abierto de verificación formal que encuentra bugs reales](/noticias/2026-07-04-mistral-leanstral-1-5) | Mistral AI | 🧠 modelos |
 | 2026-07-03 | [Anthropic reduce un 80% el system prompt de Claude Code: los modelos Fable 5 'quieren prompts más pequeños'](/noticias/2026-07-03-anthropic-claude-code-system-prompt-80) | The Decoder | 🔬 investigación |
 | 2026-07-02 | [Kimi K2.7 Code aterriza en GitHub Copilot — primer modelo open-weight en el selector](/noticias/2026-07-02-kimi-k2-7-code-github-copilot) | GitHub Blog | 🛠️ herramientas |
