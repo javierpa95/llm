@@ -16,5 +16,6 @@ export const NAV_ITEMS = [
   { label: 'Tokenización', href: '/tokenizacion' },
   { label: 'Entrenamiento', href: '/entrenamiento' },
   { label: 'Fine-Tuning', href: '/finetuning' },
+  { label: 'IA en Salud', href: '/ia-salud' },
   { label: 'Glosario', href: '/glosario' },
 ] as const

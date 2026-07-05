@@ -1,0 +1,121 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro'
+import ShareButtons from '../../components/ShareButtons.astro'
+import { getEntryBySlug, CATEGORY_INFO, resolveWikilinks } from '../../data/ia-salud'
+import type { IaSaludEntry } from '../../data/ia-salud'
+import { marked } from 'marked'
+
+marked.use({ gfm: true })
+
+export async function getStaticPaths() {
+  const { getAllEntries } = await import('../../data/ia-salud')
+  const all = getAllEntries()
+  return all.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }))
+}
+
+const { entry } = Astro.props as { entry: IaSaludEntry }
+
+// Formatear PMID como enlace a PubMed
+function pmidLink(pmid: string): string {
+  return pmid ? `<a href="https://pubmed.ncbi.nlm.nih.gov/${pmid}/" target="_blank" rel="noopener noreferrer">PMID: ${pmid}</a>` : ''
+}
+
+function doiLink(doi: string): string {
+  return doi ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener noreferrer">DOI: ${doi}</a>` : ''
+}
+---
+
+<DocLayout
+  title={entry.title}
+  description={entry.summary}
+  currentPath={`/ia-salud/${entry.slug}`}
+  :sections={[
+    { id: 'entrada', label: entry.title, level: 'beginner' },
+  ]}
+>
+  <article class="max-w-3xl">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="text-sm text-neutral-400">{entry.date}</span>
+        {entry.readingTime && (
+          <>
+            <span class="text-sm text-neutral-300">·</span>
+            <span class="text-sm text-neutral-400">{entry.readingTime} de lectura</span>
+          </>
+        )}
+        <span class="text-sm text-neutral-300">·</span>
+        <span class="text-sm text-neutral-500">{entry.articles.length} artículo{entry.articles.length !== 1 ? 's' : ''}</span>
+      </div>
+
+      <h1 class="text-2xl sm:text-3xl font-bold text-neutral-900 leading-tight">
+        {entry.title}
+      </h1>
+
+      {entry.summary && (
+        <p class="mt-3 text-lg text-neutral-600 leading-relaxed">
+          {entry.summary}
+        </p>
+      )}
+
+      {entry.tags.length > 0 && (
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          {entry.tags.map(tag => (
+            <span class="px-2 py-0.5 bg-neutral-100 text-neutral-500 rounded text-xs">#{tag}</span>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <!-- Artículos cubiertos (referencias bibliográficas) -->
+    {entry.articles.length > 0 && (
+      <div class="mb-8 p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
+        <h2 class="text-sm font-semibold text-neutral-700 mb-3 uppercase tracking-wide">📚 Artículos en esta entrada</h2>
+        <div class="space-y-3">
+          {entry.articles.map((article, i) => {
+            const info = CATEGORY_INFO[article.category]
+            return (
+              <div class="text-sm text-neutral-700">
+                <div class="flex items-start gap-2">
+                  <span class="font-mono text-xs text-neutral-400 mt-0.5 shrink-0">[{i + 1}]</span>
+                  <div>
+                    <p class="font-medium text-neutral-900">{article.title}</p>
+                    <p class="text-neutral-600 mt-0.5">{article.authors}</p>
+                    <p class="text-neutral-500 italic">{article.journal} ({article.year})</p>
+                    <div class="flex flex-wrap gap-2 mt-1">
+                      {article.pmid && <span class="text-xs text-neutral-500" set:html={pmidLink(article.pmid)} />}
+                      {article.doi && <span class="text-xs text-neutral-500" set:html={doiLink(article.doi)} />}
+                      {info && (
+                        <span class={`text-xs px-1.5 py-0.5 rounded ${info.color}`}>
+                          {info.emoji} {info.label}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )}
+
+    <!-- Cuerpo -->
+    <div class="prose prose-neutral max-w-none markdown-content" set:html={marked.parse(resolveWikilinks(entry.content))} />
+
+    <!-- Compartir -->
+    <div class="mt-10 pt-6 border-t border-neutral-200">
+      <ShareButtons title={entry.title} description={entry.summary} />
+    </div>
+
+    <!-- Footer de navegación -->
+    <div class="mt-6 pt-6 border-t border-neutral-200">
+      <a href="/ia-salud" class="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium">
+        ← Volver al archivo de IA en Salud
+      </a>
+    </div>
+  </article>
+</DocLayout>
