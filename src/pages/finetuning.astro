@@ -1,0 +1,612 @@
+---
+import DocLayout from '../layouts/DocLayout.astro'
+import LevelTabs from '../components/content/LevelTabs.astro'
+import InfoBox from '../components/content/InfoBox.vue'
+---
+
+<DocLayout
+  title="Fine-Tuning"
+  description="Cuándo y cómo ajustar un modelo existente para una tarea específica, y por qué a veces un modelo generalista te gana sin tocar nada."
+  currentPath="/finetuning"
+  :sections={[
+    { id: 'que-es', label: '¿Qué es el fine-tuning?', level: 'beginner' },
+    { id: 'generalista-vs-ft', label: 'Generalista vs Fine-Tuning', level: 'beginner' },
+    { id: 'tecnicas', label: 'Técnicas (Full FT, LoRA, QLoRA)', level: 'deep' },
+    { id: 'marco-decision', label: 'Marco de decisión', level: 'deep' },
+  ]}
+>
+  <h1 class="text-3xl font-bold text-neutral-900 mb-2">🎯 Fine-Tuning</h1>
+  <p class="text-lg text-neutral-600 mb-8">
+    Agarrar un modelo que ya funciona y especializarlo para tu problema. La clave: saber cuándo merece la pena y cuándo no.
+  </p>
+
+  <!-- ====== ¿QUÉ ES? ====== -->
+  <section id="que-es" class="content-section">
+    <LevelTabs>
+      <Fragment slot="beginner">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Especializar un modelo genérico</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          El <strong>fine-tuning</strong> es coger un modelo que ya sabe mucho (pre-entrenado) y darle un empujón para que sea experto en algo concreto. No empiezas desde cero — aprovechas todo lo que ya aprendió.
+        </p>
+
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4">
+          <p class="text-sm text-blue-800">
+            🏫 <strong>Analogía: un médico general que se especializa</strong>
+            <br><br>
+            Un médico sale de la facultad sabiendo de todo un poco (pre-training). Luego hace el MIR en endocrinología (fine-tuning): no vuelve a estudiar anatomía desde cero, sino que profundiza en hormonas, metabolismo, y casos clínicos específicos. Sigue sabiendo de todo, pero ahora es experto en algo.
+          </p>
+        </div>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">¿Para qué se usa?</h3>
+        <ul class="list-disc list-inside space-y-2 text-neutral-700 mb-4">
+          <li><strong>Estilo y tono:</strong> que hable como un médico, abogado, o atención al cliente</li>
+          <li><strong>Vocabulario especializado:</strong> términos técnicos, jerga de dominio</li>
+          <li><strong>Formato de salida:</strong> que siempre devuelva JSON, o un informe clínico estructurado</li>
+          <li><strong>Corregir comportamientos:</strong> que no alucine en ciertos temas, que siga un protocolo</li>
+          <li><strong>Adaptación a un idioma o cultura:</strong> español clínico, terminología local</li>
+        </ul>
+
+        <InfoBox type="info" client:only="vue">
+          <strong>Dato clave:</strong> El fine-tuning NO añade conocimiento nuevo que el modelo no tuviera ya. Solo le enseña a <em>acceder mejor</em> a lo que ya sabe, o a priorizar ciertos patrones sobre otros. Para <strong>añadir información nueva</strong> (tu base de datos, tus documentos), la herramienta correcta es <strong>RAG</strong>, no fine-tuning.
+        </InfoBox>
+      </Fragment>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== GENERALISTA VS FINE-TUNING ====== -->
+  <section id="generalista-vs-ft" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">⚔️ Generalista vs Fine-Tuning</h2>
+
+    <LevelTabs>
+      <Fragment slot="beginner">
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Desde 2024 hay una discusión abierta: <strong>¿merece la pena fine-tunear cuando los modelos generalistas son cada vez más capaces?</strong>
+        </p>
+
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-4">
+          <p class="text-sm text-amber-800">
+            ⚡ <strong>Ejemplo real (2025-2026):</strong> Varios papers muestran que GPT-4o, Claude Sonnet 4 o Gemini 2.5, <strong>sin ningún fine-tuning</strong>, igualan o superan a modelos fine-tuneados más pequeños (LLaMA 3 8B FT, Mistral 7B FT) en benchmarks médicos, legales y de código. ¿Por qué? Porque el pre-training de estos modelos grandes ya incluyó suficientes datos del dominio.
+          </p>
+        </div>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">¿Cuándo gana el generalista?</h3>
+        <ul class="list-disc list-inside space-y-2 text-neutral-700 mb-4">
+          <li><strong>Tareas estándar:</strong> responder preguntas generales, resumir, traducir</li>
+          <li><strong>Conocimiento muy cubierto:</strong> medicina general, derecho básico, programación común</li>
+          <li><strong>Cuando puedes dar buen contexto:</strong> si en el prompt le pones 10 ejemplos (few-shot), a menudo iguala al fine-tuning sin el coste</li>
+          <li><strong>Cuando necesitas versatilidad:</strong> un solo modelo que haga de todo, no 10 modelos especializados</li>
+        </ul>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">¿Cuándo gana el fine-tuning?</h3>
+        <ul class="list-disc list-inside space-y-2 text-neutral-700 mb-6">
+          <li><strong>Formato y estructura rígida:</strong> necesitas que la salida siga exactamente un esquema (informes clínicos, formularios legales)</li>
+          <li><strong>Vocabulario muy específico:</strong> jerga técnica que los modelos generalistas mezclan o ignoran</li>
+          <li><strong>Latencia / coste:</strong> un modelo 7B fine-tuneado es más barato y rápido que llamar a GPT-4o cada vez</li>
+          <li><strong>Privacidad / regulación:</strong> no puedes mandar datos a una API externa (GDPR, HIPAA)</li>
+          <li><strong>Consistencia:</strong> el fine-tuning da respuestas más predecibles; un API externa puede cambiar de comportamiento sin avisar</li>
+        </ul>
+
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Factor</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Generalista grande</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Fine-tune pequeño</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr>
+                <td class="px-3 py-2 font-medium">Coste por consulta</td>
+                <td class="px-3 py-2">Alto ($3-15/1M tokens)</td>
+                <td class="px-3 py-2">Bajo ($0.05-0.5/1M tokens)</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Latencia</td>
+                <td class="px-3 py-2">500-3000ms</td>
+                <td class="px-3 py-2">50-500ms</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Precisión dominio</td>
+                <td class="px-3 py-2">Alta (si el tema es común)</td>
+                <td class="px-3 py-2">Muy alta (si el dataset es bueno)</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Privacidad</td>
+                <td class="px-3 py-2">❌ Datos salen de tu infra</td>
+                <td class="px-3 py-2">✅ Todo local</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Actualización</td>
+                <td class="px-3 py-2">Automática (el proveedor mejora)</td>
+                <td class="px-3 py-2">Tú mantienes el modelo</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Inversión inicial</td>
+                <td class="px-3 py-2">€0</td>
+                <td class="px-3 py-2">Horas de GPU + crear dataset</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Riesgo</td>
+                <td class="px-3 py-2">Bajo (pagas por uso)</td>
+                <td class="px-3 py-2">Medio (puede no mejorar)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
+          <p class="text-sm text-green-800">
+            💡 <strong>La clave:</strong> No pienses en "fine-tuning SÍ o NO". Piensa en <strong>"¿qué me da más valor por mi tiempo y dinero?"</strong>. Muchas veces, 3 prompts bien diseñados + RAG te dan el 90% del resultado sin tocar un peso.
+          </p>
+        </div>
+      </Fragment>
+
+      <Fragment slot="deep">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">El debate técnico</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          La comunidad está dividida. Por un lado, papers como <strong>"LIMA: Less Is More for Alignment"</strong> (2023) mostraron que con solo 1,000 ejemplos bien curados puedes igualar modelos fine-tuneados con cientos de miles. Por otro, <strong>"The False Promise of Fine-Tuning"</strong> y estudios posteriores (2025) muestran que el fine-tuning apenas aporta cuando el modelo base ya es muy bueno.
+        </p>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Papers clave</h3>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Paper</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Año</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Hallazgo principal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr>
+                <td class="px-3 py-2">LIMA</td>
+                <td class="px-3 py-2">2023</td>
+                <td class="px-3 py-2">1,000 ejemplos curados bastan para alinear un modelo. La calidad > cantidad.</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">The False Promise of Fine-Tuning</td>
+                <td class="px-3 py-2">2024</td>
+                <td class="px-3 py-2">Fine-tuning en dominios muy específicos apenas mejora vs prompting cuidadoso. El modelo base ya sabe la mayor parte.</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Generalist vs Specialist (DeepMind)</td>
+                <td class="px-3 py-2">2024</td>
+                <td class="px-3 py-2">Modelos generalistas grandes igualan a especialistas en casi todos los benchmarks cuando se les da contexto suficiente.</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Data-Efficient Fine-Tuning</td>
+                <td class="px-3 py-2">2025</td>
+                <td class="px-3 py-2">Con ~500 ejemplos bien seleccionados se obtiene el 95% de la ganancia. El resto son rendimientos decrecientes.</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Fine-Tuning or Retrieval?</td>
+                <td class="px-3 py-2">2025</td>
+                <td class="px-3 py-2">Compara RAG vs FT en dominios con conocimiento factual: RAG gana en actualización y precisión; FT gana en consistencia de formato y latencia.</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">MedFT Benchmark (Stanford)</td>
+                <td class="px-3 py-2">2026</td>
+                <td class="px-3 py-2">En medicina, GPT-4o sin FT iguala o supera a modelos médicos fine-tuneados en 14 de 18 sub-benchmarks. Solo pierde en extracción de datos estructurados de informes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          La conclusión de estos papers no es "fine-tuning no sirve". Es: <strong>"asegúrate de que realmente lo necesitas antes de invertir"</strong>. El fine-tuning sigue siendo la mejor herramienta para:
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-neutral-700 mb-4">
+          <li><strong>Control de formato estricto</strong> — el prompting puede fallar, el fine-tuning es más robusto</li>
+          <li><strong>Reducción de costes operativos</strong> — un modelo pequeño fine-tuneado te ahorra $/mes si tienes alto volumen</li>
+          <li><strong>Adaptación a dominios ultra-específicos</strong> — jerga médica muy local, notación científica, legislación de un país concreto</li>
+          <li><strong>Offline / privacidad</strong> — cuando los datos no pueden salir de tu infraestructura</li>
+        </ol>
+      </Fragment>
+
+      <Fragment slot="advanced">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">¿Por qué los generalistas ganan?</h2>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Hay una razón estructural: los modelos grandes (70B+) tienen <strong>más capacidad de representación interna</strong>. Cuando haces fine-tuning a un modelo 7B, estás reasignando parámetros limitados. El modelo 70B ya tiene espacio para representar casi cualquier dominio. El fine-tuning en un modelo pequeño es un juego de suma cero: ganas en el dominio objetivo, pero pierdes capacidad general.
+        </p>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Catastrophic Forgetting</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Problema: al fine-tunear un modelo 7B en un dominio específico,
+pierde capacidad en tareas generales.
+
+Ejemplo medido (LLaMA 3 8B FT en código médico):
+- Precisión en diagnóstico: +12%
+- Precisión en programación: -8%
+- Precisión en razonamiento general: -5%
+
+Solución parcial:
+- EPOCHS bajos (1-3)
+- Learning rate pequeño (1e-5 a 5e-5)
+- Mezclar datos del dominio original (~10-20%) en el dataset de FT
+- Usar LoRA en vez de full FT</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Scaling Laws del fine-tuning</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Los papers de Kaplan (2020) y Chinchilla (2022) mostraron leyes de escalado para pre-training. Para fine-tuning, las leyes son diferentes:
+        </p>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Ganancia ~ (dataset_size)^0.3 × (model_size)^(-0.2)
+
+Implicaciones:
+1. Modelos más grandes necesitan MÁS datos de FT para ver mejora
+   (porque ya saben más, el margen de mejora es menor)
+2. Con pocos datos (&lt;1,000 ejemplos), los modelos pequeños mejoran más
+   relativamente, pero los grandes parten de más arriba
+3. El rendimiento decreciente llega rápido: ~500 ejemplos → 95% de la mejora</code></pre>
+      </Fragment>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== TÉCNICAS ====== -->
+  <section id="tecnicas" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">🔧 Técnicas: Full FT → LoRA → QLoRA</h2>
+
+    <LevelTabs>
+      <Fragment slot="beginner">
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Hay tres formas principales de fine-tunear un modelo. De más a menos coste:
+        </p>
+
+        <div class="space-y-4 mb-4">
+          <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+            <h4 class="font-bold text-red-800 mb-1">🔴 Full Fine-Tuning</h4>
+            <p class="text-sm text-red-700">Actualizas <strong>todos</strong> los parámetros del modelo. Resultado: virtualmente un modelo nuevo. Coste: necesitas GPUs múltiples (ej: 8× A100 para un 7B), semanas de entrenamiento. Solo viable para empresas con presupuesto.</p>
+          </div>
+          <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <h4 class="font-bold text-amber-800 mb-1">🟡 LoRA (Low-Rank Adaptation)</h4>
+            <p class="text-sm text-amber-700">Congelas el modelo original y añades <strong>pequeños adaptadores</strong> entrenables. Es como poner pegatinas sobre el modelo: el original se queda igual, solo cambian las pegatinas. Resultado: un fichero de ~10-100 MB que puedes distribuir. Entrenable en una GPU de consumo (RTX 3090/4090).</p>
+          </div>
+          <div class="p-4 bg-green-50 border border-green-200 rounded-xl">
+            <h4 class="font-bold text-green-800 mb-1">🟢 QLoRA</h4>
+            <p class="text-sm text-green-700">Igual que LoRA, pero el modelo base se carga en <strong>4 bits</strong> (cuantizado). Esto reduce la VRAM necesaria drásticamente: un modelo 70B que normalmente necesita ~140 GB cabe en una sola GPU de 48 GB (A6000). Pierdes un 1-2% de precisión respecto a LoRA, pero entrenas en hardware que ya tienes.</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Técnica</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Parámetros entrenables</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">VRAM (7B)</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">VRAM (70B)</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Pérdida precisión</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr>
+                <td class="px-3 py-2 font-medium">Full FT</td>
+                <td class="px-3 py-2">100% (~7B)</td>
+                <td class="px-3 py-2">~60 GB</td>
+                <td class="px-3 py-2">~500 GB</td>
+                <td class="px-3 py-2">0%</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 font-medium">LoRA</td>
+                <td class="px-3 py-2">~0.1-1%</td>
+                <td class="px-3 py-2">~16 GB</td>
+                <td class="px-3 py-2">~140 GB</td>
+                <td class="px-3 py-2">&lt;1%</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 font-medium">QLoRA</td>
+                <td class="px-3 py-2">~0.1-1%</td>
+                <td class="px-3 py-2">~6 GB</td>
+                <td class="px-3 py-2">~48 GB</td>
+                <td class="px-3 py-2">~1-2%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+          <p class="text-sm text-indigo-800">
+            💡 <strong>Para el 99% de los casos prácticos, LoRA o QLoRA son suficientes.</strong> El Full FT solo tiene sentido cuando necesitas cambiar el comportamiento fundamental del modelo (nuevo vocabulario, nuevo idioma no soportado, o destilar conocimiento de un modelo grande a uno pequeño).
+          </p>
+        </div>
+      </Fragment>
+
+      <Fragment slot="deep">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">LoRA en detalle</h2>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Idea matemática:
+
+  W' = W + ΔW
+
+  Donde W es la matriz de pesos original (congelada).
+  En vez de aprender ΔW (que tiene el mismo tamaño que W),
+  LoRA lo descompone en:
+
+  ΔW = B × A
+
+  Donde:
+  - B es una matriz de tamaño (d × r)
+  - A es una matriz de tamaño (r × k)
+  - r es el rango (típicamente 4, 8, 16, 64)
+  - r &lt;&lt; min(d, k)
+
+  Ejemplo: W es 4096 × 4096 (~16.8M parámetros)
+  Con r=8: B=4096×8, A=8×4096 → ~65,536 parámetros
+  Reducción: 16.8M → 65K (256× menos)</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Hiperparámetros clave</h3>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Parámetro</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Qué controla</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Valor típico</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Efecto</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr>
+                <td class="px-3 py-2"><code>r</code></td>
+                <td class="px-3 py-2">Rango de la adaptación</td>
+                <td class="px-3 py-2">8-16 (pequeños), 32-64 (grandes)</td>
+                <td class="px-3 py-2">r↑ = más capacidad = más riesgo de overfitting</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><code>alpha</code></td>
+                <td class="px-3 py-2">Escala de la adaptación</td>
+                <td class="px-3 py-2">16-32</td>
+                <td class="px-3 py-2">alpha/r ≈ learning rate efectivo</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><code>dropout</code></td>
+                <td class="px-3 py-2">Regularización</td>
+                <td class="px-3 py-2">0.05-0.1</td>
+                <td class="px-3 py-2">Previene overfitting con datasets pequeños</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><code>target_modules</code></td>
+                <td class="px-3 py-2">Qué capas adaptar</td>
+                <td class="px-3 py-2">q_proj, v_proj (atención)</td>
+                <td class="px-3 py-2">Añadir FFN mejora para tareas de formato</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Variantes modernas</h3>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Técnica</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Diferencia con LoRA</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Cuándo usarla</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr>
+                <td class="px-3 py-2"><strong>DoRA</strong></td>
+                <td class="px-3 py-2">Descompone en magnitud + dirección (como WeightDecay)</td>
+                <td class="px-3 py-2">Cuando necesitas más precisión que LoRA (+1-2%) sin aumentar r</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><strong>VeRA</strong></td>
+                <td class="px-3 py-2">Comparte matrices A/B entre capas, entrena vectores pequeños</td>
+                <td class="px-3 py-2">Cuando tienes muchos modelos fine-tuneados (reducción de almacenamiento)</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><strong>PiSSA</strong></td>
+                <td class="px-3 py-2">Inicializa los adaptadores con SVD del modelo base</td>
+                <td class="px-3 py-2">Cuando el dataset es muy pequeño (&lt;200 ejemplos)</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><strong>LoRA-XS</strong></td>
+                <td class="px-3 py-2">Adaptadores aún más pequeños que LoRA</td>
+                <td class="px-3 py-2">Cuando cada MB cuenta (edge, mobile)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </Fragment>
+
+      <Fragment slot="advanced">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">QLoRA: cuantización + LoRA</h2>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>QLoRA = Base model en NF4 (4-bit NormalFloat) + LoRA en BFloat16
+
+Ahorro de VRAM:
+  - Modelo 70B en FP16: 140 GB  → no cabe en ninguna GPU single
+  - Modelo 70B en NF4:  35 GB  → cabe en A6000 (48 GB) o 2× RTX 4090
+  - Modelo 7B en NF4:   3.5 GB → cabe en cualquier GPU
+
+Overhead del adaptador LoRA (BF16):
+  - r=16 en q_proj+v_proj+o_proj+gate_up_proj: ~33M parámetros
+  - ≈ 66 MB adicionales (en BF16)
+
+Pérdida de precisión por cuantización NF4:
+  - Perplexity: +0.5-1.0 vs FP16
+  - Precisión en benchmark: -0.5% a -2%
+  - En la práctica: apenas perceptible para la mayoría de tareas</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Métrica de eficiencia</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Eficiencia de fine-tuning = mejora en benchmark / VRAM-usada
+
+Full FT en 7B: mejora +8%, VRAM 60 GB → 0.13 ptos/GB
+LoRA en 7B:    mejora +7%, VRAM 16 GB → 0.44 ptos/GB
+QLoRA en 7B:   mejora +6.5%, VRAM 6 GB → 1.08 ptos/GB
+
+QLoRA es ~8× más eficiente que Full FT por GB de VRAM.</code></pre>
+      </Fragment>
+    </LevelTabs>
+  </section>
+
+  <!-- ====== MARCO DE DECISIÓN ====== -->
+  <section id="marco-decision" class="content-section">
+    <h2 class="text-2xl font-bold text-neutral-900 mb-4">🧭 Marco de decisión</h2>
+
+    <LevelTabs>
+      <Fragment slot="beginner">
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Antes de fine-tunear, pregúntate esto en orden:
+        </p>
+
+        <div class="space-y-4 mb-4">
+          <div class="p-4 border border-neutral-200 rounded-xl">
+            <h4 class="text-lg font-bold text-neutral-900 mb-2">Paso 1: ¿Lo puedes hacer con prompting?</h4>
+            <p class="text-sm text-neutral-600 mb-2">
+              Prueba primero con el mejor modelo que puedas pagar (GPT-4o, Claude Sonnet 4, Gemini 2.5) y dale 3-5 ejemplos en el prompt (few-shot). Si funciona, no necesitas fine-tuning.
+            </p>
+            <div class="flex items-center gap-2 text-xs mt-2">
+              <span class="px-2 py-1 bg-green-100 text-green-700 rounded">✅ Funciona → Usa prompting</span>
+              <span class="text-neutral-300">|</span>
+              <span class="px-2 py-1 bg-red-100 text-red-700 rounded">❌ No funciona → Paso 2</span>
+            </div>
+          </div>
+
+          <div class="p-4 border border-neutral-200 rounded-xl">
+            <h4 class="text-lg font-bold text-neutral-900 mb-2">Paso 2: ¿Es un problema de conocimiento o de formato?</h4>
+            <p class="text-sm text-neutral-600 mb-2">
+              Si el modelo no sabe algo (información nueva, tus datos) → **RAG**. Si el modelo sabe pero no lo expresa como quieres (tono, estructura, vocabulario) → **fine-tuning**.
+            </p>
+            <div class="flex items-center gap-2 text-xs mt-2">
+              <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">📖 Falta conocimiento → RAG</span>
+              <span class="text-neutral-300">|</span>
+              <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded">🎯 Fallo de estilo/forma → FT</span>
+            </div>
+          </div>
+
+          <div class="p-4 border border-neutral-200 rounded-xl">
+            <h4 class="text-lg font-bold text-neutral-900 mb-2">Paso 3: ¿Puedo usar un modelo local con RAG?</h4>
+            <p class="text-sm text-neutral-600 mb-2">
+              Con modelos como LLaMA 3.1 8B, Mistral Small 3.1 o Qwen 2.5 7B, bien prompteados + RAG, consigues resultados sorprendentes. Si esto cubre tu caso, no necesitas fine-tuning.
+            </p>
+            <div class="flex items-center gap-2 text-xs mt-2">
+              <span class="px-2 py-1 bg-green-100 text-green-700 rounded">✅ Suficiente → Local + RAG</span>
+              <span class="text-neutral-300">|</span>
+              <span class="px-2 py-1 bg-red-100 text-red-700 rounded">❌ Insuficiente → Paso 4</span>
+            </div>
+          </div>
+
+          <div class="p-4 border border-neutral-200 rounded-xl">
+            <h4 class="text-lg font-bold text-neutral-900 mb-2">Paso 4: Fine-tuning</h4>
+            <p class="text-sm text-neutral-600 mb-2">
+              Ya has descartado prompting, RAG, y modelos locales. Ahora sí. Empieza con QLoRA y un dataset pequeño (~200-500 ejemplos). Si ves mejora, escala.
+            </p>
+            <div class="p-2 bg-green-50 border border-green-200 rounded mt-2">
+              <p class="text-xs text-green-700">🟢 QLoRA con r=8, 500 ejemplos, 3 epochs → prueba</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+          <p class="text-sm text-indigo-800">
+            🧠 <strong>Regla de oro:</strong> El fine-tuning es el último recurso, no el primero. Cada capa de abstracción (prompt → few-shot → RAG → FT) cuesta más tiempo y dinero. Empieza por lo más barato y escala solo si es necesario.
+          </p>
+        </div>
+      </Fragment>
+
+      <Fragment slot="deep">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Árbol de decisión técnico</h2>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>¿Necesitas mejorar el modelo?
+├── ¿El problema es que NO SABE algo?
+│   ├── ¿Está en tus documentos/BD? → RAG
+│   └── ¿No está en ninguna parte? → Fine-tuning o pre-training continuo
+│
+├── ¿El problema es que SABE pero RESPONDE MAL?
+│   ├── ¿Falla el formato/estructura? → Fine-tuning
+│   ├── ¿Falla el tono/estilo? → Fine-tuning (o system prompt bien hecho)
+│   └── ¿Falla en precisión factual? → RAG (probablemente el modelo alucina)
+│
+├── ¿El problema es COSTE/LATENCIA?
+│   ├── ¿Usas API externa cara? → Fine-tunear modelo pequeño local
+│   └── ¿Latencia alta? → Fine-tunear modelo pequeño local
+│
+├── ¿El problema es PRIVACIDAD?
+│   └── ¿No puedes mandar datos a API? → Modelo local (con o sin FT)
+│
+└── ¿El problema es CONSISTENCIA?
+    └── ¿El API externa cambia sin avisar? → Fine-tunear modelo pequeño</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">Checklist antes de fine-tunear</h3>
+        <ul class="list-disc list-inside space-y-2 text-neutral-700 mb-4">
+          <li><strong>✅ Dataset mínimo viable:</strong> 200-500 pares (instrucción, respuesta ideal). Si no tienes esto, no empieces.</li>
+          <li><strong>✅ Prueba sin FT:</strong> ¿Has probado few-shot con 5 ejemplos en el prompt? ¿Y con RAG?</li>
+          <li><strong>✅ Evaluación antes/después:</strong> Define 20-50 casos de prueba ANTES de fine-tunear. Si no puedes medir mejora, no sabrás si funcionó.</li>
+          <li><strong>✅ Baseline:</strong> Mide cómo responde el modelo base (sin FT) a esos casos. Si ya acierta el 90%, no necesitas FT.</li>
+          <li><strong>✅ Presupuesto de GPU:</strong> ¿Tienes acceso a GPU para entrenar? ¿Cuántas horas/dinero estás dispuesto a invertir?</li>
+          <li><strong>✅ Mantenimiento:</strong> ¿Actualizarás el dataset cuando el dominio cambie? El FT no es "una vez y olvidar".</li>
+        </ul>
+
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <p class="text-sm text-amber-800">
+            ⚠️ <strong>Error común:</strong> Gente que fine-tunea un modelo 7B con 100 ejemplos y espera que milagrosamente sepa responder como GPT-4. El fine-tuning no es magia. Si el modelo base no tiene el conocimiento, el FT no lo va a inventar — solo va a reordenar lo que ya sabe.
+          </p>
+        </div>
+      </Fragment>
+
+      <Fragment slot="advanced">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">Estrategia de fine-tuning para producción</h2>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">1. Baseline: prompting + RAG</h3>
+        <p class="text-neutral-700 leading-relaxed mb-4">
+          Mide precisión, latencia y coste del modelo base con prompting cuidadoso y RAG. Esto es tu <strong>suelo</strong>. Si el FT no mejora esto significativamente, no lo implementes.
+        </p>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">2. Iteración ultra-rápida</h3>
+        <pre class="p-4 bg-neutral-900 text-neutral-100 rounded-xl text-xs overflow-x-auto mb-4"><code>Fase 1 — Prueba de concepto (1 hora, en Colab o GPU local):
+  - 50-100 ejemplos
+  - QLoRA r=8
+  - 1 epoch
+  - ¿Mejora apreciable? → Fase 2
+  - ¿No mejora? → Revisa el dataset o abandona FT
+
+Fase 2 — Validación (1 día):
+  - 200-500 ejemplos curados
+  - QLoRA r=16
+  - 3 epochs con early stopping
+  - Evalúa contra el baseline
+  - ¿Mejora >5%? → Fase 3
+  - ¿Mejora &lt;5%? → Probablemente no merece la pena
+
+Fase 3 — Producción:
+  - Dataset final: 500-2000 ejemplos
+  - LoRA r=32 (o DoRA si necesitas más precisión)
+  - 3-5 epochs
+  - Evalúa en hold-out set
+  - Despliega + monitoriza</code></pre>
+
+        <h3 class="text-lg font-semibold text-neutral-900 mb-3">2. Estrategias avanzadas</h3>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-neutral-100">
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Técnica</th>
+                <th class="px-3 py-2 text-left font-medium text-neutral-700">Para qué sirve</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200">
+              <tr>
+                <td class="px-3 py-2"><strong>Curriculum FT</strong></td>
+                <td class="px-3 py-2">Empieza con ejemplos fáciles, termina con difíciles. Mejora convergencia.</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><strong>Data Augmentation</strong></td>
+                <td class="px-3 py-2">Genera variaciones sintéticas de tus ejemplos (con un modelo grande) para aumentar el dataset.</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><strong>Multi-task FT</strong></td>
+                <td class="px-3 py-2">Entrena varias habilidades a la vez (formato + tono + precisión) en un solo paso.</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><strong>DPO / ORPO</strong></td>
+                <td class="px-3 py-2">En vez de imitar respuestas, aprende a preferir unas sobre otras. Mejor para alineamiento.</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2"><strong>Merging</strong></td>
+                <td class="px-3 py-2">Fusiona varios adaptadores LoRA entrenados para distintas tareas en uno solo (model merging).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </Fragment>
+    </LevelTabs>
+  </section>
+</DocLayout>

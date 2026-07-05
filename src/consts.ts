@@ -15,5 +15,6 @@ export const NAV_ITEMS = [
   { label: 'Inferencia', href: '/inferencia' },
   { label: 'Tokenización', href: '/tokenizacion' },
   { label: 'Entrenamiento', href: '/entrenamiento' },
+  { label: 'Fine-Tuning', href: '/finetuning' },
   { label: 'Glosario', href: '/glosario' },
 ] as const
