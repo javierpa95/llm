@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-07-05
+updated: 2026-07-07
 type: index
 ---
 
@@ -12,6 +12,8 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-07-07 | [🔌 NVIDIA Kyber NVL144 se retrasa a 2028 y Rubin Ultra queda cancelado](/noticias/2026-07-07-nvidia-kyber-nvl144-retraso-2028) | The Decoder | 🔌 hardware |
+| 2026-07-06 | [🤗 Kernels: Hugging Face renueva su ecosistema de kernels personalizados](/noticias/2026-07-06-huggingface-kernels-major-updates) | Hugging Face Blog | 🛠️ herramientas |
 | 2026-07-05 | [pxpipe: herramienta open-source que recorta un 70% los costes de tokens convirtiendo texto a PNG](/noticias/2026-07-05-pxpipe-token-compression-png) | The Decoder | 🛠️ herramientas |
 | 2026-07-04 | [Mistral lanza Leanstral 1.5: modelo abierto de verificación formal que encuentra bugs reales](/noticias/2026-07-04-mistral-leanstral-1-5) | Mistral AI | 🧠 modelos |
 | 2026-07-03 | [Anthropic reduce un 80% el system prompt de Claude Code: los modelos Fable 5 'quieren prompts más pequeños'](/noticias/2026-07-03-anthropic-claude-code-system-prompt-80) | The Decoder | 🔬 investigación |
