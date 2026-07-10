@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-07-09
+updated: 2026-07-10
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-07-10 | [🧠 GPT-5.6 se libera al público y OpenAI lanza ChatGPT Work, su agente autónomo para flujos de trabajo](/noticias/2026-07-10-openai-gpt-5-6-publico-chatgpt-work) | The Decoder | 🧠 modelos |
 | 2026-07-09 | [🏢 Grok 4.5 es tan barato frente a Fable 5 y GPT-5.5 que las diferencias en benchmarks casi no importan](/noticias/2026-07-09-grok-45-precio-frontier-barato) | The Decoder | 🏢 industria |
 | 2026-07-08 | [🧠 Tencent lanza Hy3: modelo MoE de 295B parámetros con licencia Apache 2.0](/noticias/2026-07-08-tencent-hy3-295b-moe-apache2) | Simon Willison's Blog | 🧠 modelos |
 | 2026-07-07 | [🔌 NVIDIA Kyber NVL144 se retrasa a 2028 y Rubin Ultra queda cancelado](/noticias/2026-07-07-nvidia-kyber-nvl144-retraso-2028) | The Decoder | 🔌 hardware |
