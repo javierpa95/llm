@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-07-12
+updated: 2026-07-13
 type: index
 ---
 
@@ -11,8 +11,9 @@ type: index
 > Seleccionadas por relevancia técnica y calidad de la fuente.
 
 | Fecha | Título | Fuente | Categoría |
-|-------|--------|--------|-----------|
-|| 2026-07-12 | [🔬 Agentes de IA vencen en Slay the Spire 2 al sustituir el chat infinito por memoria estructurada](/noticias/2026-07-12-agentes-ia-memoria-estructurada-slay-the-spire-2) | The Decoder | 🔬 investigación |
+||-------|--------|--------|-----------|
+|| 2026-07-13 | [🛠️ Claude Code ahora tiene un navegador integrado: el agente lee, hace clic y escribe en sitios web externos](/noticias/2026-07-13-claude-code-navegador-integrado) | The Decoder | 🛠️ herramientas |
+||| 2026-07-12 | [🔬 Agentes de IA vencen en Slay the Spire 2 al sustituir el chat infinito por memoria estructurada](/noticias/2026-07-12-agentes-ia-memoria-estructurada-slay-the-spire-2) | The Decoder | 🔬 investigación |
 ||| 2026-07-11 | [🔬 GPT-5.6 Sol entrena autónomamente a Luna con un solo prompt: la auto-mejora recursiva ya no es teoría](/noticias/2026-07-11-openai-gpt-5-6-sol-autonomo-post-training-luna) | The Decoder | 🔬 investigación |
 || 2026-07-10 | [🧠 GPT-5.6 se libera al público y OpenAI lanza ChatGPT Work, su agente autónomo para flujos de trabajo](/noticias/2026-07-10-openai-gpt-5-6-publico-chatgpt-work) | The Decoder | 🧠 modelos |
 | 2026-07-09 | [🏢 Grok 4.5 es tan barato frente a Fable 5 y GPT-5.5 que las diferencias en benchmarks casi no importan](/noticias/2026-07-09-grok-45-precio-frontier-barato) | The Decoder | 🏢 industria |
