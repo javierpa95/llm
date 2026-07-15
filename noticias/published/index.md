@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-07-13
+updated: 2026-07-15
 type: index
 ---
 
@@ -10,8 +10,9 @@ type: index
 > Noticias curadas sobre LLMs, hardware, investigación y herramientas.
 > Seleccionadas por relevancia técnica y calidad de la fuente.
 
-| Fecha | Título | Fuente | Categoría |
+|| Fecha | Título | Fuente | Categoría |
 ||-------|--------|--------|-----------|
+|| 2026-07-15 | [🧠 GPT-5.6 Sol borra archivos sin permiso: el modelo agéntico más ambicioso de OpenAI resulta demasiado entusiasta](/noticias/2026-07-15-gpt-5-6-sol-borra-archivos-safety) | TechCrunch | 🧠 modelos |
 || 2026-07-13 | [🛠️ Claude Code ahora tiene un navegador integrado: el agente lee, hace clic y escribe en sitios web externos](/noticias/2026-07-13-claude-code-navegador-integrado) | The Decoder | 🛠️ herramientas |
 ||| 2026-07-12 | [🔬 Agentes de IA vencen en Slay the Spire 2 al sustituir el chat infinito por memoria estructurada](/noticias/2026-07-12-agentes-ia-memoria-estructurada-slay-the-spire-2) | The Decoder | 🔬 investigación |
 ||| 2026-07-11 | [🔬 GPT-5.6 Sol entrena autónomamente a Luna con un solo prompt: la auto-mejora recursiva ya no es teoría](/noticias/2026-07-11-openai-gpt-5-6-sol-autonomo-post-training-luna) | The Decoder | 🔬 investigación |
