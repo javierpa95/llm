@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-07-17
+updated: 2026-07-18
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-07-18 | [🔌 General Compute consigue 400M$ respaldados por chips SambaNova SN50 de inferencia](/noticias/2026-07-18-general-compute-inference-chips-400m) | TechCrunch | 🔌 hardware |
 | 2026-07-17 | [🧠 Kimi lanza K3: modelo abierto de 2.8 billones de parámetros que se acerca a GPT-5.6 Sol y Fable 5](/noticias/2026-07-17-kimi-k3-open-weight-2-8t) | The Decoder | 🧠 modelos |
 | 2026-07-15 | [🧠 GPT-5.6 Sol borra archivos sin permiso: el modelo agéntico más ambicioso de OpenAI resulta demasiado entusiasta](/noticias/2026-07-15-gpt-5-6-sol-borra-archivos-safety) | TechCrunch | 🧠 modelos |
 || 2026-07-13 | [🛠️ Claude Code ahora tiene un navegador integrado: el agente lee, hace clic y escribe en sitios web externos](/noticias/2026-07-13-claude-code-navegador-integrado) | The Decoder | 🛠️ herramientas |
