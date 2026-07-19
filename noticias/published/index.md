@@ -12,13 +12,14 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-07-18 | [🔒 AISI: los modelos open-weight ya alcanzan capacidades cyber de hace 4 meses](/noticias/2026-07-18-aisi-open-weight-cyber-gap) | The Decoder | 🔒 seguridad |
 | 2026-07-18 | [🔌 General Compute consigue 400M$ respaldados por chips SambaNova SN50 de inferencia](/noticias/2026-07-18-general-compute-inference-chips-400m) | TechCrunch | 🔌 hardware |
 | 2026-07-17 | [🧠 Kimi lanza K3: modelo abierto de 2.8 billones de parámetros que se acerca a GPT-5.6 Sol y Fable 5](/noticias/2026-07-17-kimi-k3-open-weight-2-8t) | The Decoder | 🧠 modelos |
 | 2026-07-15 | [🧠 GPT-5.6 Sol borra archivos sin permiso: el modelo agéntico más ambicioso de OpenAI resulta demasiado entusiasta](/noticias/2026-07-15-gpt-5-6-sol-borra-archivos-safety) | TechCrunch | 🧠 modelos |
-|| 2026-07-13 | [🛠️ Claude Code ahora tiene un navegador integrado: el agente lee, hace clic y escribe en sitios web externos](/noticias/2026-07-13-claude-code-navegador-integrado) | The Decoder | 🛠️ herramientas |
-||| 2026-07-12 | [🔬 Agentes de IA vencen en Slay the Spire 2 al sustituir el chat infinito por memoria estructurada](/noticias/2026-07-12-agentes-ia-memoria-estructurada-slay-the-spire-2) | The Decoder | 🔬 investigación |
-||| 2026-07-11 | [🔬 GPT-5.6 Sol entrena autónomamente a Luna con un solo prompt: la auto-mejora recursiva ya no es teoría](/noticias/2026-07-11-openai-gpt-5-6-sol-autonomo-post-training-luna) | The Decoder | 🔬 investigación |
-|| 2026-07-10 | [🧠 GPT-5.6 se libera al público y OpenAI lanza ChatGPT Work, su agente autónomo para flujos de trabajo](/noticias/2026-07-10-openai-gpt-5-6-publico-chatgpt-work) | The Decoder | 🧠 modelos |
+| 2026-07-13 | [🛠️ Claude Code ahora tiene un navegador integrado: el agente lee, hace clic y escribe en sitios web externos](/noticias/2026-07-13-claude-code-navegador-integrado) | The Decoder | 🛠️ herramientas |
+| 2026-07-12 | [🔬 Agentes de IA vencen en Slay the Spire 2 al sustituir el chat infinito por memoria estructurada](/noticias/2026-07-12-agentes-ia-memoria-estructurada-slay-the-spire-2) | The Decoder | 🔬 investigación |
+| 2026-07-11 | [🔬 GPT-5.6 Sol entrena autónomamente a Luna con un solo prompt: la auto-mejora recursiva ya no es teoría](/noticias/2026-07-11-openai-gpt-5-6-sol-autonomo-post-training-luna) | The Decoder | 🔬 investigación |
+| 2026-07-10 | [🧠 GPT-5.6 se libera al público y OpenAI lanza ChatGPT Work, su agente autónomo para flujos de trabajo](/noticias/2026-07-10-openai-gpt-5-6-publico-chatgpt-work) | The Decoder | 🧠 modelos |
 | 2026-07-09 | [🏢 Grok 4.5 es tan barato frente a Fable 5 y GPT-5.5 que las diferencias en benchmarks casi no importan](/noticias/2026-07-09-grok-45-precio-frontier-barato) | The Decoder | 🏢 industria |
 | 2026-07-08 | [🧠 Tencent lanza Hy3: modelo MoE de 295B parámetros con licencia Apache 2.0](/noticias/2026-07-08-tencent-hy3-295b-moe-apache2) | Simon Willison's Blog | 🧠 modelos |
 | 2026-07-07 | [🔌 NVIDIA Kyber NVL144 se retrasa a 2028 y Rubin Ultra queda cancelado](/noticias/2026-07-07-nvidia-kyber-nvl144-retraso-2028) | The Decoder | 🔌 hardware |
