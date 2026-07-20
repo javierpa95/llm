@@ -35,7 +35,24 @@ function parseFrontmatter(filePath: string): { slug: string; data: Record<string
   const body = fmMatch[2].trim()
   const data: Record<string, any> = {}
 
+  let currentKey = ''
+  let currentArray: string[] = []
+
   for (const line of fmLines) {
+    // Check if this is a list item (starts with - and we're in an array context)
+    if (line.match(/^\s+-\s+/) && currentKey) {
+      const item = line.replace(/^\s+-\s+/, '').trim().replace(/^"|"$/g, '')
+      currentArray.push(item)
+      continue
+    }
+
+    // If we were collecting an array, save it
+    if (currentArray.length > 0) {
+      data[currentKey] = currentArray
+      currentArray = []
+      currentKey = ''
+    }
+
     const colonIdx = line.indexOf(':')
     if (colonIdx === -1) continue
     const key = line.substring(0, colonIdx).trim()
@@ -43,6 +60,11 @@ function parseFrontmatter(filePath: string): { slug: string; data: Record<string
 
     if (val.startsWith('[') && val.endsWith(']')) {
       val = val.slice(1, -1).split(',').map((t: string) => t.trim().replace(/^"|"$/g, ''))
+    } else if (val === '' || val === '[]') {
+      // Empty array - start collecting
+      currentKey = key
+      currentArray = []
+      continue
     }
     if (!isNaN(Number(val)) && val !== '') {
       val = Number(val)
@@ -51,6 +73,12 @@ function parseFrontmatter(filePath: string): { slug: string; data: Record<string
     if (val === 'false') val = false
 
     data[key] = val
+    currentKey = key
+  }
+
+  // Save any remaining array
+  if (currentArray.length > 0) {
+    data[currentKey] = currentArray
   }
 
   const slug = path.basename(filePath).replace('.md', '')

@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-07-18
+updated: 2026-07-20
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-07-20 | [🧠 Alibaba lanza Qwen 3.8: modelo abierto de 2.4 billones de parámetros que dice ser segundo solo tras Fable 5](/noticias/2026-07-20-alibaba-qwen-3-8-2-4t-open-weight) | The Decoder | 🧠 modelos |
 | 2026-07-18 | [🔒 AISI: los modelos open-weight ya alcanzan capacidades cyber de hace 4 meses](/noticias/2026-07-18-aisi-open-weight-cyber-gap) | The Decoder | 🔒 seguridad |
 | 2026-07-18 | [🔌 General Compute consigue 400M$ respaldados por chips SambaNova SN50 de inferencia](/noticias/2026-07-18-general-compute-inference-chips-400m) | TechCrunch | 🔌 hardware |
 | 2026-07-17 | [🧠 Kimi lanza K3: modelo abierto de 2.8 billones de parámetros que se acerca a GPT-5.6 Sol y Fable 5](/noticias/2026-07-17-kimi-k3-open-weight-2-8t) | The Decoder | 🧠 modelos |
