@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-07-21 | [🧠 Google lanza Gemini 3.6 Flash: 65% menos tokens y un modelo de ciberseguridad, mientras Gemini 3.5 Pro sigue en pruebas](/noticias/2026-07-21-google-gemini-3-6-flash) | Ars Technica | 🧠 modelos |
 | 2026-07-21 | [🔌 Google desarrolla 'Frozen v2': un chip que incrusta la arquitectura de Gemini directamente en silicio](/noticias/2026-07-21-google-frozen-v2-chip-arquitectura-gemini-silicio) | The Decoder | 🔌 hardware |
 | 2026-07-20 | [🧠 Alibaba lanza Qwen 3.8: modelo abierto de 2.4 billones de parámetros que dice ser segundo solo tras Fable 5](/noticias/2026-07-20-alibaba-qwen-3-8-2-4t-open-weight) | The Decoder | 🧠 modelos |
 | 2026-07-18 | [🔒 AISI: los modelos open-weight ya alcanzan capacidades cyber de hace 4 meses](/noticias/2026-07-18-aisi-open-weight-cyber-gap) | The Decoder | 🔒 seguridad |
