@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-07-27
+updated: 2026-07-28
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-07-27 | [🔬 METR propone el 'Expenditure Horizon': un métrica para calcular cuándo los agentes de IA salen más caros que los humanos](/noticias/2026-07-27-metr-expenditure-horizon-agentes-economia) | The Decoder | 🔬 investigación |
 | 2026-07-27 | [🔬 Claude Opus 5 destroza ARC-AGI-3 con 30.2%: un salto de 4x sobre el récord anterior en el benchmark que mide razonamiento real](/noticias/2026-07-27-opus-5-arc-agi-3-record) | The Decoder | 🔬 investigación |
 | 2026-07-26 | [🧠 Soofi S: consorcio europeo lanza modelo abierto de 30B con arquitectura híbrida Mamba-Transformer que domina benchmarks en alemán e inglés](/noticias/2026-07-26-soofi-s-30b-moe-hybrid-mamba-europeo) | The Decoder | 🧠 modelos |
 | 2026-07-24 | [🧠 Poolside Laguna S 2.1: modelo open-weight de coding que iguala a gigantes con 8B parámetros activos](/noticias/2026-07-24-poolside-laguna-s-2-1-open-weight-coding) | The Decoder | 🧠 modelos |
