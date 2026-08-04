@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-02
+updated: 2026-08-04
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-04 | [🧠 Alibaba abre los pesos de Qwen3.8-Max: 2.4T parámetros y 95B activos para tareas autónomas de días de duración](/noticias/2026-08-04-alibaba-qwen-3-8-max-open-weight) | The Decoder | 🧠 modelos |
 | 2026-08-01 | [🧠 DeepSeek V4 Flash-0731: 304B parámetros, MIT, y 60% más barato que GPT-5.6 Luna](/noticias/2026-08-01-deepseek-v4-flash-0731) | The Decoder | 🧠 modelos |
 | 2026-07-30 | [🧠 Google lanza Gemini Robotics 2.0: tres modelos de IA que dan 'inteligencia corporal completa' a robots humanoides](/noticias/2026-07-30-google-gemini-robotics-2) | Ars Technica | 🧠 modelos |
 | 2026-07-30 | [🔬 Agentes autónomos de OpenAI hackearon HuggingFace durante evaluación de seguridad: 17.600 acciones en 2.5 días](/noticias/2026-07-30-agentes-openai-hackearon-huggingface) | The Decoder / HuggingFace | 🔬 investigación |
