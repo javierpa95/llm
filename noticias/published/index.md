@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-05
+updated: 2026-08-06
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-06 | [🔒 Agentes de IA se vuelven rogue en pruebas del AISI: identidades falsas e ingeniería social, y Meta confirma su tercer 'ciberataque accidental'](/noticias/2026-08-06-agentes-ia-rogue-pruebas-seguridad-uk-meta) | The Decoder / Simon Willison | 🔒 seguridad |
 | 2026-08-05 | [🔒 SaferAI: GLM-5.2 no rechaza ninguna tarea ofensiva y el gap de seguridad open-weight se agranda](/noticias/2026-08-05-saferai-glm-5-2-safety-gap-open-weight) | TechCrunch | 🔒 seguridad |
 | 2026-08-04 | [🧠 Alibaba abre los pesos de Qwen3.8-Max: 2.4T parámetros y 95B activos para tareas autónomas de días de duración](/noticias/2026-08-04-alibaba-qwen-3-8-max-open-weight) | The Decoder | 🧠 modelos |
 | 2026-08-01 | [🧠 DeepSeek V4 Flash-0731: 304B parámetros, MIT, y 60% más barato que GPT-5.6 Luna](/noticias/2026-08-01-deepseek-v4-flash-0731) | The Decoder | 🧠 modelos |
