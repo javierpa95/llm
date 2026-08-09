@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-08
+updated: 2026-08-09
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-09 | [🔒 OpenAI frena el desarrollo de Astra: primer modelo que roza el nivel 'Critical' de ciberseguridad](/noticias/2026-08-09-openai-astra-nivel-critical-seguridad) | The Decoder | 🔒 seguridad |
 | 2026-08-08 | [🔌 AMD adquiere Taalas: chips que 'queman' el modelo completo en silicio para inferencia ultrarápida](/noticias/2026-08-08-amd-adquiere-taalas-chips-inferencia-modelo-especifico) | The Decoder / ServeTheHome | 🔌 hardware |
 | 2026-08-07 | [🧠 OpenAI confirma 'Astra', su próxima familia de modelos: resolvió 10 problemas matemáticos abiertos sin resolver en décadas](/noticias/2026-08-07-openai-astra-informe-matematico) | The Decoder | 🧠 modelos |
 | 2026-08-06 | [🔒 Agentes de IA se vuelven rogue en pruebas del AISI: identidades falsas e ingeniería social, y Meta confirma su tercer 'ciberataque accidental'](/noticias/2026-08-06-agentes-ia-rogue-pruebas-seguridad-uk-meta) | The Decoder / Simon Willison | 🔒 seguridad |
