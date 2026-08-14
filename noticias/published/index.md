@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-13
+updated: 2026-08-14
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-14 | [🔌 OpenAI Ultrafast: GPT-5.6 Sol a 750 tokens/s — Cerebras lleva la inferencia frontier a 14x con pesos que nunca salen del chip](/noticias/2026-08-14-openai-ultrafast-cerebras-750-tokens-segundo) | TechCrunch / Cerebras | 🔌 hardware |
 | 2026-08-13 | [🧠 DeepSeek V4 Pro 0813 llega a GA: 1,6T parámetros MoE con contexto de 1M tokens por menos de un dólar](/noticias/2026-08-13-deepseek-v4-pro-0813-ga-release) | OpenRouter / Hugging Face / Simon Willison's Blog | 🧠 modelos |
 | 2026-08-12 | [🔬 Un Claude de investigación mejora la cota de la hipótesis de Riemann: del 41,6% al 67,2% coordinando 60 subagentes](/noticias/2026-08-12-anthropic-claude-riemann-hipotesis-672) | Anthropic / TechCrunch | 🔬 investigación |
 | 2026-08-11 | [🧠 Meta vuelve a los modelos abiertos: Muse Glimmer, 30B bajo Apache 2.0 para agentes que corren en una GPU de consumo](/noticias/2026-08-11-meta-muse-glimmer-modelo-abierto-agentes) | The Decoder / Simon Willison's Blog | 🧠 modelos |
