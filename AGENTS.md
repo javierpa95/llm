@@ -119,7 +119,7 @@ Sitio web divulgativo-técnico en español que explica cómo funcionan los LLMs 
 
 - Auto-deploy via Coolify + GitHub App (a veces falla)
 - **Fallback manual:** `docker cp dist/. <container>:/usr/share/nginx/html/`
-- Contenedor: `z7c3qmng9a0p3adwg6htb4mh-234801563354`
+- Contenedor: `z7c3qmng9a0p3adwg6htb4mh-202239842479` (el sufijo cambia si Coolify recrea el contenedor; buscar por el prefijo `z7c3qmng9a0p3adwg6htb4mh`)
 - Build: `npm run build` (output en `dist/`)
 
 ## 🔐 Seguridad
