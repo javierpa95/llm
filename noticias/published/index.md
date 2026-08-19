@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-18
+updated: 2026-08-19
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-19 | [🔬 La compactación de contexto borra las instrucciones del usuario: solo sobrevive el 17% y un pequeño extractor lo arregla](/noticias/2026-08-19-compactacion-contexto-pierde-instrucciones-usuario) | The Decoder | 🔬 investigación |
 | 2026-08-18 | [🧠 Qwen3.8-27B: el modelo abierto de 27B que puntúa 52 en el índice AAII, como GPT-5.6 Luna, y corre en un portátil](/noticias/2026-08-18-qwen38-27b-modelo-abierto-portatil) | Simon Willison's Blog / Hugging Face | 🧠 modelos |
 | 2026-08-17 | [🏢 Stripe adquiere OpenRouter por más de 7.000 millones: el 'Stripe de la IA' pasa a integrarse en el sistema de pagos](/noticias/2026-08-17-stripe-adquiere-openrouter-7000-millones) | The Decoder / TechCrunch | 🏢 industria |
 | 2026-08-16 | [🔒 El filtro bio-weapons de Anthropic estuvo caído casi un año: 133 millones de chats pasaron sin control](/noticias/2026-08-16-anthropic-filtro-biologico-caido-133m-chats) | The Decoder | 🔒 seguridad |

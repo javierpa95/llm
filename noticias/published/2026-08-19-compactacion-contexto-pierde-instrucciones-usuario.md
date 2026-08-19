@@ -1,0 +1,16 @@
+---
+title: "La compactación de contexto borra las instrucciones del usuario: solo sobrevive el 17% y un pequeño extractor lo arregla"
+date: 2026-08-19
+source: "The Decoder"
+source_url: "https://the-decoder.com/ai-systems-quietly-drop-user-instructions-when-they-compress-context/"
+category: "investigación"
+summary: "Investigadores de Penn State miden qué pierde la compactación de contexto: solo el 17% de las restricciones de sesión sobrevive. Un módulo basado en Qwen3.5-9B recupera >90% sin entrenar."
+reading_time: "3 min"
+tags: [compactacion-contexto, context-compaction, kv-cache, agentes, seguridad, penn-state, qwen, contexto-largo]
+---
+
+Las conversaciones largas saturan la ventana de contexto, así que los grandes laboratorios recurren a la **compactación (context compaction)**: resumir el historial previo para liberar espacio. Pero ese resumen pierde detalles, y un estudio sistemático de investigadores de **Penn State** (preprint en [arXiv:2608.11242](https://arxiv.org/abs/2608.11242)) acaba de medir cuáles son los primeros en caer: las **restricciones de sesión**, reglas del tipo "confirma conmigo antes de cambiar nada" o "no uses mi nombre en tus respuestas". Son instrucciones del usuario que gobiernan el comportamiento durante la conversación, pero no forman parte de la tarea ni del system prompt permanente, así que los algoritmos de compactación, diseñados para preservar el objetivo y el estado de la tarea, simplemente las descartan.
+
+El resultado tiene implicaciones de **calidad y de seguridad**: si el usuario dice "no envíes ningún correo sin mi aprobación", tras una compactación el agente puede perfectamente hacerlo — llamadas a herramientas no autorizadas, divulgación de información retenida o saltarse pasos de verificación. Con la nueva suite de evaluación **COMPINT** ([GitHub](https://github.com/ZhiqiEliWang/compaction-integrity)), los investigadores midieron que **solo el 17% de las restricciones de sesión sobrevive** a la compresión de media. Sin comprimir, el cumplimiento de reglas está entre el 59% y el 71%; tras compactar, la mayoría de los compactadores probados caen cerca del nivel de "no dar ninguna restricción". Incluso un prompt diseñado específicamente para preservar restricciones no pasa del 40% de retención. Cuanto más agresiva la técnica (más espacio se gana), peor el resultado.
+
+La buena noticia: hay una solución plug-and-play. Un **módulo auxiliar construido sobre [Qwen3.5-9B](/noticias/2026-08-18-qwen38-27b-modelo-abierto-portatil)**, un modelo compacto, lee cada entrada del usuario, detecta las restricciones de sesión y las acumula en una lista separada que se anexa al resumen cuando llega la compactación. Sin entrenamiento y sin tocar el sistema de compresión, consigue **más del 90% de retención** en los tres escenarios probados (95.6% en trayectorias de agentes, 95.1% en tareas de investigación largas y 90.3% en chats multi-turno). El hallazgo apunta a un principio general: la memoria de un agente no debe tratarse como un único bloque comprimible, sino con **canales separados** para lo perecedero (el historial) y lo normativo (las reglas del usuario).
