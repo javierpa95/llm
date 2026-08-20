@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-19
+updated: 2026-08-20
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-20 | [🔬 LFM2.5 en Q4_0 sin apenas pérdida: destilación consciente de cuantización para correr LLMs en un Raspberry Pi](/noticias/2026-08-20-lfm25-q4_0-destilacion-consciente-cuantizacion) | Hugging Face Blog (Liquid AI) | 🔬 investigación |
 | 2026-08-19 | [🔬 La compactación de contexto borra las instrucciones del usuario: solo sobrevive el 17% y un pequeño extractor lo arregla](/noticias/2026-08-19-compactacion-contexto-pierde-instrucciones-usuario) | The Decoder | 🔬 investigación |
 | 2026-08-18 | [🧠 Qwen3.8-27B: el modelo abierto de 27B que puntúa 52 en el índice AAII, como GPT-5.6 Luna, y corre en un portátil](/noticias/2026-08-18-qwen38-27b-modelo-abierto-portatil) | Simon Willison's Blog / Hugging Face | 🧠 modelos |
 | 2026-08-17 | [🏢 Stripe adquiere OpenRouter por más de 7.000 millones: el 'Stripe de la IA' pasa a integrarse en el sistema de pagos](/noticias/2026-08-17-stripe-adquiere-openrouter-7000-millones) | The Decoder / TechCrunch | 🏢 industria |
