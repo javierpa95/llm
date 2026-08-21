@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-20
+updated: 2026-08-21
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-21 | [🔒 Cryptographic Context Injection: cifrar las instrucciones maliciosas para que Grok exfiltre chats y datos personales](/noticias/2026-08-21-grok-cryptographic-context-injection-exfiltracion) | Ars Technica | 🔒 seguridad |
 | 2026-08-20 | [🔬 LFM2.5 en Q4_0 sin apenas pérdida: destilación consciente de cuantización para correr LLMs en un Raspberry Pi](/noticias/2026-08-20-lfm25-q4_0-destilacion-consciente-cuantizacion) | Hugging Face Blog (Liquid AI) | 🔬 investigación |
 | 2026-08-19 | [🔬 La compactación de contexto borra las instrucciones del usuario: solo sobrevive el 17% y un pequeño extractor lo arregla](/noticias/2026-08-19-compactacion-contexto-pierde-instrucciones-usuario) | The Decoder | 🔬 investigación |
 | 2026-08-18 | [🧠 Qwen3.8-27B: el modelo abierto de 27B que puntúa 52 en el índice AAII, como GPT-5.6 Luna, y corre en un portátil](/noticias/2026-08-18-qwen38-27b-modelo-abierto-portatil) | Simon Willison's Blog / Hugging Face | 🧠 modelos |
