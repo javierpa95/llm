@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-23
+updated: 2026-08-24
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-24 | [🔬 Un estudio psicométrico destapa fallos en los benchmarks de seguridad de los LLM](/noticias/2026-08-24-benchmarks-seguridad-psicometrica-llm) | The Decoder | 🔬 investigación |
 | 2026-08-23 | [🔬 Por qué los 'skills' ayudan a los agentes de IA (y cuándo fallan): el estudio de Princeton y UC San Diego](/noticias/2026-08-23-por-que-skills-ayudan-agentes-princeton) | The Decoder | 🔬 investigación |
 | 2026-08-22 | [🧠 DeepSeek V4-Flash-Vision-Exp: el modelo multimodal que iguala a Opus 4.8](/noticias/2026-08-22-deepseek-v4-flash-vision-exp-modelo-multimodal-agentes) | The Decoder | 🧠 modelos |
 | 2026-08-21 | [🔒 Cryptographic Context Injection: cifrar las instrucciones maliciosas para que Grok exfiltre chats y datos personales](/noticias/2026-08-21-grok-cryptographic-context-injection-exfiltracion) | Ars Technica | 🔒 seguridad |
