@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-26
+updated: 2026-08-28
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-28 | [🧠 GLM-5.3-Flash: el MoE abierto de 18B activos que corre sin Nvidia y cuesta 7,5× menos](/noticias/2026-08-28-glm-5-3-flash-sin-nvidia-mit) | The Decoder / SemiAnalysis / Artificial Analysis | 🧠 modelos |
 | 2026-08-27 | [🧠 Qwen3.8-Flash-Next: el MoE de 125B con solo 6B activos que anticipa la arquitectura de Qwen4](/noticias/2026-08-27-qwen38-flash-next-preview-arquitectura-qwen4) | The Decoder / Qwen Blog | 🧠 modelos |
 | 2026-08-26 | [🔌 OpenAI muestra los primeros benchmarks de su chip Jalapeño: supera a Blackwell y Rubin en rendimiento por vatio](/noticias/2026-08-26-openai-jalapeno-benchmarks-inferencia-hot-chips) | The Decoder | 🔌 hardware |
 | 2026-08-25 | [🧠 Alibaba lanza Wan3.0: vídeo generativo de hasta 30 segundos desde texto, imágenes, PDF y diapositivas](/noticias/2026-08-25-alibaba-wan3-0-video-generativo-multimodal) | The Decoder | 🧠 modelos |
