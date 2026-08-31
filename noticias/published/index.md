@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-08-30
+updated: 2026-08-31
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-08-31 | [🔬 LAION libera BVD: 10 millones de horas de vídeo abierto para entrenar modelos multimodales](/noticias/2026-08-31-laion-bvd-video-dataset-abierto) | The Decoder / LAION | 🔬 investigación |
 | 2026-08-30 | [🧠 Tencent lanza Hy4 Preview: el MoE abierto de 770B que activa solo 49B por token y llega a 1M de contexto](/noticias/2026-08-30-tencent-hy4-preview-moe-770b-contexto-1m) | Simon Willison's Blog / Hugging Face | 🧠 modelos |
 | 2026-08-29 | [🧠 IBM lanza Granite 4.2: modelos open-weight de 3B, 8B y 30B que traen razonamiento y agentes al hardware local](/noticias/2026-08-29-ibm-granite-4-2-modelos-locales-razonamiento) | Ars Technica | 🧠 modelos |
 | 2026-08-28 | [🧠 GLM-5.3-Flash: el MoE abierto de 18B activos que corre sin Nvidia y cuesta 7,5× menos](/noticias/2026-08-28-glm-5-3-flash-sin-nvidia-mit) | The Decoder / SemiAnalysis / Artificial Analysis | 🧠 modelos |
