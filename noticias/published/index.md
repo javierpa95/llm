@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-01
+updated: 2026-09-02
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-02 | [🧠 Anthropic lanza Claude Fable 5.1: mejor coding, 45% más barato y marcas de agua integradas](/noticias/2026-09-02-anthropic-fable-5-1-coding-cheaper-watermarks) | The Decoder | 🧠 modelos |
 | 2026-09-01 | [🔌 CXMT produce sus primeros chips HBM3E: China cierra la brecha en memoria para IA](/noticias/2026-09-01-cxmt-hbm3e-chips-ia-china) | The Decoder / The Information / SemiAnalysis | 🔌 hardware |
 | 2026-08-31 | [🔬 LAION libera BVD: 10 millones de horas de vídeo abierto para entrenar modelos multimodales](/noticias/2026-08-31-laion-bvd-video-dataset-abierto) | The Decoder / LAION | 🔬 investigación |
 | 2026-08-30 | [🧠 Tencent lanza Hy4 Preview: el MoE abierto de 770B que activa solo 49B por token y llega a 1M de contexto](/noticias/2026-08-30-tencent-hy4-preview-moe-770b-contexto-1m) | Simon Willison's Blog / Hugging Face | 🧠 modelos |
