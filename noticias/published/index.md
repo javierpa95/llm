@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-02
+updated: 2026-09-04
 type: index
 ---
 
@@ -12,6 +12,8 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-04 | [🏢 Nvidia compra Hugging Face por 12.900M$: el chipset se hace con la puerta de entrada al AI abierto](/noticias/2026-09-04-nvidia-compra-hugging-face-12900m) | TechCrunch / The Decoder | 🏢 industria |
+| 2026-09-03 | [🧠 OpenAI califica Astra como su modelo más peligroso: primer sistema con capacidades "críticas" de ciberseguridad](/noticias/2026-09-03-openai-astra-modelo-peligroso-capacidades-ciberseguridad) | The Decoder | 🧠 modelos |
 | 2026-09-02 | [🧠 Anthropic lanza Claude Fable 5.1: mejor coding, 45% más barato y marcas de agua integradas](/noticias/2026-09-02-anthropic-fable-5-1-coding-cheaper-watermarks) | The Decoder | 🧠 modelos |
 | 2026-09-01 | [🔌 CXMT produce sus primeros chips HBM3E: China cierra la brecha en memoria para IA](/noticias/2026-09-01-cxmt-hbm3e-chips-ia-china) | The Decoder / The Information / SemiAnalysis | 🔌 hardware |
 | 2026-08-31 | [🔬 LAION libera BVD: 10 millones de horas de vídeo abierto para entrenar modelos multimodales](/noticias/2026-08-31-laion-bvd-video-dataset-abierto) | The Decoder / LAION | 🔬 investigación |
