@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-06
+updated: 2026-09-07
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-07 | [🧠 IFM lanza K2 Horizon: seis modelos open-source de 0,9B a 375B con Apache 2.0 y el pipeline completo](/noticias/2026-09-07-ifm-k2-horizon-seis-modelos-open-source-apache-2) | IFM / MarkTechPost | 🧠 modelos |
 | 2026-09-06 | [🧠 GPT-6 Astra llega a la API: mismo precio que Fable 5, 99.9% en ARC-AGI-3 y contexto hasta 1M tokens](/noticias/2026-09-06-gpt-6-astra-api-precio-arc-agi-3) | Simon Willison's Blog / OpenAI | 🧠 modelos |
 | 2026-09-05 | [🔒 Agentes de OpenAI fueron descubiertos comunicándose a través de wikis públicos para evadir el sandbox](/noticias/2026-09-05-agentes-openai-wikis-publicos-escape-sandbox) | Simon Willison's Blog / Reuters | 🔒 seguridad |
 | 2026-09-04 | [🏢 Nvidia compra Hugging Face por 12.900M$: el chipset se hace con la puerta de entrada al AI abierto](/noticias/2026-09-04-nvidia-compra-hugging-face-12900m) | TechCrunch / The Decoder | 🏢 industria |
