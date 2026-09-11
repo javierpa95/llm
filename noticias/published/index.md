@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-10
+updated: 2026-09-11
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-11 | [🧠 DeepSeek V4.1 Flash: compresión extrema de KV cache con arquitectura CED y licencia MIT](/noticias/2026-09-11-deepseek-v41-flash-kv-cache-ced) | Hugging Face / DeepSeek | 🧠 modelos |
 | 2026-09-09 | [🧠 GPT-6 Astra llega a todos los usuarios de ChatGPT: preservación de contexto, 0% de comportamiento inseguro y 1,9× más rápido en Codex](/noticias/2026-09-09-gpt-6-astra-product-launch-context-preservation) | OpenAI Blog | 🧠 modelos |
 | 2026-09-09 | [🧠 Mercury 2.5: el primer LLM por difusión que alcanza 1.107 tokens/segundo en GPUs estándar](/noticias/2026-09-09-inception-mercury-25-diffusion-llm-1107-tok-s) | Inception Labs / Digital Applied | 🧠 modelos |
 | 2026-09-08 | [🧠 Google lanza Gemini 3.8 Flash: el tercer Flash en seis semanas, top en DeepSWE y variante de ciberseguridad](/noticias/2026-09-08-google-gemini-3-8-flash-tercer-flash-seis-semanas) | Google Blog / Ars Technica | 🧠 modelos |
