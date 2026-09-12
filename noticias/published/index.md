@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-11
+updated: 2026-09-12
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-12 | [🛠️ OpenAI lanza la Agents API en beta público: la infraestructura de Codex y ChatGPT ahora disponible para todos](/noticias/2026-09-12-openai-agents-api-beta-publico) | The Decoder / OpenAI Developers | 🛠️ herramientas |
 | 2026-09-11 | [🧠 DeepSeek V4.1 Flash: compresión extrema de KV cache con arquitectura CED y licencia MIT](/noticias/2026-09-11-deepseek-v41-flash-kv-cache-ced) | Hugging Face / DeepSeek | 🧠 modelos |
 | 2026-09-09 | [🧠 GPT-6 Astra llega a todos los usuarios de ChatGPT: preservación de contexto, 0% de comportamiento inseguro y 1,9× más rápido en Codex](/noticias/2026-09-09-gpt-6-astra-product-launch-context-preservation) | OpenAI Blog | 🧠 modelos |
 | 2026-09-09 | [🧠 Mercury 2.5: el primer LLM por difusión que alcanza 1.107 tokens/segundo en GPUs estándar](/noticias/2026-09-09-inception-mercury-25-diffusion-llm-1107-tok-s) | Inception Labs / Digital Applied | 🧠 modelos |
