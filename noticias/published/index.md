@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-13
+updated: 2026-09-14
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-14 | [🔬 Iris-mini e Iris-pro: los agentes de búsqueda open-weight más potentes de su clase, con receta completa de entrenamiento](/noticias/2026-09-14-iris-allspark-agentes-busqueda-open-weight) | The Decoder / arXiv / AllSpark | 🔬 investigación |
 | 2026-09-13 | [🔬 NVIDIA publica la receta abierta para oro en la IMO: Nemotron 3 Ultra convierte un modelo general en agente de matemáticas olimpíadas](/noticias/2026-09-13-nvidia-nemotron-imo-oro-receta-abierta) | The Agent Times / arXiv / Hugging Face | 🔬 investigación |
 | 2026-09-12 | [🛠️ OpenAI lanza la Agents API en beta público: la infraestructura de Codex y ChatGPT ahora disponible para todos](/noticias/2026-09-12-openai-agents-api-beta-publico) | The Decoder / OpenAI Developers | 🛠️ herramientas |
 | 2026-09-11 | [🧠 DeepSeek V4.1 Flash: compresión extrema de KV cache con arquitectura CED y licencia MIT](/noticias/2026-09-11-deepseek-v41-flash-kv-cache-ced) | Hugging Face / DeepSeek | 🧠 modelos |
