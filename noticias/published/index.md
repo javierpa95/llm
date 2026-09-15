@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-15 | [🔬 Sakana lanza Fugu Max y Fugu Ultra v2: la orquestación multi-agente como nueva frontera de escalabilidad](/noticias/2026-09-15-sakana-fugu-max-ultra-v2-orquestacion-pareto) | Sakana AI / MarkTechPost | 🔬 investigación |
 | 2026-09-14 | [🔬 Iris-mini e Iris-pro: los agentes de búsqueda open-weight más potentes de su clase, con receta completa de entrenamiento](/noticias/2026-09-14-iris-allspark-agentes-busqueda-open-weight) | The Decoder / arXiv / AllSpark | 🔬 investigación |
 | 2026-09-13 | [🔬 NVIDIA publica la receta abierta para oro en la IMO: Nemotron 3 Ultra convierte un modelo general en agente de matemáticas olimpíadas](/noticias/2026-09-13-nvidia-nemotron-imo-oro-receta-abierta) | The Agent Times / arXiv / Hugging Face | 🔬 investigación |
 | 2026-09-12 | [🛠️ OpenAI lanza la Agents API en beta público: la infraestructura de Codex y ChatGPT ahora disponible para todos](/noticias/2026-09-12-openai-agents-api-beta-publico) | The Decoder / OpenAI Developers | 🛠️ herramientas |
