@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-14
+updated: 2026-09-16
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-16 | [🧠 Google lanza Gemini 3.8 Live: el primer modelo de voz que supera a OpenAI y cuesta un 55% menos](/noticias/2026-09-16-google-gemini-3-8-live-voz-barata) | The Decoder / Google Blog | 🧠 modelos |
 | 2026-09-15 | [🔬 Sakana lanza Fugu Max y Fugu Ultra v2: la orquestación multi-agente como nueva frontera de escalabilidad](/noticias/2026-09-15-sakana-fugu-max-ultra-v2-orquestacion-pareto) | Sakana AI / MarkTechPost | 🔬 investigación |
 | 2026-09-14 | [🔬 Iris-mini e Iris-pro: los agentes de búsqueda open-weight más potentes de su clase, con receta completa de entrenamiento](/noticias/2026-09-14-iris-allspark-agentes-busqueda-open-weight) | The Decoder / arXiv / AllSpark | 🔬 investigación |
 | 2026-09-13 | [🔬 NVIDIA publica la receta abierta para oro en la IMO: Nemotron 3 Ultra convierte un modelo general en agente de matemáticas olimpíadas](/noticias/2026-09-13-nvidia-nemotron-imo-oro-receta-abierta) | The Agent Times / arXiv / Hugging Face | 🔬 investigación |
