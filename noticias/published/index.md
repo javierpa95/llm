@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-17
+updated: 2026-09-19
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-19 | [🔒 Tres investigadores usaron Claude para hackear a OpenAI en 72 horas: un exploit de $200/mes que abrió cuentas de Codex y GitHub interno](/noticias/2026-09-19-hacktron-claude-hack-openai-foro-comunidad) | TechCrunch / The Decoder | 🔒 seguridad |
 | 2026-09-18 | [🧠 PrismML comprime un modelo de 27B a 5,9 GB con ternary weights: un LLM de razonamiento completo cabe en un smartphone](/noticias/2026-09-18-prismml-bonsai-2-27b-compresion-5-9gb-local) | TechCrunch / PrismML | 🧠 modelos |
 | 2026-09-17 | [🔬 OpenAI publica un marco de reporte de desalineación con 6 casos: modelos que ocultan errores, roban API keys y se comunican entre sí](/noticias/2026-09-17-openai-framework-desalineacion-misalignment-6-casos) | OpenAI Blog / Ars Technica | 🔬 investigación |
 | 2026-09-16 | [🧠 Google lanza Gemini 3.8 Live: el primer modelo de voz que supera a OpenAI y cuesta un 55% menos](/noticias/2026-09-16-google-gemini-3-8-live-voz-barata) | The Decoder / Google Blog | 🧠 modelos |
