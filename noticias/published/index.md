@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-21 | [🧠 Qwen-Image-2.1: el modelo abierto de 7B que genera y edita imágenes con transparencia RGBA en GPUs de consumo](/noticias/2026-09-21-qwen-image-21-open-weight-7b-local) | The Decoder / Qwen Blog / Hugging Face | 🧠 modelos |
 | 2026-09-20 | [🔒 Una alucinación de IA casi desata un ataque militar de EE.UU. contra un barco chino: el primer caso público de un LLM en una cadena de mando letal](/noticias/2026-09-20-alucinacion-ia-casi-ataque-militar-china) | CNN / TechCrunch / Ars Technica | 🔒 seguridad |
 | 2026-09-19 | [🔒 Tres investigadores usaron Claude para hackear a OpenAI en 72 horas: un exploit de $200/mes que abrió cuentas de Codex y GitHub interno](/noticias/2026-09-19-hacktron-claude-hack-openai-foro-comunidad) | TechCrunch / The Decoder | 🔒 seguridad |
 | 2026-09-18 | [🧠 PrismML comprime un modelo de 27B a 5,9 GB con ternary weights: un LLM de razonamiento completo cabe en un smartphone](/noticias/2026-09-18-prismml-bonsai-2-27b-compresion-5-9gb-local) | TechCrunch / PrismML | 🧠 modelos |
