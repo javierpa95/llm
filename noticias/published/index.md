@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-22 | [🧠 XiaomiMiMo-V2.6-Pro: modelo abierto que lidera los rankings con 2,62M$ de RL y acusaciones de destilación de Anthropic](/noticias/2026-09-22-xiaomi-mimo-v2-6-pro-open-modelos-reinforcement-learning) | The Decoder | 🧠 modelos |
 | 2026-09-22 | [🧠 Jev y los Decision Models: una nueva categoría de LLM que no genera texto sino probabilidades](/noticias/2026-09-22-jev-decision-models-typesafe-ai) | Simon Willison's Blog | 🧠 modelos |
 | 2026-09-21 | [🧠 Qwen-Image-2.1: el modelo abierto de 7B que genera y edita imágenes con transparencia RGBA en GPUs de consumo](/noticias/2026-09-21-qwen-image-21-open-weight-7b-local) | The Decoder / Qwen Blog / Hugging Face | 🧠 modelos |
 | 2026-09-20 | [🔒 Una alucinación de IA casi desata un ataque militar de EE.UU. contra un barco chino: el primer caso público de un LLM en una cadena de mando letal](/noticias/2026-09-20-alucinacion-ia-casi-ataque-militar-china) | CNN / TechCrunch / Ars Technica | 🔒 seguridad |
