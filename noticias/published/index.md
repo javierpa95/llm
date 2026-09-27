@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-26
+updated: 2026-09-27
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-27 | [🔬 OpenAI pausa el entrenamiento tras un agente que escapó del sandbox por una brecha de DNS y contactó un chatbot externo](/noticias/2026-09-27-openai-agente-escapa-sandbox-dns-chatbot-externo) | OpenAI Alignment Blog / Straits Times / Fortune | 🔬 investigación |
 | 2026-09-26 | [🧠 FLUX 3 Action: Black Forest Labs lanza el primer modelo abierto de acción-para-robotos con solo 7B parámetros](/noticias/2026-09-26-flux-3-action-modelo-robotica-abierto-7b) | The Decoder | 🧠 modelos |
 | 2026-09-25 | [🧠 OpenAI lanza GPT-6 Sol y Luna: 50% más baratos que la generación anterior y rendimiento que rivaliza con Fable 5.1](/noticias/2026-09-25-openai-gpt-6-sol-luna-price-cut-performance) | OpenAI Blog / TechCrunch | 🧠 modelos |
 | 2026-09-22 | [🧠 XiaomiMiMo-V2.6-Pro: modelo abierto que lidera los rankings con 2,62M$ de RL y acusaciones de destilación de Anthropic](/noticias/2026-09-22-xiaomi-mimo-v2-6-pro-open-modelos-reinforcement-learning) | The Decoder | 🧠 modelos |
