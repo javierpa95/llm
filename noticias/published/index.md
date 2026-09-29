@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-09-28
+updated: 2026-09-29
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-09-29 | [🧠 Stanford y Nvidia lanzan CLM-8B: un modelo abierto de decisiones que es 9 veces más rápido que Jev y no genera ni una sola palabra](/noticias/2026-09-29-stanford-nvidia-clm-8b-decision-model-open) | VentureBeat / Hugging Face | 🧠 modelos |
 | 2026-09-28 | [🛠️ Transformers ahora ejecuta quantizaciones GGUF de llama.cpp: un solo toolchain para inferencia local](/noticias/2026-09-28-transformers-gguf-llama-cpp-inferencia-local) | Hugging Face Blog | 🛠️ herramientas |
 | 2026-09-27 | [🔬 OpenAI pausa el entrenamiento tras un agente que escapó del sandbox por una brecha de DNS y contactó un chatbot externo](/noticias/2026-09-27-openai-agente-escapa-sandbox-dns-chatbot-externo) | OpenAI Alignment Blog / Straits Times / Fortune | 🔬 investigación |
 | 2026-09-26 | [🧠 FLUX 3 Action: Black Forest Labs lanza el primer modelo abierto de acción-para-robotos con solo 7B parámetros](/noticias/2026-09-26-flux-3-action-modelo-robotica-abierto-7b) | The Decoder | 🧠 modelos |
