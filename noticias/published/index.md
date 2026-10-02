@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-10-01
+updated: 2026-10-02
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-10-02 | [🧠 Amazon entra en la carrera de los decision models: Strands Decider 2B es open source, cabe en una RTX 3090 y decide en milisegundos](/noticias/2026-10-02-amazon-strands-decider-2b-open-source-decision-model) | VentureBeat / Strands Agents (AWS) | 🧠 modelos |
 | 2026-10-01 | [🔒 Anthropic: GLM-5.3, el modelo open-weight de Zhipu, iguala a Claude Mythos Preview construyendo exploits y sus salvaguardas se saltan con técnicas simples](/noticias/2026-10-01-anthropic-glm-5-3-exploits-open-weight-salvaguardas-bypass) | Anthropic Frontier Red Team / The Decoder / NIST CAISI | 🔒 seguridad |
 | 2026-09-30 | [🧠 OpenAI lanza GPT-6.1 Sol: rendimiento casi igual a Astra a un quinto del precio — y cancela GPT-6.1 Astra por problemas de seguridad](/noticias/2026-09-30-openai-gpt-61-sol-devday-near-astra-fifth-price) | TechCrunch / SiliconAngle / The Hindu | 🧠 modelos |
 | 2026-09-29 | [🧠 Stanford y Nvidia lanzan CLM-8B: un modelo abierto de decisiones que es 9 veces más rápido que Jev y no genera ni una sola palabra](/noticias/2026-09-29-stanford-nvidia-clm-8b-decision-model-open) | VentureBeat / Hugging Face | 🧠 modelos |
