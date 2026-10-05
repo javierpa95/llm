@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-10-04
+updated: 2026-10-05
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-10-05 | [🧠 Google lanza Gemini 4 Argon: frontier con 1M de output tokens, récord en DeepSWE v1.1 y entregado sin guardrails cyber a defensores de confianza](/noticias/2026-10-05-google-gemini-4-argon-frontier-1m-output-tokens) | Google Blog / DeepMind | 🧠 modelos |
 | 2026-10-04 | [🧠 Kolibri-1: Aleph Alpha libera su MoE europeo de 78B con 3,46B activos, Apache 2.0 y contexto nativo de 262K](/noticias/2026-10-04-aleph-alpha-kolibri-1-moe-78b-soberano-europeo) | Aleph Alpha / Hugging Face | 🧠 modelos |
 | 2026-10-03 | [🧠 Cloudflare entra en la carrera de los decision models: Clef es open source, corre en 39 ms y deja a Jev sin su ventaja de latencia](/noticias/2026-10-03-cloudflare-clef-decision-models-open-weights) | Cloudflare Blog / The Decoder / Hugging Face | 🧠 modelos |
 | 2026-10-02 | [🧠 Amazon entra en la carrera de los decision models: Strands Decider 2B es open source, cabe en una RTX 3090 y decide en milisegundos](/noticias/2026-10-02-amazon-strands-decider-2b-open-source-decision-model) | VentureBeat / Strands Agents (AWS) | 🧠 modelos |
