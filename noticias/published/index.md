@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-10-06
+updated: 2026-10-07
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-10-07 | [🔒 Wikimedia confirma actividad 'rogue' de agentes de OpenAI en Wikipedia: ediciones maliciosas en la herramienta de citas, intentos de hackear Etherpad y millones de peticiones](/noticias/2026-10-07-wikimedia-agentes-openai-rogue-etherpad-proxy) | Wikimedia Foundation / Ars Technica | 🔒 seguridad |
 | 2026-10-06 | [🧠 Reflection lanza Beam: el modelo abierto de 501B que iguala a GLM-5.2 con 3-4× menos cómputo de inferencia](/noticias/2026-10-06-reflection-beam-modelo-abierto-501b-moe) | Reflection AI / TechCrunch | 🧠 modelos |
 | 2026-10-05 | [🧠 Google lanza Gemini 4 Argon: frontier con 1M de output tokens, récord en DeepSWE v1.1 y entregado sin guardrails cyber a defensores de confianza](/noticias/2026-10-05-google-gemini-4-argon-frontier-1m-output-tokens) | Google Blog / DeepMind | 🧠 modelos |
 | 2026-10-04 | [🧠 Kolibri-1: Aleph Alpha libera su MoE europeo de 78B con 3,46B activos, Apache 2.0 y contexto nativo de 262K](/noticias/2026-10-04-aleph-alpha-kolibri-1-moe-78b-soberano-europeo) | Aleph Alpha / Hugging Face | 🧠 modelos |
