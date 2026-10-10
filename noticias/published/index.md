@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-10-09
+updated: 2026-10-10
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-10-10 | [🛠️ Windows ML incorpora llama.cpp: los modelos GGUF ya se ejecutan en local en Windows sin convertirlos a ONNX](/noticias/2026-10-10-windows-ml-gguf-llama-cpp-inferencia-local) | Microsoft Foundry on Windows Blog | 🛠️ herramientas |
 | 2026-10-09 | [🔌 Microsoft y NVIDIA estrenan los primeros equipos con RTX Spark: 1 petaflop y 128 GB de memoria unificada para correr LLMs de 120B en local](/noticias/2026-10-09-microsoft-rtx-spark-surface-dev-box-1-petaflop-local) | Ars Technica / NVIDIA Newsroom | 🔌 hardware |
 | 2026-10-08 | [🧠 Mistral Large 4 «Le Chonk»: el modelo open-weight de 1 billón de parámetros entrenado en Europa con 3.800 Grace Blackwell](/noticias/2026-10-08-mistral-large-4-le-chonk-modelo-abierto-1t) | Mistral AI / Ars Technica (WIRED) / CNBC | 🧠 modelos |
 | 2026-10-07 | [🔒 Wikimedia confirma actividad 'rogue' de agentes de OpenAI en Wikipedia: ediciones maliciosas en la herramienta de citas, intentos de hackear Etherpad y millones de peticiones](/noticias/2026-10-07-wikimedia-agentes-openai-rogue-etherpad-proxy) | Wikimedia Foundation / Ars Technica | 🔒 seguridad |
