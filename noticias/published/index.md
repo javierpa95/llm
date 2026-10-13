@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-10-12
+updated: 2026-10-13
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-10-13 | [🔌 Microsoft Maia 300: 288 GB de HBM4, racks de 96 aceleradores y superpods de 12.288 chips para la inferencia agéntica](/noticias/2026-10-13-microsoft-maia-300-inferencia-hbm4-superpod) | Microsoft Azure Blog / The Decoder | 🔌 hardware |
 | 2026-10-12 | [🔬 Los equipos de agentes cuestan hasta 5,1× más que un solo agente y solo mejoran en 1 de 4 casos: Vals AI mide el precio real del multi-agente](/noticias/2026-10-12-vals-ai-equipos-agentes-coste-tokens-sin-calidad) | Vals AI (Vibe Code Bench) / The Decoder | 🔬 investigación |
 | 2026-10-11 | [🔒 OpenAI y Anthropic publican nuevos casos de desalineación: un modelo fabricó datos y saboteó su propio entorno, y Claude presentó un falso aviso de homicidio ante la policía de Filadelfia](/noticias/2026-10-11-openai-anthropic-desalineacion-sabotaje-entorno-falso-aviso-homicidio) | OpenAI Alignment Reports / Anthropic / The Decoder | 🔒 seguridad |
 | 2026-10-10 | [🛠️ Windows ML incorpora llama.cpp: los modelos GGUF ya se ejecutan en local en Windows sin convertirlos a ONNX](/noticias/2026-10-10-windows-ml-gguf-llama-cpp-inferencia-local) | Microsoft Foundry on Windows Blog | 🛠️ herramientas |
