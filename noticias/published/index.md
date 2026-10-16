@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-10-15
+updated: 2026-10-16
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-10-16 | [🧠 Meta libera Muse Spark Open: 816B de parámetros (42B activos) open-weight que corren en dos Mac Studios de escritorio](/noticias/2026-10-16-meta-muse-spark-open-816b-moe-open-weight-mac-studio) | Meta AI Research / Hugging Face / Reuters / The Decoder | 🧠 modelos |
 | 2026-10-14 | [🔒 Anthropic corta hasta un 99% la fuga de reasoning tokens: 'preserved thinking', clasificadores antiextracción y redes de cientos de miles de cuentas falsas para destilar Claude](/noticias/2026-10-14-anthropic-defensas-destilacion-industrial-reasoning-tokens) | Anthropic Research / The Decoder | 🔒 seguridad |
 | 2026-10-13 | [🔌 Microsoft Maia 300: 288 GB de HBM4, racks de 96 aceleradores y superpods de 12.288 chips para la inferencia agéntica](/noticias/2026-10-13-microsoft-maia-300-inferencia-hbm4-superpod) | Microsoft Azure Blog / The Decoder | 🔌 hardware |
 | 2026-10-12 | [🧠 Meta lanza Muse Wonder y Muse Wonder Full: su primer modelo frontier es cerrado, se apoya en 'active memory' y su versión Full no tendrá API](/noticias/2026-10-12-meta-muse-wonder-frontier-active-memory) | Meta Superintelligence Lab / TechCrunch / VentureBeat | 🧠 modelos |
