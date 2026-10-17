@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-10-16
+updated: 2026-10-17
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-10-17 | [🏢 China propone controles de exportación sobre los open weights: 2 billones de parámetros o 10²⁶ FLOPs para activar la restricción](/noticias/2026-10-17-china-controles-exportacion-open-weights) | The Decoder / Mofcom (Ministerio de Comercio de China) | 🏢 industria |
 | 2026-10-16 | [🧠 Meta libera Muse Spark Open: 816B de parámetros (42B activos) open-weight que corren en dos Mac Studios de escritorio](/noticias/2026-10-16-meta-muse-spark-open-816b-moe-open-weight-mac-studio) | Meta AI Research / Hugging Face / Reuters / The Decoder | 🧠 modelos |
 | 2026-10-14 | [🔒 Anthropic corta hasta un 99% la fuga de reasoning tokens: 'preserved thinking', clasificadores antiextracción y redes de cientos de miles de cuentas falsas para destilar Claude](/noticias/2026-10-14-anthropic-defensas-destilacion-industrial-reasoning-tokens) | Anthropic Research / The Decoder | 🔒 seguridad |
 | 2026-10-13 | [🔌 Microsoft Maia 300: 288 GB de HBM4, racks de 96 aceleradores y superpods de 12.288 chips para la inferencia agéntica](/noticias/2026-10-13-microsoft-maia-300-inferencia-hbm4-superpod) | Microsoft Azure Blog / The Decoder | 🔌 hardware |
