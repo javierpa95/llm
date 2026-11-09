@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-11-08
+updated: 2026-11-09
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-11-09 | [🧠 Claude Opus 5.5: Anthropic estrena la familia 5.5 liderando el coding agéntico con un coste un 40% menor que Opus 5](/noticias/2026-11-09-claude-opus-5-5-coding-agentico-40-porcentaje-mas-barato) | Anthropic | 🧠 modelos |
 | 2026-11-08 | [🧠 Liquid AI lanza la familia LFM3 multimodal y su LFM3-1.7B open-weight ya tiene ruta gratuita en OpenRouter](/noticias/2026-11-08-liquid-ai-lfm3-1-7b-open-weight-openrouter) | Liquid AI / OpenRouter / Hugging Face | 🧠 modelos |
 | 2026-11-01 | [🔌 Linux en el portátil RTX Spark: el driver abierto funciona, pero un firmware cifrado de Windows estrangula la GPU a 780 MHz — 65 tok/s en Windows, 14 en Linux](/noticias/2026-11-01-linux-rtx-spark-firmware-cifrado-throttling-gpu) | MindStudio Blog / Hacker News | 🔌 hardware |
 | 2026-10-25 | [🔬 Una CNN de 10 años aplasta a GPT-6 Astra y Claude Fable 5.1 en diagnóstico de cáncer de piel: 62% vs 42% en 200 lesiones con biopsia](/noticias/2026-10-25-cnn-decade-superior-llms-frontier-cancer-piel) | Lynch Lab (Dr. Magnus Lynch) / Hacker News | 🔬 investigación |
