@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-11-12
+updated: 2026-11-13
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-11-13 | [🧠 Google lanza Gemini 4 Hydrogen: el «Flash» de Gemini 4 marca 51 en AAII, supera a Argon gratis y será el motor de Google Search](/noticias/2026-11-13-google-gemini-4-hydrogen-free-tier-niveles-razonamiento-xhigh) | Google Blog / Simon Willison / Ars Technica | 🧠 modelos |
 | 2026-11-12 | [🔬 AlphaProof Code: DeepMind verifica matemáticamente el núcleo criptográfico de Signal en 4 semanas en lugar de años](/noticias/2026-11-12-deepmind-alphaproof-code-signal-verificacion-formal-lean) | The Decoder / Google DeepMind | 🔬 investigación |
 | 2026-11-11 | [🏢 Claude Code filtra secretos en GitHub: la opción «no volver a preguntar» guarda contraseñas en claro en settings.local.json](/noticias/2026-11-11-claude-code-fuga-secretos-github-apiiro) | Ars Technica / Apiiro | 🏢 industria |
 | 2026-11-10 | [🧠 Meituan libera LongCat-2.5: MoE multimodal open-weight de 1,6T parámetros (48B activos) bajo licencia MIT](/noticias/2026-11-10-meituan-longcat-2-5-open-weight-moe-1-6t-vision-mit) | VentureBeat / Hugging Face | 🧠 modelos |
