@@ -1,7 +1,7 @@
 ---
 title: "📰 Archivo de noticias LLM"
 created: 2026-06-27
-updated: 2026-11-13
+updated: 2026-11-14
 type: index
 ---
 
@@ -12,6 +12,7 @@ type: index
 
 | Fecha | Título | Fuente | Categoría |
 |-------|--------|--------|-----------|
+| 2026-11-14 | [🧠 Thinking Machines libera los pesos de Inkling 2 Small: 594B parámetros (17B activos) multimodal y Apache 2.0 tras tests de seguridad externos](/noticias/2026-11-14-thinking-machines-inkling-2-small-open-weights-apache-2) | Thinking Machines Lab / Hugging Face | 🧠 modelos |
 | 2026-11-13 | [🧠 Google lanza Gemini 4 Hydrogen: el «Flash» de Gemini 4 marca 51 en AAII, supera a Argon gratis y será el motor de Google Search](/noticias/2026-11-13-google-gemini-4-hydrogen-free-tier-niveles-razonamiento-xhigh) | Google Blog / Simon Willison / Ars Technica | 🧠 modelos |
 | 2026-11-12 | [🔬 AlphaProof Code: DeepMind verifica matemáticamente el núcleo criptográfico de Signal en 4 semanas en lugar de años](/noticias/2026-11-12-deepmind-alphaproof-code-signal-verificacion-formal-lean) | The Decoder / Google DeepMind | 🔬 investigación |
 | 2026-11-11 | [🏢 Claude Code filtra secretos en GitHub: la opción «no volver a preguntar» guarda contraseñas en claro en settings.local.json](/noticias/2026-11-11-claude-code-fuga-secretos-github-apiiro) | Ars Technica / Apiiro | 🏢 industria |
